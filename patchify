@@ -1,0 +1,263 @@
+#! /usr/bin/env python
+# Note that cfy is used rather than the client so that the user does not have
+# to provide credentials, etc, to this script.
+import json
+import subprocess
+
+
+class VersionError(Exception):
+    pass
+
+
+def exit_with_sadness(message):
+    sadly_say(message)
+    sadly_say('FAILED TO APPLY PATCH!')
+    sys.exit(1)
+
+
+def sadly_say(message):
+    sys.stderr.write('%s\n' % message)
+
+
+def get_manager_version():
+    version_output = subprocess.check_output(['cfy', '--version'])
+
+    version = None
+    for line in version_output.splitlines():
+        if line.lower().startswith('cloudify manager'):
+            # Expecting line to be similar to:
+            # Cloudify Manager 4.2.0 [ip=10.239.3.199]
+            version = line.split(' ')[2]
+            break
+
+    return version
+
+
+def parse_version_string(version):
+    """
+        Parse a version string in semantic versioning format.
+    """
+    version = version.split('.')
+
+    if len(version) != 3:
+        raise VersionError(
+            'Version string must contain three components. '
+            'Found: {split_version}'.format(
+                split_version=version,
+            ),
+        )
+
+    try:
+        version = (int(part) for part in version)
+    except TypeError:
+        raise VersionError(
+            'Version string must contain only integer components. '
+            'Found: {version}'.format(version=version),
+        )
+
+    return version
+
+
+def load_patch_definition(filename):
+    with open(filename) as definition_handle:
+        definition = json.load(definition_handle)
+
+    # As this is a POC, I'm not creating a programmatic way to define schema
+    # yet.
+    # Currently this only handles version 1.0.0 of patch definitions:
+    # {
+    #   "patch_version": 1.0.0,  # No other value supported yet
+    #   "manager_versions": [4.2],  # List of supported cloudify managers
+    #   "commands": [  # Each command in sequence will be run on the manager
+    #                  # They will be run via a subprocess call over ssh, and
+    #                  # must return success (0).
+    #     ["command", "run", "on", "manager", "via", "ssh"],
+    #     ["second", "command", "run", "on", "manager", "via", "ssh"]
+    #   ],
+    #   # Following sections are optional, but recommended
+    #   "md5sums_before": {  # Each file will have md5sum checked before
+    #                        # applying the patch commands. If a file on the
+    #                        # manager is specified in this list and does not
+    #                        # have an md5sum in the acceptable list for that
+    #                        # file, the patch process will be aborted.
+    #                        # Files in this list will be backed up before the
+    #                        # patch is applied, and restored if it aborts for
+    #                        # any reason after the initial checks.
+    #     "/path/to/file1": ["<md5sum before patch is applied>"],
+    #     "/path/to/file2": ["<md5sum before patch is applied>"],
+    #     "/path/to/file3": ["<md5sum before patch is applied>",
+    #                        "<other acceptable md5sum>"]
+    #   },
+    #   "md5sums_after": {  # After all commands have been run, these md5sums
+    #                       # will be checked after all commands have been run
+    #                       # and will abort and roll back the patch.
+    #                       # While the list doesn't have to be the same, it
+    #                       # probably should be, usually.
+    #     "/path/to/file1": ["<md5sum after patch is applied>"],
+    #     "/path/to/file2": ["<md5sum after patch is applied>"],
+    #     "/path/to/file3": ["<md5sum after patch is applied>",
+    #                        "<other acceptable md5sum>"]
+    #   }
+    # }
+    patch_version = parse_version_string(definition['patch_version'])
+
+    if patch_version >= (2,0,0):
+        add_definition_error(
+            message=(
+                'Only version 1.x.y patches are supported currently. '
+                'Found version: {version}'.format(
+                    version='.'.join(patch_version),
+                )
+            ),
+            definition=definition,
+            fatal=True,
+        })
+        return
+    elif patch_version > (1,0,0):
+        add_definition_error(
+            message=(
+                'Only version 1.0.0 is fully supported. Features from later '
+                'versions of the patch definition will be ignored.'
+            ),
+            definition=definition,
+        )
+
+    required_keys = ['manager_version']
+    recommended_keys = []
+    if patch_version[0] == 1:
+        required_keys.append('commands')
+        recommended_keys.extend(['md5sums_before', 'md5sums_after'])
+
+    for key in required_keys:
+        if key not in definition:
+            add_definition_error(
+                message=(
+                    'Patch definition must contain {key}, but does not. '
+                    'Keys found: {found}'.format(
+                        key=key,
+                        found=', '.join(definition.keys()),
+                    )
+                ),
+                definition=definition,
+                fatal=True,
+            )
+
+    for key in recommended_keys:
+        if key not in definition:
+            add_definition_error(
+                message=(
+                    'Patch definition should contain {key}, but does not. '
+                    'Keys found: {found}'.format(
+                        key=key,
+                        found=', '.join(definition.keys()),
+                    )
+                ),
+                definition=definition,
+            )
+
+    return definition
+
+
+def add_definition_error(message, definition, fatal=False):
+    definition['errors'] = definition.get('errors', []).append({
+        'message': message,
+        'fatal': fatal,
+    })
+
+
+def get_unhealthy_services():
+    status_output = subprocess.check_output(['cfy', 'status'])
+
+    unhealthy_services = []
+
+    dividers_found = 0
+    for line in status_output.splitlines():
+        if dividers_found == 3:
+            # We reached the end of the output
+            break
+
+        line = line.strip()
+
+        # Expecting something like:
+        # Getting management services status... [ip=192.0.2.4]
+        # 
+        # Services:
+        # +--------------------------------+--------+
+        # |            service             | status |
+        # +--------------------------------+--------+
+        # | Riemann                        |   up   |
+        # | Celery Management              |   up   |
+        # | Manager Rest-Service           |   up   |
+        # | AMQP InfluxDB                  |   up   |
+        # | RabbitMQ                       |   up   |
+        # | Elasticsearch                  |   up   |
+        # | Webserver                      |   up   |
+        # | Logstash                       |   up   |
+        # +--------------------------------+--------+
+        if line.startswith('+--'):
+            dividers += 1
+        elif dividers_found == 2:
+            # Services are only shown after the second divider
+            line = line.split('|')
+            service = line[1].strip()
+            status = line[2].strip()
+            if status not in ('running', 'up'):
+                unhealthy_services.append(service)
+
+    return unhealthy_services
+
+# Check manager version (done)
+
+# Check service status (done)
+
+# Check md5sums; on fail, abort
+
+# Backup existing files
+
+# Apply specified commands
+
+# Check md5sums; on fail, restore backup, restart services, and abort
+
+# Restart services
+
+# Check service status; on fail, restore backup, restart services, and abort
+
+# Finished!
+
+def main(definition_file):
+    patch_definition = load_patch_definition(definition_file)
+
+    fatal_error = False
+    for error in patch_definition.get('errors', []):
+        sadly_say(error['message'])
+        if error['fatal']:
+            sadly_say('Fatal error.')
+            fatal_error = True
+            # But we'll display any other errors anyway, so that they can all
+            # be fixed, so don't exit early.
+    if fatal_error:
+        exit_with_sadness('Patch definition error!')
+
+    manager_version = get_manager_version()
+    supported_versions = patch_definition['manager_version']
+    if manager_version not in supported_versions:
+        exit_with_sadness(
+            'Manager version mismatch. '
+            'Manager is {manager_version}, but patch only supports '
+            '{supported_versions}'.format(
+                manager_version=manager_version,
+                supported_versions=', '.join(supported_versions),
+            )
+        )
+
+    unhealthy_services = get_unhealthy_services()
+    if unhealthy_services:
+        exit_with_sadness(
+            'Not all services are healthy. '
+            'Unhealthy services: {services}'.format(
+                services=', '.join(unhealthy_services),
+            )
+        )
+
+if __name__ == '__main__':
+    main('testdef.json')
