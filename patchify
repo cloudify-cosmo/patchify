@@ -308,6 +308,15 @@ def can_ssh(manager_connection_string):
     except subprocess.CalledProcessError:
         return False
 
+
+def patch_command_available(manager_connection_string):
+    try:
+        ssh(manager_connection_string, 'which patch')
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+
 # Check manager version (done)
 # Check service status (done)
 # Check SSH is working (done)
@@ -315,10 +324,10 @@ def can_ssh(manager_connection_string):
 # Upload patch files (done)
 # Backup existing files (done)
 # Stop services (done)
-# Apply specified patches
-# Check md5sums; on fail, restore backup, restart services, and abort
-# Start services
-# Check service status; on fail, restore backup, restart services, and abort
+# Apply specified patches (partly done)
+# Check md5sums; on fail, restore backup, restart services, and abort (partly done)
+# Start services (done)
+# Check service status; on fail, restore backup, restart services, and abort (partly done)
 # Finished!
 
 
@@ -381,7 +390,11 @@ def build_manager_version_output_string(version, community):
     return version_output
 
 
-def main(definition_file, manager_connection_string):
+def rollback(manager_connection_string, patch_definition):
+    raise NotImplemented()
+
+
+def apply(definition_file, manager_connection_string):
     say("Loading patch definition.")
     patch_definition = load_patch_definition(definition_file)
 
@@ -454,6 +467,13 @@ def main(definition_file, manager_connection_string):
             'Failed to SSH into manager.',
         )
 
+    say('Confirming patch command exists on server.')
+    if not patch_command_available(manager_connection_string):
+        exit_with_sadness(
+            'Could not find "patch" command on server. '
+            'You may need to run: sudo yum install patch'
+        )
+
     say("Checking md5sums are as expected.")
     if not md5sums_match(patch_definition['md5sums_before'],
                          manager_connection_string):
@@ -520,10 +540,76 @@ def main(definition_file, manager_connection_string):
         say("Stopping {service}".format(service=service))
         stop_service(manager_connection_string, service)
 
+    say("Applying patches.")
+    for patch in patch_definition['patches']:
+        for destination in patch['destinations']:
+            say(
+                'Applying {patch} to {target}'.format(
+                    patch=patch['patch_file'],
+                    target=destination,
+                )
+            )
+            try:
+                ssh(
+                    manager_connection_string,
+                    'sudo patch {destination} {patch}'.format(
+                        destination=destination,
+                        patch=os.path.join(
+                            staging_dir,
+                            patch['patch_file'],
+                        ),
+                    )
+                )
+            except CalledProcessError as err:
+                # TODO: Create and test
+                rollback(manager_connection_string, patch_definition)
+                exit_with_sadness(
+                    'Failed to apply patch {patch} to {target}\n'
+                    'Changes rolled back.'.format(
+                        patch=patch['patch_file'],
+                        target=destination,
+                    )
+                )
+
+    say("Checking post-patch md5sums.")
+    if not md5sums_match(patch_definition['md5sums_after'],
+                         manager_connection_string):
+        # TODO: Create and test
+        rollback(manager_connection_string, patch_definition)
+        exit_with_sadness(
+            'Unexpected md5sums found after patch installation.\n'
+            'Changes rolled back.'
+        )
+
+    say("Starting services.")
+    for service in patch_definition['affected_services']:
+        say("Starting {service}".format(service=service))
+        start_service(manager_connection_string, service)
+
+    say("Checking service state with patches applied.")
+    unhealthy_services = []
+    for attempt in range(0, 10):
+        if unhealthy_services:
+            say("Services still restarting...")
+            time.sleep(3)
+        unhealthy_services = get_unhealthy_services()
+    if unhealthy_services:
+        # TODO: Create and test
+        rollback(manager_connection_string, patch_definition)
+        exit_with_sadness(
+            'Services did not restart correctly. '
+            'Unhealthy services: {services}\n'
+            'Changes rolled back.'.format(
+                services=', '.join(unhealthy_services),
+            )
+        )
+
+    say('Patch applied!')
+
 
 if __name__ == '__main__':
     # TODO: Need manager ssh connection string
     # TODO: Need patch file path (make it a zip, extract in tempdir,
     #                             check definition.json?)
     # TODO: Don't provide a patch definitions filename, provide a patch archive
-    main('testdef.json', 'centos@10.239.3.199')
+    apply('testdef.json', 'centos@10.239.3.199')
