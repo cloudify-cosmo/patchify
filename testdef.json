@@ -4,9 +4,11 @@
   "community": true,
   "premium": true,
   "patches": [
-    "patch_file": "hostspatch",
-    "md5sum": "",
-    "destinations": ["/etc/hosts"]
+    {
+      "patch_file": "hostspatch",
+      "md5sum": "",
+      "destinations": ["/etc/hosts"]
+    }
   ],
   "affected_services": [],
   "md5sums_before": {
