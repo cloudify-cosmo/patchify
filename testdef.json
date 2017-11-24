@@ -6,7 +6,7 @@
   "patches": [
     {
       "patch_file": "hostspatch",
-      "md5sum": "",
+      "md5sum": "d5e0e273da535480fad08d9e06675309",
       "destinations": ["/etc/hosts"]
     }
   ],

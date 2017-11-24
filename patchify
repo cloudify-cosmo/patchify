@@ -344,19 +344,19 @@ def start_service(manager_connection_string, service):
 
 def upload_and_verify_patch_files(manager_connection_string, patches,
                                   staging_dir):
-    for patch, details in patches.items():
-        expected_md5sum = details['md5sum']
+    for patch in patches:
+        patch_name = patch['patch_file']
+        expected_md5sum = patch['md5sum']
         subprocess.check_call(
             ['scp',
-             'patches/{patch}'.format(patch=patch),
-             '{mgr}:{staging_dir}/patches'.format(
+             'patches/{patch}'.format(patch=patch_name),
+             '{mgr}:{staging_dir}'.format(
                  mgr=manager_connection_string,
-                 # Escape homedir for the other end of the scp
-                 staging_dir=staging_dir.replace('~', '\\~'),
+                 staging_dir=staging_dir,
              )]
         )
         uploaded_md5sum = get_file_md5sum(
-            file_path=os.path.join(staging_dir, patch),
+            file_path=os.path.join(staging_dir, patch_name),
             manager_connection_string=manager_connection_string,
         )
 
@@ -364,7 +364,7 @@ def upload_and_verify_patch_files(manager_connection_string, patches,
             raise UploadError(
                 'Uploaded {patch} had md5sum {actual}, but should have had '
                 '{expected}.'.format(
-                    patch=patch,
+                    patch=patch_name,
                     actual=uploaded_md5sum,
                     expected=expected_md5sum,
                 )
