@@ -401,6 +401,8 @@ def rollback(manager_connection_string, patch_definition, backup_root):
         patch_definition['affected_services'],
     )
 
+    # TODO: We should check service state here
+
     sadly_say('Rollback complete.')
 
 
@@ -621,6 +623,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Apply a patch to a cloudify manager.',
     )
+    # TODO: We should probably want the patch supplied as a zip containing
+    # the patch definition and the patch file, but for POC purposes we just
+    # put everything in the POC folder
 
     parser.add_argument(
         '-c', '--manager_connection_string',
