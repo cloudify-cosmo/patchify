@@ -3,22 +3,31 @@
 # to provide credentials, etc, to this script.
 import json
 import subprocess
+import sys
 
 
 class VersionError(Exception):
     pass
 
 
+# Manually tested
 def exit_with_sadness(message):
     sadly_say(message)
     sadly_say('FAILED TO APPLY PATCH!')
     sys.exit(1)
 
 
+# Manually tested
+def say(message):
+    print(message)
+
+
+# Manually tested
 def sadly_say(message):
     sys.stderr.write('%s\n' % message)
 
 
+# Manually tested
 def get_manager_version():
     version_output = subprocess.check_output(['cfy', '--version'])
 
@@ -33,6 +42,7 @@ def get_manager_version():
     return version
 
 
+# Manually tested
 def parse_version_string(version):
     """
         Parse a version string in semantic versioning format.
@@ -48,8 +58,8 @@ def parse_version_string(version):
         )
 
     try:
-        version = (int(part) for part in version)
-    except TypeError:
+        version = tuple(int(part) for part in version)
+    except ValueError:
         raise VersionError(
             'Version string must contain only integer components. '
             'Found: {version}'.format(version=version),
@@ -59,6 +69,7 @@ def parse_version_string(version):
 
 
 def load_patch_definition(filename):
+    # TODO: Load the patch definition straight from the patch zip file
     with open(filename) as definition_handle:
         definition = json.load(definition_handle)
 
@@ -68,11 +79,22 @@ def load_patch_definition(filename):
     # {
     #   "patch_version": 1.0.0,  # No other value supported yet
     #   "manager_versions": [4.2],  # List of supported cloudify managers
-    #   "commands": [  # Each command in sequence will be run on the manager
-    #                  # They will be run via a subprocess call over ssh, and
-    #                  # must return success (0).
-    #     ["command", "run", "on", "manager", "via", "ssh"],
-    #     ["second", "command", "run", "on", "manager", "via", "ssh"]
+    #   "patches": [
+    #     {
+    #       "patch_file": "<relative path to patch file in patch archive>",  # TODO: Force these to be in a patches dir for future-proofing
+    #       "md5sum": "<md5sum of patch file>",
+    #       "destinations": [
+    #         
+    #       ]
+    #     },
+    #     # TODO: Example showing valency is allowed to be greater than 1
+    #   ],
+    #   "affected_services": [  # List of services that will be stopped before
+    #                           # applying the patches and started afterwards.
+    #                           # These services will also be stopped before
+    #                           # any rollbacks and started afterwards.
+    #     "cloudify-service-1",
+    #     "cloudify-service-2"
     #   ],
     #   # Following sections are optional, but recommended
     #   "md5sums_before": {  # Each file will have md5sum checked before
@@ -111,7 +133,7 @@ def load_patch_definition(filename):
             ),
             definition=definition,
             fatal=True,
-        })
+        )
         return
     elif patch_version > (1,0,0):
         add_definition_error(
@@ -165,8 +187,12 @@ def add_definition_error(message, definition, fatal=False):
     })
 
 
+# Manually tested
 def get_unhealthy_services():
-    status_output = subprocess.check_output(['cfy', 'status'])
+    try:
+        status_output = subprocess.check_output(['cfy', 'status'])
+    except subprocess.CalledProcessError:
+        return ['All processes (is cfy pointing at a working manager?)']
 
     unhealthy_services = []
 
@@ -195,7 +221,7 @@ def get_unhealthy_services():
         # | Logstash                       |   up   |
         # +--------------------------------+--------+
         if line.startswith('+--'):
-            dividers += 1
+            dividers_found += 1
         elif dividers_found == 2:
             # Services are only shown after the second divider
             line = line.split('|')
@@ -206,11 +232,57 @@ def get_unhealthy_services():
 
     return unhealthy_services
 
+
+# Manually tested
+def get_file_md5sum(file_path, manager_connection_string):
+    # Structure the command so that we return meaningful output in predictable
+    # situations (where the path isn't a file (e.g. is a directory) or does
+    # not exist), while still allowing failure for unexpected situations
+    # (e.g. segfault on one of the commands)
+    md5command = (
+        'if [[ -f {path} ]]; '
+        '  then md5sum {path}; '
+        'elif [[ -e {path} ]]; '
+        '  then echo -n "{notafile}"; '
+        'else '
+        '  echo -n "{notexisting}"; '
+        'fi'.format(
+            path=file_path,
+            notafile="NOTAFILE",
+            notexisting="DOESNOTEXIST",
+        )
+    )
+    return subprocess.check_output([
+        'ssh', manager_connection_string, md5command,
+    ]).split(' ')[0]
+
+
+# Manually tested
+def md5sums_match(check_list, manager_connection_string):
+    matching = True
+    for file_path, acceptable_md5sums in check_list.items():
+        say('Checking md5sum for {path}'.format(path=file_path))
+        md5sum = get_file_md5sum(file_path, manager_connection_string)
+
+        if md5sum not in acceptable_md5sums:
+            matching = False
+            sadly_say(
+                '{file_path} has an incorrect md5sum. '
+                'md5sum was {md5sum}. '
+                'Allowed md5sums are {acceptable}'.format(
+                    file_path=file_path,
+                    md5sum=md5sum,
+                    acceptable=', '.join(acceptable_md5sums),
+                )
+            )
+
+    return matching
+
 # Check manager version (done)
 
 # Check service status (done)
 
-# Check md5sums; on fail, abort
+# Check md5sums; on fail, abort (done)
 
 # Backup existing files
 
@@ -224,7 +296,7 @@ def get_unhealthy_services():
 
 # Finished!
 
-def main(definition_file):
+def main(definition_file, manager_connection_string):
     patch_definition = load_patch_definition(definition_file)
 
     fatal_error = False
@@ -259,5 +331,17 @@ def main(definition_file):
             )
         )
 
+    if not md5sums_match(patch_definition['md5sums_before'],
+                         manager_connection_string):
+        exit_with_sadness(
+            'Unexpected md5sums found before starting patch installation.'
+        )
+
 if __name__ == '__main__':
-    main('testdef.json')
+    print(get_unhealthy_services())
+    exit_with_sadness('Going, going, gone')
+    print('more, you should not see this')
+    # TODO: Need manager ssh connection string
+    # TODO: Need patch file path (make it a zip, extract in tempdir, check definition.json?)
+    # TODO: Don't provide a patch definitions filename, provide a patch archive
+    #main('testdef.json', 'centos@10.239.3.199')
