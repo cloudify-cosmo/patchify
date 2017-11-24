@@ -16,19 +16,16 @@ class UploadError(Exception):
     pass
 
 
-# Manually tested
 def exit_with_sadness(message):
     sadly_say(message)
     sadly_say('FAILED TO APPLY PATCH!')
     sys.exit(1)
 
 
-# Manually tested
 def say(message):
     print(message)
 
 
-# Manually tested
 def sadly_say(message):
     sys.stderr.write('%s\n' % message)
 
@@ -55,7 +52,6 @@ def get_manager_version():
     }
 
 
-# Manually tested
 def parse_version_string(version):
     """
         Parse a version string in semantic versioning format.
@@ -210,7 +206,6 @@ def add_definition_error(message, definition, fatal=False):
     definition['errors'] = errors
 
 
-# Manually tested
 def get_unhealthy_services():
     try:
         status_output = subprocess.check_output(['cfy', 'status'])
@@ -256,7 +251,6 @@ def get_unhealthy_services():
     return unhealthy_services
 
 
-# Manually tested
 def get_file_md5sum(file_path, manager_connection_string):
     # Structure the command so that we return meaningful output in predictable
     # situations (where the path isn't a file (e.g. is a directory) or does
@@ -278,7 +272,6 @@ def get_file_md5sum(file_path, manager_connection_string):
     return ssh(manager_connection_string, md5command).split(' ')[0]
 
 
-# Manually tested
 def md5sums_match(check_list, manager_connection_string):
     matching = True
     for file_path, acceptable_md5sums in check_list.items():
@@ -300,7 +293,6 @@ def md5sums_match(check_list, manager_connection_string):
     return matching
 
 
-# Manually tested
 def can_ssh(manager_connection_string):
     try:
         ssh(manager_connection_string, 'echo "SSH works."')
@@ -337,18 +329,20 @@ def ssh(manager_connection_string, command):
     )
 
 
-def stop_service(manager_connection_string, service):
-    ssh(
-        manager_connection_string,
-        'sudo systemctl stop {service}'.format(service=service),
-    )
+def stop_services(manager_connection_string, services):
+    for service in services:
+        ssh(
+            manager_connection_string,
+            'sudo systemctl stop {service}'.format(service=service),
+        )
 
 
-def start_service(manager_connection_string, service):
-    ssh(
-        manager_connection_string,
-        'sudo systemctl start {service}'.format(service=service),
-    )
+def start_services(manager_connection_string, services):
+    for service in services:
+        ssh(
+            manager_connection_string,
+            'sudo systemctl start {service}'.format(service=service),
+        )
 
 
 def upload_and_verify_patch_files(manager_connection_string, patches,
@@ -380,7 +374,6 @@ def upload_and_verify_patch_files(manager_connection_string, patches,
             )
 
 
-# Manually tested
 def build_manager_version_output_string(version, community):
     version_output = version
     if community:
@@ -390,11 +383,47 @@ def build_manager_version_output_string(version, community):
     return version_output
 
 
-def rollback(manager_connection_string, patch_definition):
-    raise NotImplemented()
+def rollback(manager_connection_string, patch_definition, backup_root):
+    # Make sure all services are stopped, which might not be the case
+    # depending on when we had to begin the rollback.
+    sadly_say('Ensuring services are stopped for rollback.')
+    stop_services(
+        manager_connection_string,
+        patch_definition['affected_services'],
+    )
+
+    sadly_say('Rolling back file changes.')
+    affected_files = get_list_of_affected_files(patch_definition['patches'])
+    for affected_file in affected_files:
+        backed_up_file = os.path.join(
+            backup_root,
+            affected_file.lstrip('/'),
+        )
+        ssh(
+            manager_connection_string,
+            'sudo cp {backup} {orig}'.format(
+                backup=backed_up_file,
+                orig=affected_file,
+            ),
+        )
+
+    sadly_say('Starting services after rollback.')
+    start_services(
+        manager_connection_string,
+        patch_definition['affected_services'],
+    )
+
+    sadly_say('Rollback complete.')
 
 
-def apply(definition_file, manager_connection_string):
+def get_list_of_affected_files(patches):
+    affected_files = []
+    for patch in patches:
+        affected_files.extend(patch['destinations'])
+    return set(affected_files)
+
+
+def apply_patch(definition_file, manager_connection_string):
     say("Loading patch definition.")
     patch_definition = load_patch_definition(definition_file)
 
@@ -493,10 +522,7 @@ def apply(definition_file, manager_connection_string):
         manager_connection_string,
         'mkdir -p ' + backup_root,
     )
-    affected_files = []
-    for patch in patch_definition['patches']:
-        affected_files.extend(patch['destinations'])
-    affected_files = set(affected_files)
+    affected_files = get_list_of_affected_files(patch_definition['patches'])
     for affected_file in affected_files:
         say("Backing up {file_path} to {destination}".format(
             file_path=affected_file,
@@ -536,9 +562,8 @@ def apply(definition_file, manager_connection_string):
         )
 
     say("Stopping services.")
-    for service in patch_definition['affected_services']:
-        say("Stopping {service}".format(service=service))
-        stop_service(manager_connection_string, service)
+    stop_services(manager_connection_string,
+                  patch_definition['affected_services'])
 
     say("Applying patches.")
     for patch in patch_definition['patches']:
@@ -561,8 +586,8 @@ def apply(definition_file, manager_connection_string):
                     )
                 )
             except CalledProcessError as err:
-                # TODO: Create and test
-                rollback(manager_connection_string, patch_definition)
+                rollback(manager_connection_string, patch_definition,
+                         backup_root)
                 exit_with_sadness(
                     'Failed to apply patch {patch} to {target}\n'
                     'Changes rolled back.'.format(
@@ -574,17 +599,15 @@ def apply(definition_file, manager_connection_string):
     say("Checking post-patch md5sums.")
     if not md5sums_match(patch_definition['md5sums_after'],
                          manager_connection_string):
-        # TODO: Create and test
-        rollback(manager_connection_string, patch_definition)
+        rollback(manager_connection_string, patch_definition, backup_root)
         exit_with_sadness(
             'Unexpected md5sums found after patch installation.\n'
             'Changes rolled back.'
         )
 
     say("Starting services.")
-    for service in patch_definition['affected_services']:
-        say("Starting {service}".format(service=service))
-        start_service(manager_connection_string, service)
+    start_services(manager_connection_string,
+                   patch_definition['affected_services'])
 
     say("Checking service state with patches applied.")
     unhealthy_services = []
@@ -594,8 +617,7 @@ def apply(definition_file, manager_connection_string):
             time.sleep(3)
         unhealthy_services = get_unhealthy_services()
     if unhealthy_services:
-        # TODO: Create and test
-        rollback(manager_connection_string, patch_definition)
+        rollback(manager_connection_string, patch_definition, backup_root)
         exit_with_sadness(
             'Services did not restart correctly. '
             'Unhealthy services: {services}\n'
@@ -612,4 +634,4 @@ if __name__ == '__main__':
     # TODO: Need patch file path (make it a zip, extract in tempdir,
     #                             check definition.json?)
     # TODO: Don't provide a patch definitions filename, provide a patch archive
-    apply('testdef.json', 'centos@10.239.3.199')
+    apply_patch('testdef.json', 'centos@10.239.3.199')
