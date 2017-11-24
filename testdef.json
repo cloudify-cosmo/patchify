@@ -10,7 +10,9 @@
       "destinations": ["/etc/hosts"]
     }
   ],
-  "affected_services": [],
+  "affected_services": [
+    "cloudify-mgmtworker"
+  ],
   "md5sums_before": {
     "/etc/hosts": ["3d2fd8331483d30d32d70431b70233ef"]
   },

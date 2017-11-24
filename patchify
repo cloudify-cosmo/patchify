@@ -12,6 +12,10 @@ class VersionError(Exception):
     pass
 
 
+class UploadError(Exception):
+    pass
+
+
 # Manually tested
 def exit_with_sadness(message):
     sadly_say(message)
@@ -34,7 +38,6 @@ def get_manager_version():
         version_output = subprocess.check_output(['cfy', '--version'])
     except subprocess.CalledProcessError:
         return None
-
 
     community = 'Community edition' in version_output
     version = None
@@ -149,7 +152,7 @@ def load_patch_definition(filename):
         )
         return definition
 
-    if patch_version > (1,0,0):
+    if patch_version > (1, 0, 0):
         add_definition_error(
             message=(
                 'Only version 1.0.0 patches are supported currently. '
@@ -199,12 +202,13 @@ def load_patch_definition(filename):
 
 
 def add_definition_error(message, definition, fatal=False):
-    errors =  definition.get('errors', [])
+    errors = definition.get('errors', [])
     errors.append({
         'message': message,
         'fatal': fatal,
     })
     definition['errors'] = errors
+
 
 # Manually tested
 def get_unhealthy_services():
@@ -225,7 +229,7 @@ def get_unhealthy_services():
 
         # Expecting something like:
         # Getting management services status... [ip=192.0.2.4]
-        # 
+        #
         # Services:
         # +--------------------------------+--------+
         # |            service             | status |
@@ -305,33 +309,66 @@ def can_ssh(manager_connection_string):
         return False
 
 # Check manager version (done)
-
 # Check service status (done)
-
 # Check SSH is working (done)
-
 # Check md5sums; on fail, abort (done)
-
+# Upload patch files (done)
 # Backup existing files (done)
-
-# Stop services
-
+# Stop services (done)
 # Apply specified patches
-
 # Check md5sums; on fail, restore backup, restart services, and abort
-
 # Start services
-
 # Check service status; on fail, restore backup, restart services, and abort
-
 # Finished!
-
 
 
 def ssh(manager_connection_string, command):
     return subprocess.check_output(
         ['ssh', manager_connection_string, command]
     )
+
+
+def stop_service(manager_connection_string, service):
+    ssh(
+        manager_connection_string,
+        'sudo systemctl stop {service}'.format(service=service),
+    )
+
+
+def start_service(manager_connection_string, service):
+    ssh(
+        manager_connection_string,
+        'sudo systemctl start {service}'.format(service=service),
+    )
+
+
+def upload_and_verify_patch_files(manager_connection_string, patches,
+                                  staging_dir):
+    for patch, details in patches.items():
+        expected_md5sum = details['md5sum']
+        subprocess.check_call(
+            ['scp',
+             'patches/{patch}'.format(patch=patch),
+             '{mgr}:{staging_dir}/patches'.format(
+                 mgr=manager_connection_string,
+                 # Escape homedir for the other end of the scp
+                 staging_dir=staging_dir.replace('~', '\\~'),
+             )]
+        )
+        uploaded_md5sum = get_file_md5sum(
+            file_path=os.path.join(staging_dir, patch),
+            manager_connection_string=manager_connection_string,
+        )
+
+        if not uploaded_md5sum == expected_md5sum:
+            raise UploadError(
+                'Uploaded {patch} had md5sum {actual}, but should have had '
+                '{expected}.'.format(
+                    patch=patch,
+                    actual=uploaded_md5sum,
+                    expected=expected_md5sum,
+                )
+            )
 
 
 # Manually tested
@@ -424,7 +461,8 @@ def main(definition_file, manager_connection_string):
             'Unexpected md5sums found before starting patch installation.'
         )
 
-    timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
+    # Avoiding : in timestamp to avoid needing to escape it for bash
+    timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S%z')
     say("Patching timestamp is: {timestamp}".format(timestamp=timestamp))
 
     backup_root = '~/cloudifypatch/{timestamp}/backups'.format(
@@ -455,11 +493,37 @@ def main(definition_file, manager_connection_string):
             'sudo cp --parents {source} {destination}'.format(
                 source=affected_file,
                 destination=backup_root,
-           ),
+            ),
         )
+
+    staging_dir = '~/cloudifypatch/{timestamp}/patches'.format(
+        timestamp=timestamp,
+    )
+    ssh(
+        manager_connection_string,
+        'mkdir -p ' + staging_dir,
+    )
+    say("Uploading and verifying patch files.")
+    try:
+        upload_and_verify_patch_files(manager_connection_string,
+                                      patch_definition['patches'],
+                                      staging_dir)
+    except UploadError as err:
+        exit_with_sadness(
+            'Failed to upload patch files: {err}'.format(
+                err=str(err),
+            )
+        )
+
+    say("Stopping services.")
+    for service in patch_definition['affected_services']:
+        say("Stopping {service}".format(service=service))
+        stop_service(manager_connection_string, service)
+
 
 if __name__ == '__main__':
     # TODO: Need manager ssh connection string
-    # TODO: Need patch file path (make it a zip, extract in tempdir, check definition.json?)
+    # TODO: Need patch file path (make it a zip, extract in tempdir,
+    #                             check definition.json?)
     # TODO: Don't provide a patch definitions filename, provide a patch archive
     main('testdef.json', 'centos@10.239.3.199')
