@@ -1,0 +1,18 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.1.1", "4.2.0"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    "patch_file": "hostspatch",
+    "md5sum": "",
+    "destinations": ["/etc/hosts"]
+  ],
+  "affected_services": [],
+  "md5sums_before": {
+    "/etc/hosts": ["3d2fd8331483d30d32d70431b70233ef"]
+  },
+  "md5sums_after": {
+    "/etc/hosts": []
+  }
+}
