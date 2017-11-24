@@ -1,11 +1,13 @@
 #! /usr/bin/env python
 # Note that cfy is used rather than the client so that the user does not have
 # to provide credentials, etc, to this script.
+import argparse
 import datetime
 import json
 import os
 import subprocess
 import sys
+import time
 
 
 class VersionError(Exception):
@@ -309,20 +311,6 @@ def patch_command_available(manager_connection_string):
         return False
 
 
-# Check manager version (done)
-# Check service status (done)
-# Check SSH is working (done)
-# Check md5sums; on fail, abort (done)
-# Upload patch files (done)
-# Backup existing files (done)
-# Stop services (done)
-# Apply specified patches (partly done)
-# Check md5sums; on fail, restore backup, restart services, and abort (partly done)
-# Start services (done)
-# Check service status; on fail, restore backup, restart services, and abort (partly done)
-# Finished!
-
-
 def ssh(manager_connection_string, command):
     return subprocess.check_output(
         ['ssh', manager_connection_string, command]
@@ -585,7 +573,7 @@ def apply_patch(definition_file, manager_connection_string):
                         ),
                     )
                 )
-            except CalledProcessError as err:
+            except subprocess.CalledProcessError as err:
                 rollback(manager_connection_string, patch_definition,
                          backup_root)
                 exit_with_sadness(
@@ -630,8 +618,26 @@ def apply_patch(definition_file, manager_connection_string):
 
 
 if __name__ == '__main__':
-    # TODO: Need manager ssh connection string
-    # TODO: Need patch file path (make it a zip, extract in tempdir,
-    #                             check definition.json?)
-    # TODO: Don't provide a patch definitions filename, provide a patch archive
-    apply_patch('testdef.json', 'centos@10.239.3.199')
+    parser = argparse.ArgumentParser(
+        description='Apply a patch to a cloudify manager.',
+    )
+
+    parser.add_argument(
+        '-c', '--manager_connection_string',
+        help="The manager connection string for ssh, e.g. centos@192.0.2.4",
+        required=True,
+    )
+    parser.add_argument(
+        '-p', '--patch_file',
+        help=(
+            'The patch file to use. Note that for POC purposes this is just '
+            'a definition file, but this should probably be changed to a zip '
+            'for real world use (so that it can work on Windows as well as '
+            'Linux.'
+        ),
+        required=True,
+    )
+
+    args = parser.parse_args()
+
+    apply_patch(args.patch_file, args.manager_connection_string)
