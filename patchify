@@ -334,6 +334,11 @@ def stop_services(manager_connection_string, services):
 
 
 def start_services(manager_connection_string, services):
+    # Ensure we're using any unit files we may have updated
+    ssh(
+        manager_connection_string,
+        'sudo systemctl daemon-reload',
+    )
     for service in services:
         ssh(
             manager_connection_string,
