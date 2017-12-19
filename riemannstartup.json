@@ -11,7 +11,7 @@
     },
     {
       "patch_file": "riemannstartup_activate_riemann_policies",
-      "md5sum": "8cc4a3f209dad77c017baa21d0ccabdc",
+      "md5sum": "e8f9f83afa7f38fce522205ac3875485",
       "destinations": ["/opt/cloudify/activate_riemann_policies"]
     }
   ],
@@ -22,6 +22,6 @@
   },
   "md5sums_after": {
     "/usr/lib/systemd/system/cloudify-riemann.service": ["c19204685632449df54c52bed3b0d87e"],
-    "/opt/cloudify/activate_riemann_policies": ["6e742ec46ff5c3ee27e06ffc0f79202a"]
+    "/opt/cloudify/activate_riemann_policies": ["65d5468541612d25f666ac9259f0f313"]
   }
 }

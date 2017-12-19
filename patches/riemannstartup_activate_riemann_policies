@@ -1,6 +1,6 @@
 --- a/activate_riemann_policies
 +++ b/activate_riemann_policies
-@@ -0,0 +1,17 @@
+@@ -0,0 +1,18 @@
 +from riemann_controller import tasks
 +import os
 +
