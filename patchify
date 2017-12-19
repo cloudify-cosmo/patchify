@@ -9,8 +9,6 @@ import subprocess
 import sys
 import time
 
-# TODO: BACKUP AND RESTORE IS BROKEN, FIX IT FOR EXISTING AND NON-EXISTING FILES!
-
 
 class VersionError(Exception):
     pass
