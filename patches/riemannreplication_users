@@ -1,0 +1,18 @@
+--- a/cloudify_premium/ha/users.py
++++ b/cloudify_premium/ha/users.py
+@@ -20,6 +20,7 @@ CLUSTER_OS_GROUP = 'cluster'
+ POSTGRESQL_USER = 'postgres'
+ SYNCTHING_OS_USERNAME = CLOUDIFY_USER
+ SYNCTHING_OS_GROUP = 'syncthing'
++RIEMANN_OS_USER = 'riemann'
+ 
+ 
+ def configure(**kwargs):
+@@ -80,5 +81,6 @@ def create_cluster_group():
+     # also add the restservice user to the group - it needs access to cluster's
+     # data storage, for api calls
+     # also the stage user needs access to stage files
+-    for username in [RESTSERVICE_OS_USER, STAGE_OS_USER, COMPOSER_OS_USER]:
++    for username in [RESTSERVICE_OS_USER, STAGE_OS_USER, COMPOSER_OS_USER,
++                     RIEMANN_OS_USER]:
+         subprocess.check_call(['usermod', '-aG', CLUSTER_OS_GROUP, username])

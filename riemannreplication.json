@@ -1,0 +1,29 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.2.0"],
+  "community": false,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "riemannreplication_syncthing",
+      "md5sum": "7ac509d43f62e2b0116e93146b758e93",
+      "destinations": ["/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/syncthing.py"]
+    },
+    {
+      "patch_file": "riemannreplication_users",
+      "md5sum": "6c090639ccd95d2350e9d88851dcc294",
+      "destinations": ["/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/users.py"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-restservice"
+  ],
+  "md5sums_before": {
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/syncthing.py": ["9b34212856875605a7251265466fd3ea"],
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/users.py": ["8dffe3a47c67f2aec8d9c614851329a3"]
+  },
+  "md5sums_after": {
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/syncthing.py": ["1f7183b39f808e67eb70f110c3f40df2"],
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/users.py": ["3d721568f54de9cf5737eeb29d405746"]
+  }
+}

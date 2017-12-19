@@ -1,0 +1,27 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.2.0"],
+  "community": false,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "riemannstartup_unitfile",
+      "md5sum": "21389a1d0d2273306bb2da98f7419f2d",
+      "destinations": ["/usr/lib/systemd/system/cloudify-riemann.service"]
+    },
+    {
+      "patch_file": "riemannstartup_activate_riemann_policies",
+      "md5sum": "8cc4a3f209dad77c017baa21d0ccabdc",
+      "destinations": ["/opt/cloudify/activate_riemann_policies"]
+    }
+  ],
+  "affected_services": [],
+  "md5sums_before": {
+    "/usr/lib/systemd/system/cloudify-riemann.service": ["d22f0eff98c9e4f1877f4d73337d8523"],
+    "/opt/cloudify/activate_riemann_policies": ["DOESNOTEXIST"]
+  },
+  "md5sums_after": {
+    "/usr/lib/systemd/system/cloudify-riemann.service": ["c19204685632449df54c52bed3b0d87e"],
+    "/opt/cloudify/activate_riemann_policies": ["6e742ec46ff5c3ee27e06ffc0f79202a"]
+  }
+}

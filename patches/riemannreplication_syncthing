@@ -1,0 +1,43 @@
+--- a/cloudify_premium/ha/syncthing.py
++++ b/cloudify_premium/ha/syncthing.py
+@@ -38,19 +38,20 @@ SYNCTHING_SERVICE_NAME = 'syncthing'
+ SYNCTHING_API_PORT = 8384
+ SYNCTHING_REPLICATION_PORT = 22000
+ 
+-# label, path, files to replicate (None for all files)
++# label, path, .stignore entries
+ SYNCED_DIRECTORIES = [
+     ('resources', '/opt/manager/resources', None),
+     ('mgmtworker-plugins', '/opt/mgmtworker/env/plugins', None),
+     ('manager-config', '/opt/manager',
+-        ['authorization.conf', 'rest-security.conf']),
++        ['!authorization.conf', '!rest-security.conf', '*']),
+     ('ui-conf', '/opt/cloudify-stage/conf', None),
+     ('ui-widgets', '/opt/cloudify-stage/dist/widgets', None),
+     ('ui-templates', '/opt/cloudify-stage/dist/templates', None),
+     ('maintenance-dir', '/opt/manager/maintenance', None),
+     ('composer-config', '/opt/cloudify-composer/backend/conf', None),
+     ('composer-blueprints', '/opt/cloudify-composer/backend/dev', None),
+-    ('stage-resources', '/opt/cloudify-stage/resources', None)
++    ('stage-resources', '/opt/cloudify-stage/resources', None),
++    ('riemann-policies', '/opt/riemann', ['ok'])
+ ]
+ 
+ 
+@@ -146,13 +147,12 @@ def _clean_directory(path, files, bootstrap_cluster):
+ def _prepare_stignore(path, files, bootstrap_cluster):
+     with open(os.path.join(path, '.stignore'), 'w') as f:
+         for filename in files:
+-            f.write('!{0}\n'.format(filename))
+-            if not bootstrap_cluster:
++            f.write('{0}\n'.format(filename))
++            if filename.startswith('!') and not bootstrap_cluster:
+                 try:
+-                    os.unlink(os.path.join(path, filename))
++                    os.unlink(os.path.join(path, filename[1:]))
+                 except IOError:
+                     pass
+-        f.write('*\n')
+ 
+ 
+ def _create_directory(path):

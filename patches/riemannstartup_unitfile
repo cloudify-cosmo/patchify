@@ -1,0 +1,17 @@
+--- a/unitfile
++++ b/unitfile
+@@ -6,10 +6,9 @@ After=cloudify-rabbitmq.service
+ [Service]
+ TimeoutStartSec=0
+ Restart=always
+-User=riemann
+-Group=riemann
+ EnvironmentFile=-/etc/sysconfig/cloudify-riemann
+-ExecStart=/usr/bin/riemann -a ${RIEMANN_CONFIG_PATH}/main.clj
++ExecStart=/bin/sudo -E -uriemann /usr/bin/riemann -a ${RIEMANN_CONFIG_PATH}/main.clj
++ExecStartPost=/bin/sudo -ucfyuser /bin/bash -c "set -a && . /etc/sysconfig/cloudify-mgmtworker && /opt/mgmtworker/env/bin/python /opt/cloudify/activate_riemann_policies"
+ 
+ [Install]
+-WantedBy=multi-user.target
+\ No newline at end of file
++WantedBy=multi-user.target
