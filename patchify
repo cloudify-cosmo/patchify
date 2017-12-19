@@ -9,6 +9,8 @@ import subprocess
 import sys
 import time
 
+# TODO: BACKUP AND RESTORE IS BROKEN, FIX IT FOR EXISTING AND NON-EXISTING FILES!
+
 
 class VersionError(Exception):
     pass
@@ -282,15 +284,23 @@ def md5sums_match(check_list, manager_connection_string):
 
         if md5sum not in acceptable_md5sums:
             matching = False
-            sadly_say(
-                '{file_path} has an incorrect md5sum. '
-                'md5sum was {md5sum}. '
-                'Allowed md5sums are {acceptable}'.format(
-                    file_path=file_path,
-                    md5sum=md5sum,
-                    acceptable=', '.join(acceptable_md5sums),
+            if acceptable_md5sums == ["DOESNOTEXIST"]:
+                message = (
+                    '{file_path} should not exist, but file with md5sum '
+                    '{md5sum} was found.'
                 )
-            )
+            else:
+                message = (
+                    '{file_path} has an incorrect md5sum. '
+                    'md5sum was {md5sum}. '
+                    'Allowed md5sums are {acceptable}'
+                )
+
+            sadly_say(message.format(
+                file_path=file_path,
+                md5sum=md5sum,
+                acceptable=', '.join(acceptable_md5sums),
+            ))
 
     return matching
 
@@ -371,7 +381,8 @@ def build_manager_version_output_string(version, community):
     return version_output
 
 
-def rollback(manager_connection_string, patch_definition, backup_root):
+def rollback(manager_connection_string, patch_definition, backup_root,
+             delete_root):
     # Make sure all services are stopped, which might not be the case
     # depending on when we had to begin the rollback.
     sadly_say('Ensuring services are stopped for rollback.')
@@ -387,11 +398,26 @@ def rollback(manager_connection_string, patch_definition, backup_root):
             backup_root,
             affected_file.lstrip('/'),
         )
+        delete_dest_parent = os.path.join(
+            delete_root,
+            os.path.split(affected_file.lstrip('/'))[0]
+        )
+        delete_dest = os.path.join(
+            delete_root,
+            affected_file.lstrip('/')
+        )
         ssh(
             manager_connection_string,
-            'sudo cp {backup} {orig}'.format(
+            'if sudo test -f {backup}; then '    # Only restore existing
+            '  sudo cp {backup} {orig}; '        # and remove added files
+            'else '
+            '  mkdir -p {delete_dest_parent} && '
+            '  sudo mv {orig} {delete_dest}; '
+            'fi'.format(
                 backup=backed_up_file,
                 orig=affected_file,
+                delete_dest_parent=delete_dest_parent,
+                delete_dest=delete_dest,
             ),
         )
 
@@ -507,10 +533,17 @@ def apply_patch(definition_file, manager_connection_string):
     backup_root = '~/cloudifypatch/{timestamp}/backups'.format(
         timestamp=timestamp,
     )
+    delete_root = '~/cloudifypatch/{timestamp}/deleted_files'.format(
+        timestamp=timestamp,
+    )
     say("Backing up affected files to {path}".format(path=backup_root))
     ssh(
         manager_connection_string,
         'mkdir -p ' + backup_root,
+    )
+    ssh(
+        manager_connection_string,
+        'mkdir -p ' + delete_root,
     )
     affected_files = get_list_of_affected_files(patch_definition['patches'])
     for affected_file in affected_files:
@@ -526,7 +559,8 @@ def apply_patch(definition_file, manager_connection_string):
         # based on which version it's targetting.
         ssh(
             manager_connection_string,
-            'sudo cp --parents {source} {destination}'.format(
+            'if sudo test -f {source}; then '  # Only if the file exists
+            'sudo cp --parents {source} {destination}; fi'.format(
                 source=affected_file,
                 destination=backup_root,
             ),
@@ -577,7 +611,7 @@ def apply_patch(definition_file, manager_connection_string):
                 )
             except subprocess.CalledProcessError as err:
                 rollback(manager_connection_string, patch_definition,
-                         backup_root)
+                         backup_root, delete_root)
                 exit_with_sadness(
                     'Failed to apply patch {patch} to {target}\n'
                     'Changes rolled back.'.format(
@@ -589,7 +623,8 @@ def apply_patch(definition_file, manager_connection_string):
     say("Checking post-patch md5sums.")
     if not md5sums_match(patch_definition['md5sums_after'],
                          manager_connection_string):
-        rollback(manager_connection_string, patch_definition, backup_root)
+        rollback(manager_connection_string, patch_definition, backup_root,
+                 delete_root)
         exit_with_sadness(
             'Unexpected md5sums found after patch installation.\n'
             'Changes rolled back.'
@@ -607,7 +642,8 @@ def apply_patch(definition_file, manager_connection_string):
             time.sleep(3)
         unhealthy_services = get_unhealthy_services()
     if unhealthy_services:
-        rollback(manager_connection_string, patch_definition, backup_root)
+        rollback(manager_connection_string, patch_definition, backup_root,
+                 delete_root)
         exit_with_sadness(
             'Services did not restart correctly. '
             'Unhealthy services: {services}\n'
