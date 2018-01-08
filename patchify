@@ -519,7 +519,7 @@ def apply_patch(definition_file, manager_connection_string):
     if not patch_command_available(manager_connection_string):
         exit_with_sadness(
             'Could not find "patch" command on server. '
-            'You may need to run: sudo yum install patch'
+            'On the manager, you may need to run: sudo yum install -y patch'
         )
 
     say("Checking md5sums are as expected.")
