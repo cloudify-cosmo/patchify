@@ -1,0 +1,55 @@
+--- a/cloudify_premium/ha/resources/sudo_trampoline.py
++++ b/cloudify_premium/ha/resources/sudo_trampoline.py
+@@ -113,24 +113,25 @@ def follow_db(config, trigger_file, data_dir, owner, connstring):
+     subprocess.check_call(['systemctl', 'start', 'cloudify-postgresql'])
+
+
+-def recreate_db_directory(config, data_dir, owner):
++def standby_clone(config, connstring, owner, data_dir):
++    tmpdir = '{0}.tmp'.format(data_dir)
+     subprocess.check_call(['systemctl', 'stop', 'cloudify-postgresql'])
+-    shutil.rmtree(data_dir, ignore_errors=True)
+-    os.mkdir(data_dir)
++    os.mkdir(tmpdir)
+     db_owner = pwd.getpwnam(owner)
+-    os.chown(data_dir, db_owner.pw_uid, db_owner.pw_gid)
+-    os.chmod(data_dir, stat.S_IRWXU)
++    os.chown(tmpdir, db_owner.pw_uid, db_owner.pw_gid)
++    os.chmod(tmpdir, stat.S_IRWXU)
+
+-
+-def standby_clone(config, connstring, owner, data_dir):
+     try:
+         subprocess.check_call(['sudo', '-u', owner,
+                                'pg_basebackup',
+                                '-d', connstring,
+-                               '-D', data_dir])
++                               '-D', tmpdir])
+     except Exception as e:
+         raise ValueError(e.output)
+
++    shutil.rmtree(data_dir, ignore_errors=True)
++    os.rename(tmpdir, data_dir)
++
+
+ def consul_peers(config, data_dir, peers):
+     subprocess.check_call(['systemctl', 'stop', 'cloudify-consul'])
+@@ -168,7 +169,6 @@ handlers = {
+     'partitioned_cluster_changed': partitioned_cluster_changed,
+     'promote_db': promote_db,
+     'follow_db': follow_db,
+-    'recreate_db_directory': recreate_db_directory,
+     'standby_clone': standby_clone,
+     'consul_peers': consul_peers,
+     'leave': leave_cluster
+@@ -217,10 +217,6 @@ standby_follow_parser.add_argument('--data-dir', dest='data_dir')
+ standby_follow_parser.add_argument('--connstring')
+ standby_follow_parser.add_argument('--owner')
+
+-recreate_db_parser = subparsers.add_parser('recreate_db_directory')
+-recreate_db_parser.add_argument('--data-dir', dest='data_dir')
+-recreate_db_parser.add_argument('--owner')
+-
+ standby_clone_parser = subparsers.add_parser('standby_clone')
+ standby_clone_parser.add_argument('--connstring')
+ standby_clone_parser.add_argument('--data-dir', dest='data_dir')
