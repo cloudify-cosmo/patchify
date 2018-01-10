@@ -51,6 +51,7 @@ def get_manager_version():
     return {
         'version': version,
         'community': community,
+        'raw': version_output,
     }
 
 
@@ -492,10 +493,18 @@ def apply_patch(definition_file, manager_connection_string, keyfile):
             })
     if manager_version not in supported_versions:
         manager_version_output = manager_version['version']
-        manager_version_output = build_manager_version_output_string(
-            version=manager_version['version'],
-            community=manager_version['community'],
-        )
+        try:
+            manager_version_output = build_manager_version_output_string(
+                version=manager_version['version'],
+                community=manager_version['community'],
+            )
+        except Exception:
+            exit_with_sadness(
+                'Could not determine manager version.\n'
+                'Version check output was: {raw_output}'.format(
+                    raw_output=manager_version['raw'],
+                )
+            )
         supported_versions_output = ', '.join([
             build_manager_version_output_string(
                 version=version['version'],
