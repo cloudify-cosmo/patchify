@@ -260,7 +260,8 @@ def get_file_md5sum(file_path, manager_connection_string):
     # (e.g. segfault on one of the commands)
     md5command = (
         'if [[ -f {path} ]]; '
-        '  then md5sum {path}; '
+        # sudo this so that we can avoid permissions issues
+        '  then sudo md5sum {path}; '
         'elif [[ -e {path} ]]; '
         '  then echo -n "{notafile}"; '
         'else '
