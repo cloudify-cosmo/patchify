@@ -253,7 +253,7 @@ def get_unhealthy_services():
     return unhealthy_services
 
 
-def get_file_md5sum(file_path, manager_connection_string):
+def get_file_md5sum(file_path, manager_connection_string, keyfile):
     # Structure the command so that we return meaningful output in predictable
     # situations (where the path isn't a file (e.g. is a directory) or does
     # not exist), while still allowing failure for unexpected situations
@@ -272,14 +272,14 @@ def get_file_md5sum(file_path, manager_connection_string):
             notexisting="DOESNOTEXIST",
         )
     )
-    return ssh(manager_connection_string, md5command).split(' ')[0]
+    return ssh(manager_connection_string, keyfile, md5command).split(' ')[0]
 
 
-def md5sums_match(check_list, manager_connection_string):
+def md5sums_match(check_list, manager_connection_string, keyfile):
     matching = True
     for file_path, acceptable_md5sums in check_list.items():
         say('Checking md5sum for {path}'.format(path=file_path))
-        md5sum = get_file_md5sum(file_path, manager_connection_string)
+        md5sum = get_file_md5sum(file_path, manager_connection_string, keyfile)
 
         if md5sum not in acceptable_md5sums:
             matching = False
@@ -304,65 +304,74 @@ def md5sums_match(check_list, manager_connection_string):
     return matching
 
 
-def can_ssh(manager_connection_string):
+def can_ssh(manager_connection_string, keyfile):
     try:
-        ssh(manager_connection_string, 'echo "SSH works."')
+        ssh(manager_connection_string, keyfile, 'echo "SSH works."')
         return True
     except subprocess.CalledProcessError:
         return False
 
 
-def patch_command_available(manager_connection_string):
+def patch_command_available(manager_connection_string, keyfile):
     try:
-        ssh(manager_connection_string, 'which patch')
+        ssh(manager_connection_string, keyfile, 'which patch')
         return True
     except subprocess.CalledProcessError:
         return False
 
 
-def ssh(manager_connection_string, command):
-    return subprocess.check_output(
-        ['ssh', manager_connection_string, command]
-    )
+def ssh(manager_connection_string, keyfile, command):
+    ssh_command = ['ssh']
+    if keyfile:
+        ssh_command.extend(['-i', keyfile])
+    ssh_command.extend([manager_connection_string, command])
+    return subprocess.check_output(ssh_command)
 
 
-def stop_services(manager_connection_string, services):
+def stop_services(manager_connection_string, services, keyfile):
     for service in services:
         ssh(
             manager_connection_string,
+            keyfile,
             'sudo systemctl stop {service}'.format(service=service),
         )
 
 
-def start_services(manager_connection_string, services):
+def start_services(manager_connection_string, services, keyfile):
     # Ensure we're using any unit files we may have updated
     ssh(
         manager_connection_string,
+        keyfile,
         'sudo systemctl daemon-reload',
     )
     for service in services:
         ssh(
             manager_connection_string,
+            keyfile,
             'sudo systemctl start {service}'.format(service=service),
         )
 
 
 def upload_and_verify_patch_files(manager_connection_string, patches,
-                                  staging_dir):
+                                  staging_dir, keyfile):
     for patch in patches:
         patch_name = patch['patch_file']
         expected_md5sum = patch['md5sum']
-        subprocess.check_call(
-            ['scp',
-             'patches/{patch}'.format(patch=patch_name),
-             '{mgr}:{staging_dir}'.format(
-                 mgr=manager_connection_string,
-                 staging_dir=staging_dir,
-             )]
-        )
+        scp_command = ['scp']
+        if keyfile:
+            scp_command.extend(['-i', keyfile])
+        scp_command.extend([
+            'patches/{patch}'.format(patch=patch_name),
+            '{mgr}:{staging_dir}'.format(
+                mgr=manager_connection_string,
+                staging_dir=staging_dir,
+            )
+        ])
+        subprocess.check_call(scp_command)
         uploaded_md5sum = get_file_md5sum(
             file_path=os.path.join(staging_dir, patch_name),
             manager_connection_string=manager_connection_string,
+            keyfile=keyfile,
         )
 
         if not uploaded_md5sum == expected_md5sum:
@@ -386,13 +395,14 @@ def build_manager_version_output_string(version, community):
 
 
 def rollback(manager_connection_string, patch_definition, backup_root,
-             delete_root):
+             delete_root, keyfile):
     # Make sure all services are stopped, which might not be the case
     # depending on when we had to begin the rollback.
     sadly_say('Ensuring services are stopped for rollback.')
     stop_services(
         manager_connection_string,
         patch_definition['affected_services'],
+        keyfile,
     )
 
     sadly_say('Rolling back file changes.')
@@ -412,6 +422,7 @@ def rollback(manager_connection_string, patch_definition, backup_root,
         )
         ssh(
             manager_connection_string,
+            keyfile,
             'if sudo test -f {backup}; then '    # Only restore existing
             '  sudo cp {backup} {orig}; '        # and remove added files
             'else '
@@ -429,6 +440,7 @@ def rollback(manager_connection_string, patch_definition, backup_root,
     start_services(
         manager_connection_string,
         patch_definition['affected_services'],
+        keyfile,
     )
 
     # TODO: We should check service state here
@@ -443,7 +455,7 @@ def get_list_of_affected_files(patches):
     return set(affected_files)
 
 
-def apply_patch(definition_file, manager_connection_string):
+def apply_patch(definition_file, manager_connection_string, keyfile):
     say("Loading patch definition.")
     patch_definition = load_patch_definition(definition_file)
 
@@ -511,13 +523,13 @@ def apply_patch(definition_file, manager_connection_string):
         )
 
     say("Checking SSH.")
-    if not can_ssh(manager_connection_string):
+    if not can_ssh(manager_connection_string, keyfile):
         exit_with_sadness(
             'Failed to SSH into manager.',
         )
 
     say('Confirming patch command exists on server.')
-    if not patch_command_available(manager_connection_string):
+    if not patch_command_available(manager_connection_string, keyfile):
         exit_with_sadness(
             'Could not find "patch" command on server. '
             'On the manager, you may need to run: sudo yum install -y patch'
@@ -525,7 +537,8 @@ def apply_patch(definition_file, manager_connection_string):
 
     say("Checking md5sums are as expected.")
     if not md5sums_match(patch_definition['md5sums_before'],
-                         manager_connection_string):
+                         manager_connection_string,
+                         keyfile):
         exit_with_sadness(
             'Unexpected md5sums found before starting patch installation.'
         )
@@ -543,10 +556,12 @@ def apply_patch(definition_file, manager_connection_string):
     say("Backing up affected files to {path}".format(path=backup_root))
     ssh(
         manager_connection_string,
+        keyfile,
         'mkdir -p ' + backup_root,
     )
     ssh(
         manager_connection_string,
+        keyfile,
         'mkdir -p ' + delete_root,
     )
     affected_files = get_list_of_affected_files(patch_definition['patches'])
@@ -563,6 +578,7 @@ def apply_patch(definition_file, manager_connection_string):
         # based on which version it's targetting.
         ssh(
             manager_connection_string,
+            keyfile,
             'if sudo test -f {source}; then '  # Only if the file exists
             'sudo cp --parents {source} {destination}; fi'.format(
                 source=affected_file,
@@ -575,13 +591,15 @@ def apply_patch(definition_file, manager_connection_string):
     )
     ssh(
         manager_connection_string,
+        keyfile,
         'mkdir -p ' + staging_dir,
     )
     say("Uploading and verifying patch files.")
     try:
         upload_and_verify_patch_files(manager_connection_string,
                                       patch_definition['patches'],
-                                      staging_dir)
+                                      staging_dir,
+                                      keyfile)
     except UploadError as err:
         exit_with_sadness(
             'Failed to upload patch files: {err}'.format(
@@ -591,7 +609,8 @@ def apply_patch(definition_file, manager_connection_string):
 
     say("Stopping services.")
     stop_services(manager_connection_string,
-                  patch_definition['affected_services'])
+                  patch_definition['affected_services'],
+                  keyfile)
 
     say("Applying patches.")
     for patch in patch_definition['patches']:
@@ -605,6 +624,7 @@ def apply_patch(definition_file, manager_connection_string):
             try:
                 ssh(
                     manager_connection_string,
+                    keyfile,
                     'sudo patch {destination} {patch}'.format(
                         destination=destination,
                         patch=os.path.join(
@@ -615,7 +635,7 @@ def apply_patch(definition_file, manager_connection_string):
                 )
             except subprocess.CalledProcessError as err:
                 rollback(manager_connection_string, patch_definition,
-                         backup_root, delete_root)
+                         backup_root, delete_root, keyfile)
                 exit_with_sadness(
                     'Failed to apply patch {patch} to {target}\n'
                     'Changes rolled back.'.format(
@@ -626,9 +646,10 @@ def apply_patch(definition_file, manager_connection_string):
 
     say("Checking post-patch md5sums.")
     if not md5sums_match(patch_definition['md5sums_after'],
-                         manager_connection_string):
+                         manager_connection_string,
+                         keyfile):
         rollback(manager_connection_string, patch_definition, backup_root,
-                 delete_root)
+                 delete_root, keyfile)
         exit_with_sadness(
             'Unexpected md5sums found after patch installation.\n'
             'Changes rolled back.'
@@ -636,7 +657,8 @@ def apply_patch(definition_file, manager_connection_string):
 
     say("Starting services.")
     start_services(manager_connection_string,
-                   patch_definition['affected_services'])
+                   patch_definition['affected_services'],
+                   keyfile)
 
     say("Checking service state with patches applied.")
     unhealthy_services = []
@@ -647,7 +669,7 @@ def apply_patch(definition_file, manager_connection_string):
         unhealthy_services = get_unhealthy_services()
     if unhealthy_services:
         rollback(manager_connection_string, patch_definition, backup_root,
-                 delete_root)
+                 delete_root, keyfile)
         exit_with_sadness(
             'Services did not restart correctly. '
             'Unhealthy services: {services}\n'
@@ -682,7 +704,17 @@ if __name__ == '__main__':
         ),
         required=True,
     )
+    parser.add_argument(
+        '-i', '--keyfile',
+        help=(
+           'The path to the ssh keyfile to use. If not set, no keyfile will '
+           'be specified.'
+        ),
+        default=None,
+        required=False,
+    )
 
     args = parser.parse_args()
 
-    apply_patch(args.patch_file, args.manager_connection_string)
+    apply_patch(args.patch_file, args.manager_connection_string,
+                args.keyfile)
