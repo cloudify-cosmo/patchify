@@ -472,6 +472,7 @@ def apply_patch(definition_file, manager_connection_string, keyfile):
 
     say("Checking manager version is valid.")
     manager_version = get_manager_version()
+    raw_version_output = manager_version.pop('raw')
     if manager_version is None:
         exit_with_sadness(
             'Could not get manager version! '
@@ -502,7 +503,7 @@ def apply_patch(definition_file, manager_connection_string, keyfile):
             exit_with_sadness(
                 'Could not determine manager version.\n'
                 'Version check output was: {raw_output}'.format(
-                    raw_output=manager_version['raw'],
+                    raw_output=raw_version_output,
                 )
             )
         supported_versions_output = ', '.join([
