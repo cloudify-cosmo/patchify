@@ -1,0 +1,30 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.1.1.1"],
+  "community": false,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "4111_cluster_reliability_database",
+      "md5sum": "04e4d7b9bbb811b2533539feac2d787c",
+      "destinations": ["/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/database.py"]
+    },
+    {
+      "patch_file": "4111_cluster_reliability_checks",
+      "md5sum": "015cbc3ca9a291b9a7b9ff4c287b6bf6",
+      "destinations": ["/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/checks.py"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-handler-runner",
+    "cloudify-check-runner"
+  ],
+  "md5sums_before": {
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/database.py": ["9813eb031ce8bf8933be65a188265e6e"],
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/checks.py": ["b1a0ee973d88851142a56603cf3254c6"]
+  },
+  "md5sums_after": {
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/database.py": ["62d6f617aede6c57d44e5094951ed74e"],
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/checks.py": ["dcf783e73d6b6438c74282cae889adf6"]
+  }
+}
