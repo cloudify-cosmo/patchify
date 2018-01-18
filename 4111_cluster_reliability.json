@@ -11,7 +11,7 @@
     },
     {
       "patch_file": "4111_cluster_reliability_checks",
-      "md5sum": "015cbc3ca9a291b9a7b9ff4c287b6bf6",
+      "md5sum": "554f436a8bdc89fa96e6333e4af428b9",
       "destinations": ["/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/checks.py"]
     }
   ],
@@ -25,6 +25,6 @@
   },
   "md5sums_after": {
     "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/database.py": ["62d6f617aede6c57d44e5094951ed74e"],
-    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/checks.py": ["dcf783e73d6b6438c74282cae889adf6"]
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/checks.py": ["cae01fa05d59d791c69cf4548b829073"]
   }
 }

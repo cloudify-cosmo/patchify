@@ -1,6 +1,6 @@
 --- a/cloudify_premium/ha/checks.py
 +++ b/cloudify_premium/ha/checks.py
-@@ -81,7 +81,8 @@ class _Check(utils._WithConsulClient):
+@@ -81,10 +81,10 @@ class _Check(utils._WithConsulClient):
              # update the check state, if consul is down; simply do nothing
              # and wait for the next iteration
              pass
@@ -9,8 +9,11 @@
 +            logger.error('Error running check {0}: {1}'.format(self.name, e))
              if node_status.get(FAIL_FAST_OPTION, True):
                  self.mark_failing()
-             raise
-@@ -124,7 +125,7 @@ def check(name=None, **kwargs):
+-            raise
+         else:
+             self.mark_passing()
+ 
+@@ -124,7 +124,7 @@ def check(name=None, **kwargs):
      return _decorator
  
  
@@ -19,7 +22,7 @@
  def check_local_db():
      """Check if the database on localhost is up and running.
  
-@@ -139,7 +140,7 @@ def check_local_db():
+@@ -139,7 +139,7 @@ def check_local_db():
              cur.fetchall()
  
  
@@ -28,7 +31,7 @@
  def check_db_following():
      """Check if the local database is replicating from the current master."""
      db = database.Database()
-@@ -240,8 +241,8 @@ class Checker(object):
+@@ -240,8 +240,8 @@ class Checker(object):
          while True:
              try:
                  check.run()
