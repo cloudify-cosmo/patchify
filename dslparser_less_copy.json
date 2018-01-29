@@ -1,0 +1,22 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.2.0"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "dslparser_batch_types",
+      "md5sum": "214ca1d0aef1836e44b95a5e79ba2d70",
+      "destinations": ["/opt/manager/env/lib/python2.7/site-packages/dsl_parser/framework/elements.py"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-restservice"
+  ],
+  "md5sums_before": {
+    "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/framework/elements.py": ["9138a1faf7f1f32192491d53226c8292"]
+  },
+  "md5sums_after": {
+    "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/framework/elements.py": ["55a99fb9a72321c9e260f961219c95e5"]
+  }
+}
