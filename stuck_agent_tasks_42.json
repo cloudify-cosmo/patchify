@@ -1,0 +1,34 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.2.0"],
+  "community": false,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "stuck_agent_tasks_events",
+      "md5sum": "05495dc4db90e5397dba39e21fa69aba",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/events.py"]
+    },
+    {
+      "patch_file": "stuck_agent_tasks_tasks",
+      "md5sum": "92e01c73c862ef5586ae7e6cbace928c",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py"]
+    },
+    {
+      "patch_file": "stuck_agent_tasks_workflow_context",
+      "md5sum": "06ed129271cd81618fc7478eb3fb8ba5",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py"]
+    }
+  ],
+  "affected_services": [],
+  "md5sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/events.py": ["56eeed15964037e0605d81b9b64f5cd1"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": ["62b5b8eff231ecfa9d87f96e7d3203ef"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": ["6ea0c06a2ab959769833972a7fe89e37"]
+  },
+  "md5sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/events.py": ["d51aabe5507903545ad514c37946ebe2"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": ["9cf0be144060a8792065cfbae0ce767f"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": ["1297ac4308fb2a070084e9ba583a11e2"]
+  }
+}
