@@ -353,8 +353,8 @@ def start_services(manager_connection_string, services, keyfile):
         )
 
 
-def upload_and_verify_patch_files(manager_connection_string, patches,
-                                  staging_dir, keyfile):
+def upload_and_verify_patch_files(manager_connection_string, patch_dir,
+                                  patches, staging_dir, keyfile):
     for patch in patches:
         patch_name = patch['patch_file']
         expected_md5sum = patch['md5sum']
@@ -362,7 +362,7 @@ def upload_and_verify_patch_files(manager_connection_string, patches,
         if keyfile:
             scp_command.extend(['-i', keyfile])
         scp_command.extend([
-            'patches/{patch}'.format(patch=patch_name),
+            os.path.join(patch_dir, patch_name),
             '{mgr}:{staging_dir}'.format(
                 mgr=manager_connection_string,
                 staging_dir=staging_dir,
@@ -604,9 +604,11 @@ def apply_patch(definition_file, manager_connection_string, keyfile):
         keyfile,
         'mkdir -p ' + staging_dir,
     )
+    patch_dir = os.path.join(os.path.dirname(definition_file), 'patches')
     say("Uploading and verifying patch files.")
     try:
         upload_and_verify_patch_files(manager_connection_string,
+                                      patch_dir,
                                       patch_definition['patches'],
                                       staging_dir,
                                       keyfile)
