@@ -20,7 +20,9 @@
       "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py"]
     }
   ],
-  "affected_services": [],
+  "affected_services": [
+    "cloudify-mgmtworker"
+  ],
   "md5sums_before": {
     "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/events.py": ["56eeed15964037e0605d81b9b64f5cd1"],
     "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": ["62b5b8eff231ecfa9d87f96e7d3203ef"],
