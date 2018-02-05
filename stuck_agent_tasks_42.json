@@ -18,6 +18,11 @@
       "patch_file": "stuck_agent_tasks_workflow_context",
       "md5sum": "06ed129271cd81618fc7478eb3fb8ba5",
       "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py"]
+    },
+    {
+      "patch_file": "stuck_agent_tasks_uninstall_tasks",
+      "md5sum": "aef690d51bcc716f29b939787e3dc2d7",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py"]
     }
   ],
   "affected_services": [
@@ -30,7 +35,7 @@
   },
   "md5sums_after": {
     "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/events.py": ["d51aabe5507903545ad514c37946ebe2"],
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": ["9cf0be144060a8792065cfbae0ce767f"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": ["c9c7aaf71cab86eb57b3745de87be027"],
     "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": ["1297ac4308fb2a070084e9ba583a11e2"]
   }
 }
