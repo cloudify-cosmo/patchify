@@ -1,0 +1,20 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.1.1.1"],
+  "community": false,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "stuck_agent_tasks_uninstall_tasks",
+      "md5sum": "aef690d51bcc716f29b939787e3dc2d7",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py"]
+    }
+  ],
+  "affected_services": [],
+  "md5sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": ["d09c9f22dab650a6db629519c211f5bb"]
+  },
+  "md5sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": ["530c05beae61f31fe3812aa7fa731268"]
+  }
+}
