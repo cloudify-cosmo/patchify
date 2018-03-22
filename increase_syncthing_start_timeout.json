@@ -1,0 +1,20 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.1.1.1", "4.2.0", "4.3", "4.3.0", "4.3.0.1"],
+  "community": false,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "increase_syncthing_start_timeout",
+      "md5sum": "ca987f52345c1a11dc9d59261dfd5cb6",
+      "destinations": ["/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/syncthing.py"]
+    }
+  ],
+  "affected_services": [],
+  "md5sums_before": {
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/syncthing.py": ["d2a81815e0eeadfc3d82041d3dd6c51b", "9b34212856875605a7251265466fd3ea", "20ef849d68219b95c1f42d3768114e8e"]
+  },
+  "md5sums_after": {
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/syncthing.py": ["2154a9ce50d9698dcb1d4261c7e2e822", "231eeadc12b8fa133f6ec91345239fff", "535e99536121a797295c028e78e16cb9"]
+  }
+}

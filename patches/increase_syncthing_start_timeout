@@ -1,0 +1,13 @@
+diff --git a/cloudify_premium/ha/syncthing.py b/cloudify_premium/ha/syncthing.py
+index 0863a73..9467918 100644
+--- a/cloudify_premium/ha/syncthing.py
++++ b/cloudify_premium/ha/syncthing.py
+@@ -149,7 +149,7 @@ def configure(**kwargs):
+         subprocess.check_call(['chmod', 'g+rw', '-R', path])
+
+
+-def start(start_retries=20, start_retry_interval=1, **kwargs):
++def start(start_retries=900, start_retry_interval=2, **kwargs):
+     syncthing.start()
+     with open(syncthing._config_path) as f:
+         config_source = f.read()
