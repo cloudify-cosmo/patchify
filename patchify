@@ -396,15 +396,20 @@ def build_manager_version_output_string(version, community):
 
 
 def rollback(manager_connection_string, patch_definition, backup_root,
-             delete_root, keyfile):
-    # Make sure all services are stopped, which might not be the case
-    # depending on when we had to begin the rollback.
-    sadly_say('Ensuring services are stopped for rollback.')
-    stop_services(
-        manager_connection_string,
-        patch_definition['affected_services'],
-        keyfile,
-    )
+             delete_root, keyfile, skip_services):
+    if skip_services:
+        sadly_say(
+            "Not ensuring services are stopped due to skip-services flag."
+        )
+    else:
+        # Make sure all services are stopped, which might not be the case
+        # depending on when we had to begin the rollback.
+        sadly_say('Ensuring services are stopped for rollback.')
+        stop_services(
+            manager_connection_string,
+            patch_definition['affected_services'],
+            keyfile,
+        )
 
     sadly_say('Rolling back file changes.')
     affected_files = get_list_of_affected_files(patch_definition['patches'])
@@ -437,12 +442,15 @@ def rollback(manager_connection_string, patch_definition, backup_root,
             ),
         )
 
-    sadly_say('Starting services after rollback.')
-    start_services(
-        manager_connection_string,
-        patch_definition['affected_services'],
-        keyfile,
-    )
+    if skip_services:
+        sadly_say("Not restarting services due to skip-services flag.")
+    else:
+        sadly_say('Starting services after rollback.')
+        start_services(
+            manager_connection_string,
+            patch_definition['affected_services'],
+            keyfile,
+        )
 
     # TODO: We should check service state here
 
@@ -456,7 +464,8 @@ def get_list_of_affected_files(patches):
     return set(affected_files)
 
 
-def apply_patch(definition_file, manager_connection_string, keyfile):
+def apply_patch(definition_file, manager_connection_string, keyfile,
+                skip_services):
     say("Loading patch definition.")
     patch_definition = load_patch_definition(definition_file)
 
@@ -619,10 +628,13 @@ def apply_patch(definition_file, manager_connection_string, keyfile):
             )
         )
 
-    say("Stopping services.")
-    stop_services(manager_connection_string,
-                  patch_definition['affected_services'],
-                  keyfile)
+    if skip_services:
+        say("Not stopping services due to skip-services flag.")
+    else:
+        say("Stopping services.")
+        stop_services(manager_connection_string,
+                      patch_definition['affected_services'],
+                      keyfile)
 
     say("Applying patches.")
     for patch in patch_definition['patches']:
@@ -647,7 +659,7 @@ def apply_patch(definition_file, manager_connection_string, keyfile):
                 )
             except subprocess.CalledProcessError as err:
                 rollback(manager_connection_string, patch_definition,
-                         backup_root, delete_root, keyfile)
+                         backup_root, delete_root, keyfile, skip_services)
                 exit_with_sadness(
                     'Failed to apply patch {patch} to {target}\n'
                     'Changes rolled back.'.format(
@@ -661,16 +673,19 @@ def apply_patch(definition_file, manager_connection_string, keyfile):
                          manager_connection_string,
                          keyfile):
         rollback(manager_connection_string, patch_definition, backup_root,
-                 delete_root, keyfile)
+                 delete_root, keyfile, skip_services)
         exit_with_sadness(
             'Unexpected md5sums found after patch installation.\n'
             'Changes rolled back.'
         )
 
-    say("Starting services.")
-    start_services(manager_connection_string,
-                   patch_definition['affected_services'],
-                   keyfile)
+    if skip_services:
+        say("Not starting services due to skip-services flag.")
+    else:
+        say("Starting services.")
+        start_services(manager_connection_string,
+                       patch_definition['affected_services'],
+                       keyfile)
 
     say("Checking service state with patches applied.")
     unhealthy_services = []
@@ -681,7 +696,7 @@ def apply_patch(definition_file, manager_connection_string, keyfile):
         unhealthy_services = get_unhealthy_services()
     if unhealthy_services:
         rollback(manager_connection_string, patch_definition, backup_root,
-                 delete_root, keyfile)
+                 delete_root, keyfile, skip_services)
         exit_with_sadness(
             'Services did not restart correctly. '
             'Unhealthy services: {services}\n'
@@ -725,8 +740,18 @@ if __name__ == '__main__':
         default=None,
         required=False,
     )
+    parser.add_argument(
+        '-s', '--skip-services',
+        help=(
+            'Set this flag to not restart services. This is only to be used '
+            'when instructed by Cloudify support.'
+        ),
+        action='store_true',
+        default=False,
+        required=False,
+    )
 
     args = parser.parse_args()
 
     apply_patch(args.patch_file, args.manager_connection_string,
-                args.keyfile)
+                args.keyfile, args.skip_services)
