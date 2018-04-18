@@ -1,0 +1,29 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.3.1", "4.3"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "agents_upgrade_initscript_agentconfig",
+      "md5sum": "7432005234ac6c04af8915d3eb439d30",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py"]
+
+    },
+    {
+      "patch_file": "agents_upgrade_initscript_operations",
+      "md5sum": "f7c27e20740efdf071e72faef76557b2",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py"]
+    }
+  ],
+  "affected_services": [],
+  "md5sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py": ["f98e97792e2cf53bd4ea77a526b56c26"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py": ["1161de3d7e79f64bc2fc7440b5af7c74"]
+
+  },
+  "md5sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py": ["4bb688969dbb4aafeb4914b62c3b4308"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py": ["1d5d9e7353e5232ea1a457987da74814"]    
+  }
+}
