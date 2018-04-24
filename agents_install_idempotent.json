@@ -1,0 +1,29 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.3.1"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "agents_install_idempotent_windows",
+      "md5sum": "73badb3a375a4ad199bf74d35b8cfded",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/windows.ps1.template"]
+    },
+    {
+      "patch_file": "agents_install_idempotent_linux",
+      "md5sum": "046f57e485ae6ece3c7162477a691e5e",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-restservice"
+  ],
+  "md5sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/windows.ps1.template": ["8fd1aa426741bc20d96ca270ea7c34b5"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template": ["a4e11a0f0c2f4be7af5e73a0ed21648e"]
+  },
+  "md5sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/windows.ps1.template": ["d720970c3abd46f68330a6f49844e8fc"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template": ["c45e4c4e044d829005a18f451f11c35a"]
+  }
+}
