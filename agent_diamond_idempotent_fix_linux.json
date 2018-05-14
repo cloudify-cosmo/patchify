@@ -1,0 +1,22 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.3.1"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "agent_diamond_idempotent_fix_linux",
+      "md5sum": "dca54dd66f5219ee8d790889a526f55f",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-restservice"
+  ],
+  "md5sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template": ["c45e4c4e044d829005a18f451f11c35a"]
+  },
+  "md5sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template": ["833a19a9f613f97c8e9d454d5083ab0b"]
+  }
+}
