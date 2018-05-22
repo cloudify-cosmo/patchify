@@ -373,7 +373,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         description=(
-            'Something in the way she moves'
+            'Fixes 4.3.2'
         ),
     )
 
@@ -386,7 +386,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '-u', '--user',
         required=True,
-        help='User to update pex',
+        help='Username that run cfy_manager install',
     )
 
     args = parser.parse_args()
