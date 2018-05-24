@@ -329,11 +329,16 @@ def create_external_certs(private_ip=None,
 
 
 def find_certificates_py(user):
-    cmd = "sudo find / -name certificates.py | grep " + user + " | grep .pex | grep cloudify_manager_install"
+    cmd = "sudo find / -name certificates.py | grep .pex | grep cloudify_manager_install"
+    if user:
+        cmd = cmd + " | grep " + user
+
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
-    path = proc.stdout.read()
-    path = path.strip('\n')
-    return path
+    paths = proc.stdout.readlines()
+    if len(paths) > 1:
+        raise Exception("Found more than one certificates.py file, use the -u flag")
+
+    return paths[0].strip('\n')
 
 
 def write_certificates_py(user):
@@ -341,18 +346,6 @@ def write_certificates_py(user):
     f = open(path, "w")
     f.write(certificates_py_str)
     f.close()
-
-
-def update_stage_ip(internal_ip):
-    stage_config_path = '/opt/cloudify-stage/conf/manager.json'
-    with open(stage_config_path) as f:
-        stage_config = json.load(f)
-
-    stage_config['ip'] = internal_ip
-    content = json.dumps(stage_config, indent=4, sort_keys=True)
-
-    f = open(stage_config_path, "w")
-    f.write(content)
 
 
 def install_cryptography():
@@ -373,7 +366,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         description=(
-            'Fixes 4.3.2'
+            '4.3.2 fixes'
         ),
     )
 
@@ -385,18 +378,54 @@ if __name__ == '__main__':
 
     parser.add_argument(
         '-u', '--user',
-        required=True,
+        required=False,
+        default=None,
         help='Username that run cfy_manager install',
     )
 
     args = parser.parse_args()
-    update_stage_ip(args.ip)
+
+    # update certificates.py with fixes on disk
     write_certificates_py(args.user)
+
+    # install cryptography library on mgworker environment
     install_cryptography()
+
+    # update internal hostname in stage configuration
+    replace_str_in_file('/opt/cloudify-stage/conf/manager.json', '127.0.0.1', args.ip)
+
+    # update internal hostname in composer configuration
+    replace_str_in_file('/opt/cloudify-composer/backend/conf/prod.json', '"ip": "localhost"', '"ip": "' + args.ip + '"')
+
+    # update autoindex to off in nginx configuration
     replace_str_in_file('/etc/nginx/conf.d/fileserver-location.cloudify', 'autoindex on', 'autoindex off')
+
+    # force https in agents upgrade install script link
     replace_str_in_file('/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py', 'http:', 'https:')
+
+    # exclude stage configuration from syncthing
     replace_str_in_file('/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/syncthing.py',
                         "('ui-conf', '/opt/cloudify-stage/conf', None)",
                         "('ui-conf', '/opt/cloudify-stage/conf', ['manager.json'])")
+
+    # exclude composer configuration from syncthing
+    replace_str_in_file('/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/syncthing.py',
+                        "('composer-config', '/opt/cloudify-composer/backend/conf', None)",
+                        "('composer-config', '/opt/cloudify-composer/backend/conf', ['prod.json'])")
+
+    # update rabbitmw to use internal certs
     replace_str_in_file('/etc/cloudify/rabbitmq/rabbitmq.config',
                         'cloudify_internal_ca_cert', 'cloudify_internal_cert')
+
+    # make force-cancel also stop executions
+    replace_str_in_file('/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py',
+                        "result = api.EXECUTION_CANCELLED_RESULT",
+                        "result = api.EXECUTION_CANCELLED_RESULT\n                    api.cancel_request = True")
+
+    # fix agent install method provided
+    replace_str_in_file('/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/lifecycle.py',
+                        'constants.AGENT_INSTALL_METHOD_PLUGIN', 'constants.AGENT_INSTALL_METHOD_PLUGIN, constants.AGENT_INSTALL_METHOD_PROVIDED')
+    replace_str_in_file('/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/operations.py',
+                        'not cloudify_agent.is_provided', 'not cloudify_agent.is_provided or cloudify_agent.is_provided')
+    replace_str_in_file('/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/script.py',
+                        'not self.cloudify_agent.is_provided', 'True')
