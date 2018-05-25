@@ -4,7 +4,7 @@ import subprocess
 import json
 import argparse
 
-
+MGMTWORKER_SITE_PACKAGES = '/opt/mgmtworker/env/lib/python2.7/site-packages'
 certificates_py_str = '''
 #########
 # Copyright (c) 2017 GigaSpaces Technologies Ltd. All rights reserved
@@ -350,7 +350,7 @@ def write_certificates_py(user):
 
 def install_cryptography():
     subprocess.call(['sudo', '/opt/mgmtworker/env/bin/pip', 'install', 'cryptography==2.2.2'])
-
+    subprocess.call(['sudo', 'chmod', '-R', 'o+r', MGMTWORKER_SITE_PACKAGES])
 
 def replace_str_in_file(filepath, str1, str2):
     previous_chmod = subprocess.check_output(
