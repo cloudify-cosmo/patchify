@@ -353,13 +353,15 @@ def install_cryptography():
 
 
 def replace_str_in_file(filepath, str1, str2):
+    previous_chmod = subprocess.check_output(
+        ['sudo', 'stat', '--printf=%a', filepath])
     subprocess.call(['sudo', 'chmod', '666', filepath])
     with open(filepath, 'r') as f:
         s = f.read()
     with open(filepath, 'w') as f:
         s = s.replace(str1, str2)
         f.write(s)
-    subprocess.call(['sudo', 'chmod', '644', filepath])
+    subprocess.call(['sudo', 'chmod', previous_chmod, filepath])
 
 
 if __name__ == '__main__':
