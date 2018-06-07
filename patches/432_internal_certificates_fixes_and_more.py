@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import subprocess
 import json
 import argparse
@@ -351,6 +352,8 @@ def write_certificates_py(user):
 def install_cryptography():
     subprocess.call(['sudo', '/opt/mgmtworker/env/bin/pip', 'install', 'cryptography==2.2.2'])
     subprocess.call(['sudo', 'chmod', '-R', 'o+r', MGMTWORKER_SITE_PACKAGES])
+    site_packages_subdirs = os.path.join(MGMTWORKER_SITE_PACKAGES, '*')
+    subprocess.call('sudo chmod o+x {0}'.format(site_packages_subdirs), shell=True)
 
 def replace_str_in_file(filepath, str1, str2):
     previous_chmod = subprocess.check_output(
