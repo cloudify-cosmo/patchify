@@ -1,0 +1,20 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.3.1"],
+  "community": false,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "zmq_linger",
+      "md5sum": "cb1834032d16855f392eb2b73c86ebcf",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py"]
+    }
+  ],
+  "affected_services": [],
+  "md5sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py": ["57c7f97e3c101b1b727452e25242642e"]
+  },
+  "md5sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py": ["28696111189090148555f0a4ca0e0001"]
+  }
+}
