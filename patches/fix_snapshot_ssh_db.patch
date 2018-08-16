@@ -1,0 +1,13 @@
+--- before.py	2018-08-16 11:54:11.112936141 +0300
++++ after.py	2018-08-16 11:55:09.535272699 +0300
+@@ -122,7 +122,9 @@
+                 fabric_changed = fix_fabric_env(inputs,
+                                                 original_string,
+                                                 secret_name)
+-                changed = changed or key_changed or fabric_changed
++                if key_changed or fabric_changed:
++                    ops[op]['has_intrinsic_functions'] = True
++                    changed = True
+             props = node.properties
+             new_changed = replace_ssh_keys(props,
+                                            original_string,
