@@ -1,0 +1,23 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.4.0","4.4"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "fix_snapshot_ssh_db.patch",
+      "md5sum": "06f2798611d04c17ae7340e86dbe6698",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/fix_snapshot_ssh_db.py"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-mgmtworker"
+  ],
+  "md5sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/fix_snapshot_ssh_db.py": ["87cc3faeb047b7dc32f73b6bd08cff2a"]
+  },
+  "md5sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/fix_snapshot_ssh_db.py": ["10cc32c60dc802108a1231e1bca34101"]
+  }
+}
+
