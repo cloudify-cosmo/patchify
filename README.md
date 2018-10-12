@@ -1,5 +1,8 @@
 A tool for patching cloudify managers.
 
+Details of all applied patches will be stored in /etc/cloudify/patch.
+Backups of modified files will also be held in this location.
+
 Example usage:
 1. Make sure cfy is pointing at a test 4.1.1 manager
 2. If you point at another manager (or none), you should get helpful errors<br />

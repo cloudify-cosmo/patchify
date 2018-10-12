@@ -464,6 +464,12 @@ def get_list_of_affected_files(patches):
     return set(affected_files)
 
 
+def get_patch_storage_path(timestamp):
+    # Don't use os.path.join in case this gets run on windows (the path itself
+    # is on the manager, which will be Linux)
+    return '/etc/cloudify/patches/{timestamp}'.format(timestamp=timestamp)
+
+
 def apply_patch(definition_file, manager_connection_string, keyfile,
                 skip_services):
     say("Loading patch definition.")
@@ -565,33 +571,46 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
     # Avoiding : in timestamp to avoid needing to escape it for bash
     timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S%z')
     say("Patching timestamp is: {timestamp}".format(timestamp=timestamp))
+    patch_path = get_patch_storage_path(timestamp)
 
-    backup_root = '~/cloudifypatch/{timestamp}/backups'.format(
-        timestamp=timestamp,
+    say("Creating patch directory in: {path}".format(path=patch_path))
+    # We will also put the name of the definition file without the json
+    # extension
+    ssh(
+        manager_connection_string,
+        keyfile,
+        'sudo mkdir -p ' + patch_path +
+        ' && sudo touch ' + patch_path + '/' + definition_file[:-5],
     )
-    delete_root = '~/cloudifypatch/{timestamp}/deleted_files'.format(
-        timestamp=timestamp,
+
+    backup_root = '{base}/backups'.format(
+        base=patch_path,
+    )
+    delete_root = '{base}/deleted_files'.format(
+        base=patch_path,
     )
     say("Backing up affected files to {path}".format(path=backup_root))
     ssh(
         manager_connection_string,
         keyfile,
-        'mkdir -p ' + backup_root,
+        'sudo mkdir -p ' + backup_root,
     )
     ssh(
         manager_connection_string,
         keyfile,
-        'mkdir -p ' + delete_root,
+        'sudo mkdir -p ' + delete_root,
     )
     affected_files = get_list_of_affected_files(patch_definition['patches'])
     for affected_file in affected_files:
-        say("Backing up {file_path} to {destination}".format(
-            file_path=affected_file,
-            destination=os.path.join(
-                backup_root,
-                affected_file.lstrip('/'),
-            ),
-        ))
+        say(
+            "Backing up {file_path} to {destination}".format(
+                file_path=affected_file,
+                destination=os.path.join(
+                    backup_root,
+                    affected_file.lstrip('/'),
+                ),
+            )
+        )
         # We sudo (root) the copy because of user differences in different
         # versions of cloudify, but we probably should define this better
         # based on which version it's targetting.
@@ -605,13 +624,18 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
             ),
         )
 
-    staging_dir = '~/cloudifypatch/{timestamp}/patches'.format(
-        timestamp=timestamp,
+    staging_dir = '{base}/patch_files'.format(
+        base=patch_path,
     )
     ssh(
         manager_connection_string,
         keyfile,
-        'mkdir -p ' + staging_dir,
+        'sudo mkdir -p ' + staging_dir,
+    )
+    ssh(
+        manager_connection_string,
+        keyfile,
+        'sudo chown $(whoami). ' + staging_dir,
     )
     patch_dir = os.path.join(os.path.dirname(definition_file), 'patches')
     say("Uploading and verifying patch files.")
@@ -627,6 +651,11 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
                 err=str(err),
             )
         )
+    ssh(
+        manager_connection_string,
+        keyfile,
+        'sudo chown root. ' + staging_dir,
+    )
 
     if skip_services:
         say("Not stopping services due to skip-services flag.")
@@ -734,8 +763,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '-i', '--keyfile',
         help=(
-           'The path to the ssh keyfile to use. If not set, no keyfile will '
-           'be specified.'
+            'The path to the ssh keyfile to use. If not set, no keyfile will '
+            'be specified.'
         ),
         default=None,
         required=False,
