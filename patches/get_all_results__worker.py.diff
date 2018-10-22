@@ -1,0 +1,12 @@
+--- worker.py.before	2018-10-21 08:52:24.355157921 +0000
++++ worker.py.after	2018-10-21 08:53:23.266193869 +0000
+@@ -237,7 +237,8 @@
+         yield MGMTWORKER_QUEUE
+         execution = rest_client.executions.get(execution_id)
+         node_instances = rest_client.node_instances.list(
+-            deployment_id=execution.deployment_id)
++            deployment_id=execution.deployment_id,
++            _get_all_results=True)
+         for instance in node_instances:
+             if self._is_agent(instance):
+                 yield instance.runtime_properties['cloudify_agent']['queue']

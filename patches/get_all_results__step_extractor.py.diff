@@ -1,0 +1,12 @@
+--- step_extractor.py.before	2018-10-21 18:47:31.917754384 +0300
++++ step_extractor.py.after	2018-10-21 18:59:44.396538283 +0300
+@@ -149,7 +149,8 @@
+ 
+         # get the nodes from the storage
+         nodes = sm.list(models.Node,
+-                        filters={'deployment_id': [deployment_id]})
++                        filters={'deployment_id': [deployment_id]},
++                        get_all_results=True)
+         nodes = {node.id: node.to_dict() for node in nodes}
+         return cls(deployment.to_dict(),
+                    nodes,

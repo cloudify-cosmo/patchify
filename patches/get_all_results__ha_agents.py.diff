@@ -1,0 +1,12 @@
+--- ha_agents.py.before	2018-10-21 18:47:31.825753568 +0300
++++ ha_agents.py.after	2018-10-21 19:01:55.761782097 +0300
+@@ -38,7 +38,8 @@
+ 
+ class AgentsController(object):
+     def broadcast_task(self, storage_manager, task):
+-        node_instances = storage_manager.list(models.NodeInstance)
++        node_instances = storage_manager.list(models.NodeInstance,
++                                              get_all_results=True)
+         by_tenant = self._group_agents(node_instances)
+         for credentials, agents in by_tenant.items():
+             with self.get_client(credentials) as client:

@@ -1,0 +1,13 @@
+--- cli_agents.py.before	2018-10-21 18:47:31.773753106 +0300
++++ cli_agents.py.after	2018-10-21 18:53:35.477065658 +0300
+@@ -42,8 +42,8 @@
+ 
+ def _is_deployment_installed(client, deployment_id):
+     for node_instance in client.node_instances.list(
+-            deployment_id=deployment_id
+-    ):
++            deployment_id=deployment_id,
++            _get_all_results=True):
+         if node_instance.state != _NODE_INSTANCE_STATE_STARTED:
+             return False
+     return True
