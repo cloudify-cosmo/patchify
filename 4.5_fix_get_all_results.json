@@ -1,0 +1,85 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.5.0","4.5"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "get_all_results__base.py.diff",
+      "md5sum": "d49c809f678f368e877dea29a532342a",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/api/pm/base.py"]
+    },
+    {
+      "patch_file": "get_all_results__4.5_resource_manager.py.diff",
+      "md5sum": "1b9f49f2cf228cdc536f951d1dc7607b",
+      "destinations": ["/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py"]
+    },
+    {
+      "patch_file": "get_all_results__4.5_worker.py.diff",
+      "md5sum": "c25c68707c114e6ab92a20f556739ba7",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/worker.py"]
+    },
+    {
+      "patch_file": "get_all_results__4.5_workflow_context.py.diff",
+      "md5sum": "27f46c062da0680e9315ae5dc35f60ea",
+      "destinations": ["/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py",
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py",
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py"]
+    },
+    {
+      "patch_file": "get_all_results__step_extractor.py.diff",
+      "md5sum": "296f3d411ae03adc0040faeff61e7240",
+      "destinations": ["/opt/manager/env/lib/python2.7/site-packages/manager_rest/deployment_update/step_extractor.py"]
+    },
+    {
+      "patch_file": "get_all_results__manager.py.diff",
+      "md5sum": "5f409b4f9d01e7c0c24c9883c49e2f8e",
+      "destinations": ["/opt/manager/env/lib/python2.7/site-packages/manager_rest/deployment_update/manager.py"]
+    },
+    {
+      "patch_file": "get_all_results__handlers.py.diff",
+      "md5sum": "fef0a4ab3246efd3f8735186bdf0bb0c",
+      "destinations": ["/opt/manager/env/lib/python2.7/site-packages/manager_rest/deployment_update/handlers.py"]
+    },
+    {
+      "patch_file": "get_all_results__4.5_ha_agents.py.diff",
+      "md5sum": "b6bfda5457670446abf297e8c9fc8d68",
+      "destinations": ["/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/agents.py"]
+    },
+    {
+      "patch_file": "get_all_results__4.5_cli_agents.py.diff",
+      "md5sum": "407fc38604f9d0457ae8eef6c2e3288e",
+      "destinations": ["/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/commands/agents.py"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-restservice",
+    "cloudify-mgmtworker"
+  ],
+  "md5sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/api/pm/base.py": ["9621a2916c52aa2fdbc7d3aaa18d412a"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/worker.py": ["6de15cef7ea0cc65ae9e5ca1f4d2de69"],
+    "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": ["1b88c1d410f6d0c29fd3559e5ee8f438"],
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": ["51f3dc38e054c4c91ffa14ec9fcaf076"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": ["51f3dc38e054c4c91ffa14ec9fcaf076"],
+    "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": ["51f3dc38e054c4c91ffa14ec9fcaf076"],
+    "/opt/manager/env/lib/python2.7/site-packages/manager_rest/deployment_update/step_extractor.py": ["d16d4eb2f5d483709c98227edf1bd1b3"],
+    "/opt/manager/env/lib/python2.7/site-packages/manager_rest/deployment_update/manager.py": ["9af826b7074231b6d8005cd167573c7a"],
+    "/opt/manager/env/lib/python2.7/site-packages/manager_rest/deployment_update/handlers.py": ["7a836ae93fe5fcc98558482b78a9766d"],
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/agents.py": ["a9273a0e36b437b49297ea141eacb239"],
+    "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/commands/agents.py": ["28ef0d86324c18b9e724c64c47680bac"]
+  },
+  "md5sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/api/pm/base.py": ["fd9c4dfb90211693b5fb92819b2b2716"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/worker.py": ["6bd663408a1f3044823559d6308d310b"],
+    "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": ["fff4d1821531294d7fa95c0c567d2e29"],
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": ["1692794c635b1501f22e801610af43fb"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": ["1692794c635b1501f22e801610af43fb"],
+    "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": ["1692794c635b1501f22e801610af43fb"],
+    "/opt/manager/env/lib/python2.7/site-packages/manager_rest/deployment_update/step_extractor.py": ["a232b71e1d8ccaf94aa1589c4bca4fe1"],
+    "/opt/manager/env/lib/python2.7/site-packages/manager_rest/deployment_update/manager.py": ["a43e48f0445f35edc860b2e486db58ba"],
+    "/opt/manager/env/lib/python2.7/site-packages/manager_rest/deployment_update/handlers.py": ["b0ba0743ae10b2b990feea0a628bc729"],
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/agents.py": ["c352e75c05bc329892a21117e5d865df"],
+    "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/commands/agents.py": ["4553e2831ded49d2101b653cd765a234"]
+  }
+}
