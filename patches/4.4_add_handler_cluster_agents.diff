@@ -1,0 +1,37 @@
+--- agents.py.before	2018-10-27 16:36:08.554522490 +0300
++++ agents.py.after	2018-10-27 16:50:13.972758141 +0300
+@@ -41,9 +41,18 @@
+         node_instances = storage_manager.list(models.NodeInstance)
+         by_tenant = self._group_agents(node_instances)
+         for credentials, agents in by_tenant.items():
+-            with self.get_client(credentials) as client:
+-                for agent in agents:
+-                    self.send_task(client, agent, task)
++            client = self.get_client(credentials)
++            # create and addthe handlers first, before connecting
++            handlers = {}
++            for agent in agents:
++                handler = amqp_client.SendHandler(agent, routing_key='service')
++                handlers[agent] = handler
++                client.add_handler(handler)
++
++            with client:
++                for agent, handler in handlers.items():
++                    logger.debug('Sending update task to {0}'.format(agent))
++                    handler.publish(task)
+ 
+     def get_client(self, credentials):
+         vhost, username, password = credentials
+@@ -57,12 +66,6 @@
+             ssl_cert_path=config.instance.amqp_ca_path
+         )
+ 
+-    def send_task(self, client, agent, task):
+-        logger.debug('Sending update task to agent {0}'.format(agent))
+-        handler = amqp_client.SendHandler(agent, routing_key='service')
+-        client.add_handler(handler)
+-        handler.publish(task)
+-
+     def send_update(self):
+         task = {
+             'service_task': {

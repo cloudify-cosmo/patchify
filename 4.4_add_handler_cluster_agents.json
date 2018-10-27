@@ -1,0 +1,22 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.4.0", "4.4"],
+  "community": false,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "4.4_add_handler_cluster_agents.diff",
+      "md5sum": "55ea4aa67d930afb7cb4ef6339b955f1",
+      "destinations": ["/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/agents.py"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-restservice"
+  ],
+  "md5sums_before": {
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/agents.py": ["229368798005f186ca60c5541161d866"]
+  },
+  "md5sums_after": {
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/agents.py": ["b5cd85dda9dd11e22d928d2458e863ab"]
+  }
+}
