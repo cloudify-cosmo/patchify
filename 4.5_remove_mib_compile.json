@@ -1,0 +1,22 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.5.0","4.5"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "4.5_remove_mib_compile__snmp_trap.py.patch",
+      "md5sum": "d9ee2328a375b77c66ccabc68369bcf3",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/snmp/snmp_trap.py"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-mgmtworker"
+  ],
+  "md5sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/snmp/snmp_trap.py": ["037184030aa7a9c1190e2c19a41c8dee"]
+  },
+  "md5sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/snmp/snmp_trap.py": ["986b659cfaa630630cdaf66fdb793870"]
+  }
+}
