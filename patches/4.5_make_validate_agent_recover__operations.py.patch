@@ -1,0 +1,14 @@
+--- operations.py.before	2018-11-26 15:11:15.578299607 +0200
++++ operations.py.after	2018-11-26 15:13:55.123526445 +0200
+@@ -581,9 +581,9 @@
+     ctx.instance.runtime_properties['agent_status'] = result
+ 
+     if current_amqp and not result['agent_alive']:
+-        raise NonRecoverableError(result['agent_alive_error'])
++        raise RecoverableError(result['agent_alive_error'])
+     if not current_amqp and not result['agent_alive_crossbroker']:
+-        raise NonRecoverableError(result['agent_alive_crossbroker_error'])
++        raise RecoverableError(result['agent_alive_crossbroker_error'])
+ 
+ 
+ def _get_broker_config(agent):
