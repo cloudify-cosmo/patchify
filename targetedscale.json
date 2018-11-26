@@ -1,0 +1,40 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.5"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "targetedscale_workflows",
+      "md5sum": "57f46788da514c3586024bbb98d4fcb7",
+      "destinations": [
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py",
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py"
+      ]
+    },
+    {
+      "patch_file": "targetedscale_dsl_parser",
+      "md5sum": "80c073f3fb25c43ee019a7e9099ff96e",
+      "destinations": [
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py",
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py"
+      ]
+    }
+  ],
+  "affected_services": [
+    "cloudify-mgmtworker",
+    "cloudify-restservice"
+  ],
+  "md5sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": ["995ab763e6b0416713c0559738c9cd54"],
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": ["995ab763e6b0416713c0559738c9cd54"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py": ["b984c70fbc5837428cc6d174aede9471"],
+    "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py": ["b984c70fbc5837428cc6d174aede9471"]
+  },
+  "md5sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": ["a6ed44297c4a58ee08cf52d3a44aa0c8"],
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": ["a6ed44297c4a58ee08cf52d3a44aa0c8"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py": ["a04d278676a29cba401b0a3dff4c8c18"],
+    "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py": ["a04d278676a29cba401b0a3dff4c8c18"]
+  }
+}
