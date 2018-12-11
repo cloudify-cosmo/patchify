@@ -1,0 +1,11 @@
+--- script.py.before	2018-12-11 19:41:00.928031124 +0000
++++ script.py.after	2018-12-11 19:43:09.168956093 +0000
+@@ -38,7 +38,7 @@
+         self.custom_env = None
+         self.file_server_root = cloudify_utils.get_manager_file_server_root()
+         self.file_server_url = utils.get_manager_file_server_url(
+-            cloudify_agent['rest_host'],
++            cloudify_agent.get_manager_ip(),
+             cloudify_agent['rest_port']
+         )
+ 
