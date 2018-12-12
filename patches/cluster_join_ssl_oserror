@@ -1,0 +1,14 @@
+--- a/cloudify_premium/ha/ssl.py
++++ b/cloudify_premium/ha/ssl.py
+@@ -240,7 +240,10 @@ def download_ca_certs(consul_client):
+                 if required:
+                     raise ValueError('Error copying certs: {0} not available'
+                                      .format(key))
+-                os.unlink(filename)
++                try:
++                    os.unlink(filename)
++                except OSError:
++                    pass
+                 continue
+             with open(filename, 'w') as f:
+                 f.write(ca_data[key])
