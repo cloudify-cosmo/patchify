@@ -474,6 +474,10 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
                 skip_services):
     say("Loading patch definition.")
     patch_definition = load_patch_definition(definition_file)
+    patch_name = os.path.basename(definition_file)
+    if patch_name.endswith('.json'):
+        # Remove patch name extension
+        patch_name = os.path.splitext(patch_name)[0]
 
     fatal_error = False
     for error in patch_definition.get('errors', []):
@@ -574,13 +578,12 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
     patch_path = get_patch_storage_path(timestamp)
 
     say("Creating patch directory in: {path}".format(path=patch_path))
-    # We will also put the name of the definition file without the json
-    # extension
+    # We will also put the name of the patch to aid with later investigation
     ssh(
         manager_connection_string,
         keyfile,
         'sudo mkdir -p ' + patch_path +
-        ' && sudo touch ' + patch_path + '/' + definition_file[:-5],
+        ' && sudo touch ' + patch_path + '/' + patch_name,
     )
 
     backup_root = '{base}/backups'.format(
