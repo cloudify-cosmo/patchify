@@ -18,6 +18,10 @@ class UploadError(Exception):
     pass
 
 
+class DownloadError(Exception):
+    pass
+
+
 def exit_with_sadness(message):
     sadly_say(message)
     sadly_say('FAILED TO APPLY PATCH!')
@@ -329,6 +333,75 @@ def ssh(manager_connection_string, keyfile, command):
     return subprocess.check_output(ssh_command)
 
 
+def _scp(keyfile, source, dest):
+    scp_command = ['scp']
+    if keyfile:
+        scp_command.extend(['-i', keyfile])
+    scp_command.extend([source, dest])
+    subprocess.check_call(scp_command)
+
+
+def upload(file_name, source_path, dest_path,
+           manager_connection_string, keyfile,
+           expected_md5sum=None):
+    source = os.path.join(source_path, file_name)
+    dest = '{mgr}:{dest_path}'.format(
+        mgr=manager_connection_string,
+        dest_path=dest_path,
+    )
+
+    _scp(keyfile, source, dest)
+
+    if expected_md5sum:
+        uploaded_md5sum = get_file_md5sum(
+            file_path=os.path.join(dest_path, file_name),
+            manager_connection_string=manager_connection_string,
+            keyfile=keyfile,
+        )
+
+        if not uploaded_md5sum == expected_md5sum:
+            raise UploadError(
+                'Uploaded file {file_name} had md5sum {actual}, but should '
+                'have had {expected}.'.format(
+                    file_name=file_name,
+                    actual=uploaded_md5sum,
+                    expected=expected_md5sum,
+                )
+            )
+
+
+def download(file_name, source_path, dest_path,
+             manager_connection_string, keyfile):
+    source = '{mgr}:{dest_path}'.format(
+        mgr=manager_connection_string,
+        dest_path=os.path.join(source_path, file_name),
+    )
+    dest = dest_path
+
+    _scp(keyfile, source, dest)
+
+    original_md5sum = get_file_md5sum(
+        file_path=os.path.join(source_path, file_name),
+        manager_connection_string=manager_connection_string,
+        keyfile=keyfile,
+    )
+
+    downloaded_md5sum = subprocess.check_output([
+        'md5sum',
+        os.path.join(dest_path, file_name),
+    ])
+
+    if not original_md5sum == downloaded_md5sum:
+        raise DownloadError(
+            'Downloaded file {file_path} had md5sum {actual}, but should '
+            'have had {expected}.'.format(
+                file_path=os.path.join(dest_path, file_name),
+                actual=downloaded_md5sum,
+                expected=original_md5sum,
+            )
+        )
+
+
 def stop_services(manager_connection_string, services, keyfile):
     for service in services:
         ssh(
@@ -358,32 +431,15 @@ def upload_and_verify_patch_files(manager_connection_string, patch_dir,
     for patch in patches:
         patch_name = patch['patch_file']
         expected_md5sum = patch['md5sum']
-        scp_command = ['scp']
-        if keyfile:
-            scp_command.extend(['-i', keyfile])
-        scp_command.extend([
-            os.path.join(patch_dir, patch_name),
-            '{mgr}:{staging_dir}'.format(
-                mgr=manager_connection_string,
-                staging_dir=staging_dir,
-            )
-        ])
-        subprocess.check_call(scp_command)
-        uploaded_md5sum = get_file_md5sum(
-            file_path=os.path.join(staging_dir, patch_name),
+
+        upload(
+            file_name=patch_name,
+            source_path=patch_dir,
+            dest_path=staging_dir,
+            expected_md5sum=expected_md5sum,
             manager_connection_string=manager_connection_string,
             keyfile=keyfile,
         )
-
-        if not uploaded_md5sum == expected_md5sum:
-            raise UploadError(
-                'Uploaded {patch} had md5sum {actual}, but should have had '
-                '{expected}.'.format(
-                    patch=patch_name,
-                    actual=uploaded_md5sum,
-                    expected=expected_md5sum,
-                )
-            )
 
 
 def build_manager_version_output_string(version, community):
