@@ -2,6 +2,7 @@
 # Note that cfy is used rather than the client so that the user does not have
 # to provide credentials, etc, to this script.
 import argparse
+from contextlib import contextmanager
 import datetime
 import json
 import os
@@ -89,8 +90,6 @@ def load_patch_definition(filename):
     with open(filename) as definition_handle:
         definition = json.load(definition_handle)
 
-    # As this is a POC, I'm not creating a programmatic way to define schema
-    # yet.
     # Currently this only handles version 1.0.0 of patch definitions:
     # {
     #   "patch_version": 1.0.0,  # No other value supported yet
@@ -280,6 +279,10 @@ def get_file_md5sum(file_path, manager_connection_string, keyfile):
     return ssh(manager_connection_string, keyfile, md5command).split(' ')[0]
 
 
+def get_local_md5sum(file_path):
+    return subprocess.check_output(['md5sum', file_path]).split(' ')[0]
+
+
 def md5sums_match(check_list, manager_connection_string, keyfile):
     matching = True
     for file_path, acceptable_md5sums in check_list.items():
@@ -333,6 +336,23 @@ def ssh(manager_connection_string, keyfile, command):
     return subprocess.check_output(ssh_command)
 
 
+@contextmanager
+def temporarily_own_directory(manager_connection_string, keyfile, path):
+    ssh(
+        manager_connection_string,
+        keyfile,
+        'sudo chown $(whoami). ' + path,
+    )
+    try:
+        yield
+    finally:
+        ssh(
+            manager_connection_string,
+            keyfile,
+            'sudo chown root. ' + path,
+        )
+
+
 def _scp(keyfile, source, dest):
     scp_command = ['scp']
     if keyfile:
@@ -349,24 +369,27 @@ def upload(file_name, source_path, dest_path,
         mgr=manager_connection_string,
         dest_path=dest_path,
     )
+    say("Uploading {source} to {dest}".format(source=source, dest=dest))
 
     _scp(keyfile, source, dest)
 
-    if expected_md5sum:
-        uploaded_md5sum = get_file_md5sum(
-            file_path=os.path.join(dest_path, file_name),
-            manager_connection_string=manager_connection_string,
-            keyfile=keyfile,
-        )
+    if not expected_md5sum:
+        expected_md5sum = get_local_md5sum(source)
 
-        if not uploaded_md5sum == expected_md5sum:
-            raise UploadError(
-                'Uploaded file {file_name} had md5sum {actual}, but should '
-                'have had {expected}.'.format(
-                    file_name=file_name,
-                    actual=uploaded_md5sum,
-                    expected=expected_md5sum,
-                )
+    uploaded_md5sum = get_file_md5sum(
+        file_path=dest_path,
+        manager_connection_string=manager_connection_string,
+        keyfile=keyfile,
+    )
+
+    if not uploaded_md5sum == expected_md5sum:
+        raise UploadError(
+            'Uploaded file {file_name} had md5sum {actual}, but should '
+            'have had {expected}.'.format(
+                file_name=file_name,
+                actual=uploaded_md5sum,
+                expected=expected_md5sum,
+            )
             )
 
 
@@ -377,6 +400,7 @@ def download(file_name, source_path, dest_path,
         dest_path=os.path.join(source_path, file_name),
     )
     dest = dest_path
+    say("Downloading {source} to {dest}".format(source=source, dest=dest))
 
     _scp(keyfile, source, dest)
 
@@ -386,10 +410,7 @@ def download(file_name, source_path, dest_path,
         keyfile=keyfile,
     )
 
-    downloaded_md5sum = subprocess.check_output([
-        'md5sum',
-        os.path.join(dest_path, file_name),
-    ])
+    downloaded_md5sum = get_local_md5sum(os.path.join(dest_path, file_name))
 
     if not original_md5sum == downloaded_md5sum:
         raise DownloadError(
@@ -435,7 +456,7 @@ def upload_and_verify_patch_files(manager_connection_string, patch_dir,
         upload(
             file_name=patch_name,
             source_path=patch_dir,
-            dest_path=staging_dir,
+            dest_path=os.path.join(staging_dir, patch_name),
             expected_md5sum=expected_md5sum,
             manager_connection_string=manager_connection_string,
             keyfile=keyfile,
@@ -644,13 +665,25 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
     patch_path = get_patch_storage_path(timestamp)
 
     say("Creating patch directory in: {path}".format(path=patch_path))
-    # We will also put the name of the patch to aid with later investigation
+    # We will also put some patch details to aid any later troubleshooting
+    patch_info = 'attempting to apply ' + patch_name
     ssh(
         manager_connection_string,
         keyfile,
         'sudo mkdir -p ' + patch_path +
-        ' && sudo touch ' + patch_path + '/' + patch_name,
+        ' && echo ' + patch_info +
+        ' | sudo tee ' + patch_path + '/patch_info >/dev/null',
     )
+    with temporarily_own_directory(manager_connection_string, keyfile,
+                                   patch_path):
+        source_path, file_name = os.path.split(definition_file)
+        upload(
+            file_name=file_name,
+            source_path=source_path,
+            dest_path=os.path.join(patch_path, 'patch_definition'),
+            manager_connection_string=manager_connection_string,
+            keyfile=keyfile,
+        )
 
     backup_root = '{base}/backups'.format(
         base=patch_path,
@@ -701,30 +734,22 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
         keyfile,
         'sudo mkdir -p ' + staging_dir,
     )
-    ssh(
-        manager_connection_string,
-        keyfile,
-        'sudo chown $(whoami). ' + staging_dir,
-    )
-    patch_dir = os.path.join(os.path.dirname(definition_file), 'patches')
-    say("Uploading and verifying patch files.")
-    try:
-        upload_and_verify_patch_files(manager_connection_string,
-                                      patch_dir,
-                                      patch_definition['patches'],
-                                      staging_dir,
-                                      keyfile)
-    except UploadError as err:
-        exit_with_sadness(
-            'Failed to upload patch files: {err}'.format(
-                err=str(err),
+    with temporarily_own_directory(manager_connection_string, keyfile,
+                                   staging_dir):
+        patch_dir = os.path.join(os.path.dirname(definition_file), 'patches')
+        say("Uploading and verifying patch files.")
+        try:
+            upload_and_verify_patch_files(manager_connection_string,
+                                          patch_dir,
+                                          patch_definition['patches'],
+                                          staging_dir,
+                                          keyfile)
+        except UploadError as err:
+            exit_with_sadness(
+                'Failed to upload patch files: {err}'.format(
+                    err=str(err),
+                )
             )
-        )
-    ssh(
-        manager_connection_string,
-        keyfile,
-        'sudo chown root. ' + staging_dir,
-    )
 
     if skip_services:
         say("Not stopping services due to skip-services flag.")
@@ -802,7 +827,16 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
                 services=', '.join(unhealthy_services),
             )
         )
+    say("Patch installed and services healthy.")
 
+    say("Updating patch information and registry.")
+    patch_info = "applied " + patch_name
+    ssh(
+        manager_connection_string,
+        keyfile,
+        'echo ' + patch_info +
+        ' | sudo tee ' + patch_path + '/patch_info >/dev/null',
+    )
     say('Patch applied!')
 
 
