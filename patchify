@@ -8,7 +8,14 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import time
+
+BASE_MANAGER_PATCH_STORAGE_PATH = '/etc/cloudify/patches'
+PATCH_REGISTRY_FILE_NAME = 'patch_registry.json'
+PATCH_REGISTRY_PATH = os.path.join(
+    BASE_MANAGER_PATCH_STORAGE_PATH, PATCH_REGISTRY_FILE_NAME
+)
 
 
 class VersionError(Exception):
@@ -410,7 +417,7 @@ def download(file_name, source_path, dest_path,
         keyfile=keyfile,
     )
 
-    downloaded_md5sum = get_local_md5sum(os.path.join(dest_path, file_name))
+    downloaded_md5sum = get_local_md5sum(dest)
 
     if not original_md5sum == downloaded_md5sum:
         raise DownloadError(
@@ -544,7 +551,10 @@ def get_list_of_affected_files(patches):
 def get_patch_storage_path(timestamp):
     # Don't use os.path.join in case this gets run on windows (the path itself
     # is on the manager, which will be Linux)
-    return '/etc/cloudify/patches/{timestamp}'.format(timestamp=timestamp)
+    return '{base}/{timestamp}'.format(
+        base=BASE_MANAGER_PATCH_STORAGE_PATH,
+        timestamp=timestamp,
+    )
 
 
 def apply_patch(definition_file, manager_connection_string, keyfile,
@@ -658,6 +668,9 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
         exit_with_sadness(
             'Unexpected md5sums found before starting patch installation.'
         )
+
+    say("Retrieving patch registry information.")
+    registry = download_patch_registry(manager_connection_string, keyfile)
 
     # Avoiding : in timestamp to avoid needing to escape it for bash
     timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S%z')
@@ -837,7 +850,105 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
         'echo ' + patch_info +
         ' | sudo tee ' + patch_path + '/patch_info >/dev/null',
     )
+    add_patch_to_registry(registry, timestamp,
+                          patch_name, patch_path, patch_definition,
+                          manager_connection_string, keyfile)
+
     say('Patch applied!')
+
+
+def add_patch_to_registry(registry, timestamp,
+                          patch_name, patch_path, patch_definition,
+                          manager_connection_string, keyfile):
+    current_patches = registry.get('current_patches', [])
+
+    affected_files = patch_definition['md5sums_after'].keys()
+
+    block_uninstall = []
+    for existing_patch in current_patches:
+        if any(affected_file in existing_patch['modified_files']
+               for affected_file in affected_files):
+            block_uninstall.append(existing_patch['patch_id'])
+
+    definition_md5sum = get_file_md5sum(
+        file_path=os.path.join(patch_path, 'patch_definition'),
+        manager_connection_string=manager_connection_string,
+        keyfile=keyfile,
+    )
+
+    new_patch = {
+        'patch_id': patch_name + '-' + definition_md5sum,
+        'patch_name': patch_name,
+        'timestamp': timestamp,
+        'patch_directory': patch_path,
+        'modified_files': patch_definition['md5sums_after'],
+        'blocks_uninstall_of': block_uninstall,
+    }
+
+    current_patches.append(new_patch)
+
+    registry['current_patches'] = current_patches
+
+    tmp_path = tempfile.mkdtemp(prefix='patchify-')
+    local_reg_path = os.path.join(tmp_path, PATCH_REGISTRY_FILE_NAME)
+
+    try:
+        with open(local_reg_path, 'w') as local_reg_handle:
+            local_reg_handle.write(json.dumps(registry))
+    except Exception as err:
+        exit_with_sadness(
+            'FAILED TO GENERATE NEW REGISTRY!\n'
+            'PATCH HAS BEEN APPLIED BUT REGISTRY IS INCORRECT!\n'
+            'Error was: {err}'.format(err=err)
+        )
+
+    with temporarily_own_directory(manager_connection_string, keyfile,
+                                   BASE_MANAGER_PATCH_STORAGE_PATH):
+        upload(
+            file_name=PATCH_REGISTRY_FILE_NAME,
+            source_path=tmp_path,
+            dest_path=PATCH_REGISTRY_PATH,
+            manager_connection_string=manager_connection_string,
+            keyfile=keyfile,
+        )
+
+    os.unlink(local_reg_path)
+    os.rmdir(tmp_path)
+
+
+def download_patch_registry(manager_connection_string, keyfile):
+    patch_registry_md5 = get_file_md5sum(
+        PATCH_REGISTRY_PATH,
+        manager_connection_string,
+        keyfile,
+    )
+    if patch_registry_md5 == 'DOESNOTEXIST':
+        registry = {
+            'current_patches': [],
+        }
+    else:
+        tmp_path = tempfile.mkdtemp(prefix='patchify-')
+        local_reg_path = os.path.join(tmp_path, PATCH_REGISTRY_FILE_NAME)
+
+        download(
+            file_name=PATCH_REGISTRY_FILE_NAME,
+            source_path=BASE_MANAGER_PATCH_STORAGE_PATH,
+            dest_path=local_reg_path,
+            manager_connection_string=manager_connection_string,
+            keyfile=keyfile,
+        )
+
+        try:
+            with open(local_reg_path) as local_reg_handle:
+                registry = json.load(local_reg_handle)
+        except ValueError:
+            exit_with_sadness(
+                'Could not parse existing patch registry.'
+            )
+        finally:
+            os.unlink(local_reg_path)
+            os.rmdir(tmp_path)
+    return registry
 
 
 if __name__ == '__main__':
