@@ -471,7 +471,7 @@ def get_patch_storage_path(timestamp):
 
 
 def apply_patch(definition_file, manager_connection_string, keyfile,
-                skip_services):
+                skip_services, install_patch_command):
     say("Loading patch definition.")
     patch_definition = load_patch_definition(definition_file)
     patch_name = os.path.basename(definition_file)
@@ -559,10 +559,20 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
 
     say('Confirming patch command exists on server.')
     if not patch_command_available(manager_connection_string, keyfile):
-        exit_with_sadness(
-            'Could not find "patch" command on server. '
-            'On the manager, you may need to run: sudo yum install -y patch'
-        )
+        if install_patch_command:
+            say("Patch command not found. Installing patch command.")
+            ssh(
+                manager_connection_string,
+                keyfile,
+                'sudo yum install -y patch',
+            )
+        else:
+            exit_with_sadness(
+                'Could not find "patch" command on server. '
+                'On the manager, you may need to run: '
+                '"sudo yum install -y patch" or call this script with '
+                'the --install-patch-command flag.'
+            )
 
     say("Checking md5sums are as expected.")
     if not md5sums_match(patch_definition['md5sums_before'],
@@ -782,8 +792,18 @@ if __name__ == '__main__':
         default=False,
         required=False,
     )
+    parser.add_argument(
+        '-P', '--install-patch-command',
+        help=(
+            'Set this flag to yum install the patch command if it is not '
+            'present.'
+        ),
+        action='store_true',
+        default=False,
+        required=False,
+    )
 
     args = parser.parse_args()
 
     apply_patch(args.patch_file, args.manager_connection_string,
-                args.keyfile, args.skip_services)
+                args.keyfile, args.skip_services, args.install_patch_command)
