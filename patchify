@@ -30,9 +30,9 @@ class DownloadError(Exception):
     pass
 
 
-def exit_with_sadness(message):
+def exit_with_sadness(message, action):
     sadly_say(message)
-    sadly_say('FAILED TO APPLY PATCH!')
+    sadly_say('FAILED TO {action}!'.format(action=action))
     sys.exit(1)
 
 
@@ -210,6 +210,22 @@ def load_patch_definition(filename):
     return definition
 
 
+def load_and_validate_patch_definition(filename, action):
+    definition = load_patch_definition(filename)
+
+    fatal_error = False
+    for error in definition.get('errors', []):
+        message = error['message']
+        if error['fatal']:
+            message = 'FATAL: ' + message
+            fatal_error = True
+        sadly_say(message)
+    if fatal_error:
+        exit_with_sadness('Patch definition error!', action)
+
+    return definition
+
+
 def add_definition_error(message, definition, fatal=False):
     errors = definition.get('errors', [])
     errors.append({
@@ -360,12 +376,15 @@ def temporarily_own_directory(manager_connection_string, keyfile, path):
         )
 
 
-def _scp(keyfile, source, dest):
+def _scp(keyfile, source, dest, quiet=False):
     scp_command = ['scp']
     if keyfile:
         scp_command.extend(['-i', keyfile])
     scp_command.extend([source, dest])
-    subprocess.check_call(scp_command)
+    if quiet:
+        subprocess.check_output(scp_command)
+    else:
+        subprocess.check_call(scp_command)
 
 
 def upload(file_name, source_path, dest_path,
@@ -401,15 +420,16 @@ def upload(file_name, source_path, dest_path,
 
 
 def download(file_name, source_path, dest_path,
-             manager_connection_string, keyfile):
+             manager_connection_string, keyfile, quiet=False):
     source = '{mgr}:{dest_path}'.format(
         mgr=manager_connection_string,
         dest_path=os.path.join(source_path, file_name),
     )
     dest = dest_path
-    say("Downloading {source} to {dest}".format(source=source, dest=dest))
+    if not quiet:
+        say("Downloading {source} to {dest}".format(source=source, dest=dest))
 
-    _scp(keyfile, source, dest)
+    _scp(keyfile, source, dest, quiet=quiet)
 
     original_md5sum = get_file_md5sum(
         file_path=os.path.join(source_path, file_name),
@@ -557,10 +577,24 @@ def get_patch_storage_path(timestamp):
     )
 
 
+def abort_on_ssh_failure(manager_connection_string, keyfile, action,
+                         quiet=False):
+    if not quiet:
+        say("Checking SSH.")
+    if not can_ssh(manager_connection_string, keyfile):
+        exit_with_sadness(
+            'Failed to SSH into manager.', action,
+        )
+
+
 def apply_patch(definition_file, manager_connection_string, keyfile,
                 skip_services, install_patch_command):
+    action = 'APPLY PATCH'
+
     say("Loading patch definition.")
-    patch_definition = load_patch_definition(definition_file)
+    patch_definition = load_and_validate_patch_definition(definition_file,
+                                                          action)
+
     patch_name = os.path.basename(definition_file)
     if patch_name.endswith('.json'):
         # Remove patch name extension
@@ -583,7 +617,8 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
         exit_with_sadness(
             'Could not get manager version! '
             'Are you in an environment with cfy using a profile for the '
-            'manager you intend to patch?'
+            'manager you intend to patch?',
+            action,
         )
     supported_versions = []
     if patch_definition['premium']:
@@ -610,7 +645,8 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
                 'Could not determine manager version.\n'
                 'Version check output was: {raw_output}'.format(
                     raw_output=raw_version_output,
-                )
+                ),
+                action,
             )
         supported_versions_output = ', '.join([
             build_manager_version_output_string(
@@ -625,7 +661,8 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
             '{supported_versions}'.format(
                 manager_version=manager_version_output,
                 supported_versions=supported_versions_output,
-            )
+            ),
+            action,
         )
 
     say("Checking service state.")
@@ -635,14 +672,11 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
             'Not all services are healthy. '
             'Unhealthy services: {services}'.format(
                 services=', '.join(unhealthy_services),
-            )
+            ),
+            action,
         )
 
-    say("Checking SSH.")
-    if not can_ssh(manager_connection_string, keyfile):
-        exit_with_sadness(
-            'Failed to SSH into manager.',
-        )
+    abort_on_ssh_failure(manager_connection_string, keyfile, action)
 
     say('Confirming patch command exists on server.')
     if not patch_command_available(manager_connection_string, keyfile):
@@ -658,7 +692,8 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
                 'Could not find "patch" command on server. '
                 'On the manager, you may need to run: '
                 '"sudo yum install -y patch" or call this script with '
-                'the --install-patch-command flag.'
+                'the --install-patch-command flag.',
+                action,
             )
 
     say("Checking md5sums are as expected.")
@@ -666,11 +701,13 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
                          manager_connection_string,
                          keyfile):
         exit_with_sadness(
-            'Unexpected md5sums found before starting patch installation.'
+            'Unexpected md5sums found before starting patch installation.',
+            action,
         )
 
     say("Retrieving patch registry information.")
-    registry = download_patch_registry(manager_connection_string, keyfile)
+    registry = download_patch_registry(manager_connection_string, keyfile,
+                                       action)
 
     # Avoiding : in timestamp to avoid needing to escape it for bash
     timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S%z')
@@ -761,7 +798,8 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
             exit_with_sadness(
                 'Failed to upload patch files: {err}'.format(
                     err=str(err),
-                )
+                ),
+                action,
             )
 
     if skip_services:
@@ -801,7 +839,8 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
                     'Changes rolled back.'.format(
                         patch=patch['patch_file'],
                         target=destination,
-                    )
+                    ),
+                    action,
                 )
 
     say("Checking post-patch md5sums.")
@@ -812,7 +851,8 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
                  delete_root, keyfile, skip_services)
         exit_with_sadness(
             'Unexpected md5sums found after patch installation.\n'
-            'Changes rolled back.'
+            'Changes rolled back.',
+            action,
         )
 
     if skip_services:
@@ -838,7 +878,8 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
             'Unhealthy services: {services}\n'
             'Changes rolled back.'.format(
                 services=', '.join(unhealthy_services),
-            )
+            ),
+            action,
         )
     say("Patch installed and services healthy.")
 
@@ -852,14 +893,16 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
     )
     add_patch_to_registry(registry, timestamp,
                           patch_name, patch_path, patch_definition,
-                          manager_connection_string, keyfile)
+                          manager_connection_string, keyfile,
+                          action)
 
     say('Patch applied!')
 
 
 def add_patch_to_registry(registry, timestamp,
                           patch_name, patch_path, patch_definition,
-                          manager_connection_string, keyfile):
+                          manager_connection_string, keyfile,
+                          action):
     current_patches = registry.get('current_patches', [])
 
     affected_files = patch_definition['md5sums_after'].keys()
@@ -899,7 +942,8 @@ def add_patch_to_registry(registry, timestamp,
         exit_with_sadness(
             'FAILED TO GENERATE NEW REGISTRY!\n'
             'PATCH HAS BEEN APPLIED BUT REGISTRY IS INCORRECT!\n'
-            'Error was: {err}'.format(err=err)
+            'Error was: {err}'.format(err=err),
+            action,
         )
 
     with temporarily_own_directory(manager_connection_string, keyfile,
@@ -916,7 +960,59 @@ def add_patch_to_registry(registry, timestamp,
     os.rmdir(tmp_path)
 
 
-def download_patch_registry(manager_connection_string, keyfile):
+def get_uninstall_blockers(patches):
+    blockers = {}
+    for patch in patches:
+        for blocked in patch.get('blocks_uninstall_of', []):
+            if blocked not in blockers:
+                blockers[blocked] = []
+            blockers[blocked].append(patch['patch_id'])
+    return blockers
+
+
+def list_patches(manager_connection_string, keyfile, json_output):
+    action = 'LIST PATCHES'
+
+    if not json_output:
+        say("Getting installed patch details from manager...")
+    abort_on_ssh_failure(manager_connection_string, keyfile, action,
+                         quiet=json_output)
+    registry = download_patch_registry(manager_connection_string, keyfile,
+                                       action, quiet=json_output)
+    patches = registry.get('current_patches', [])
+
+    if json_output:
+        say(json.dumps(patches))
+    else:
+        if patches:
+            uninstall_blocked = get_uninstall_blockers(patches)
+            for patch in patches:
+                if patch['patch_id'] in uninstall_blocked:
+                    uninstall_restrictions = (
+                        ' Uninstall blocked by: {blockers}'.format(
+                            blockers=', '.join(
+                                uninstall_blocked[patch['patch_id']]
+                            ),
+                        )
+                    )
+                else:
+                    uninstall_restrictions = ''
+
+                say(
+                    'Patch {name} (ID: {patch_id}) was installed on '
+                    '{timestamp}.{uninstall_restrictions}'.format(
+                        name=patch['patch_name'],
+                        patch_id=patch['patch_id'],
+                        timestamp=patch['timestamp'],
+                        uninstall_restrictions=uninstall_restrictions,
+                    )
+                )
+        else:
+            say("No installed patches found on manager.")
+
+
+def download_patch_registry(manager_connection_string, keyfile, action,
+                            quiet=False):
     patch_registry_md5 = get_file_md5sum(
         PATCH_REGISTRY_PATH,
         manager_connection_string,
@@ -936,6 +1032,7 @@ def download_patch_registry(manager_connection_string, keyfile):
             dest_path=local_reg_path,
             manager_connection_string=manager_connection_string,
             keyfile=keyfile,
+            quiet=quiet,
         )
 
         try:
@@ -943,7 +1040,8 @@ def download_patch_registry(manager_connection_string, keyfile):
                 registry = json.load(local_reg_handle)
         except ValueError:
             exit_with_sadness(
-                'Could not parse existing patch registry.'
+                'Could not parse existing patch registry.',
+                action,
             )
         finally:
             os.unlink(local_reg_path)
@@ -951,27 +1049,10 @@ def download_patch_registry(manager_connection_string, keyfile):
     return registry
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Apply a patch to a cloudify manager.',
-    )
-    # TODO: We should probably want the patch supplied as a zip containing
-    # the patch definition and the patch file, but for POC purposes we just
-    # put everything in the POC folder
-
+def add_default_args(parser):
     parser.add_argument(
         '-c', '--manager_connection_string',
         help="The manager connection string for ssh, e.g. centos@192.0.2.4",
-        required=True,
-    )
-    parser.add_argument(
-        '-p', '--patch_file',
-        help=(
-            'The patch file to use. Note that for POC purposes this is just '
-            'a definition file, but this should probably be changed to a zip '
-            'for real world use (so that it can work on Windows as well as '
-            'Linux.'
-        ),
         required=True,
     )
     parser.add_argument(
@@ -983,7 +1064,37 @@ if __name__ == '__main__':
         default=None,
         required=False,
     )
-    parser.add_argument(
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Apply a patch to a cloudify manager.',
+    )
+    # TODO: We should probably want the patch supplied as a zip containing
+    # the patch definition and the patch file, but for POC purposes we just
+    # put everything in the POC folder
+
+    subparsers = parser.add_subparsers(help='Patch action',
+                                       dest='action')
+
+    list_patch_args = subparsers.add_parser('list',
+                                            help='List installed patches')
+    list_patch_args.add_argument(
+        '-j', '--json',
+        help=(
+            'Whether to output the patch list in json. '
+            'If true, a json dict mapping timestamps to patch names will be '
+            'the output.'
+        ),
+        action='store_true',
+        default=False,
+        required=False,
+    )
+    add_default_args(list_patch_args)
+
+    apply_patch_args = subparsers.add_parser('apply',
+                                             help='Apply a patch')
+    apply_patch_args.add_argument(
         '-s', '--skip-services',
         help=(
             'Set this flag to not restart services. This is only to be used '
@@ -993,7 +1104,17 @@ if __name__ == '__main__':
         default=False,
         required=False,
     )
-    parser.add_argument(
+    apply_patch_args.add_argument(
+        '-p', '--patch_file',
+        help=(
+            'The patch file to use. Note that for POC purposes this is just '
+            'a definition file, but this should probably be changed to a zip '
+            'for real world use (so that it can work on Windows as well as '
+            'Linux.'
+        ),
+        required=True,
+    )
+    apply_patch_args.add_argument(
         '-P', '--install-patch-command',
         help=(
             'Set this flag to yum install the patch command if it is not '
@@ -1003,8 +1124,16 @@ if __name__ == '__main__':
         default=False,
         required=False,
     )
+    add_default_args(apply_patch_args)
 
     args = parser.parse_args()
 
-    apply_patch(args.patch_file, args.manager_connection_string,
-                args.keyfile, args.skip_services, args.install_patch_command)
+    if args.action == 'apply':
+        apply_patch(args.patch_file, args.manager_connection_string,
+                    args.keyfile, args.skip_services,
+                    args.install_patch_command)
+    elif args.action == 'list':
+        list_patches(args.manager_connection_string, args.keyfile, args.json)
+    else:
+        # You can't get here without messing about with the code above
+        raise RuntimeError('Invalid action specified in parser.')
