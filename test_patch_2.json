@@ -1,0 +1,22 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.5"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "test_patch_2",
+      "md5sum": "cafb9a2d743a5f941f8af25ce5b26d01",
+      "destinations": ["/opt/cloudify/test_patch_2"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-mgmtworker"
+  ],
+  "md5sums_before": {
+    "/opt/cloudify/test_patch_2": ["DOESNOTEXIST"]
+  },
+  "md5sums_after": {
+    "/opt/cloudify/test_patch_2": ["ab182328e2a866130feed047371f66f8"]
+  }
+}

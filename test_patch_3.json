@@ -1,0 +1,29 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.5"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "test_patch_3_replace_1",
+      "md5sum": "3080a4dc12e588b0013f09babfc5b408",
+      "destinations": ["/opt/cloudify/test_patch_1"]
+    },
+    {
+      "patch_file": "test_patch_3_replace_2",
+      "md5sum": "1a50a78d8f65d3ac577cc428971d1a1c",
+      "destinations": ["/opt/cloudify/test_patch_2"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-rabbitmq"
+  ],
+  "md5sums_before": {
+    "/opt/cloudify/test_patch_1": ["ac1831e6aa0f04486b58617723511502"],
+    "/opt/cloudify/test_patch_2": ["ab182328e2a866130feed047371f66f8"]
+  },
+  "md5sums_after": {
+    "/opt/cloudify/test_patch_1": ["60d0aa99e59cd5934711ed10f955b680"],
+    "/opt/cloudify/test_patch_2": ["83c53cbcc57ed5f9c1ce23395aabcc64"]
+  }
+}

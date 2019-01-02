@@ -1,0 +1,10 @@
+--- a/test_patch_2
++++ b/test_patch_2
+@@ -1,5 +1,5 @@
+ Test patch file 2
+-
+-This is another test
++Pretending to fix bugs
++Another test file
+ ...
+ For the testing of patchify
