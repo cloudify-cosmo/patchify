@@ -516,7 +516,7 @@ def rollback(manager_connection_string, patch_definition, backup_root,
             'if sudo test -f {backup}; then '    # Only restore existing
             '  sudo cp {backup} {orig}; '        # and remove added files
             'else '
-            '  mkdir -p {delete_dest_parent} && '
+            '  sudo mkdir -p {delete_dest_parent} && '
             '  sudo mv {orig} {delete_dest}; '
             'fi'.format(
                 backup=backed_up_file,
