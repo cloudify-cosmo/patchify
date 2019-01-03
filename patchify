@@ -600,16 +600,6 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
         # Remove patch name extension
         patch_name = os.path.splitext(patch_name)[0]
 
-    fatal_error = False
-    for error in patch_definition.get('errors', []):
-        message = error['message']
-        if error['fatal']:
-            message = 'FATAL: ' + message
-            fatal_error = True
-        sadly_say(message)
-    if fatal_error:
-        exit_with_sadness('Patch definition error!')
-
     say("Checking manager version is valid.")
     manager_version = get_manager_version()
     raw_version_output = manager_version.pop('raw')
