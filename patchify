@@ -271,6 +271,10 @@ def get_profile_ssh_details(action):
     manager_ip_pos = headers.index('manager_ip')
     ssh_port_pos = headers.index('ssh_port')
     ssh_key_path_pos = headers.index('ssh_key_path')
+    try:
+        cluster_node_name_pos = headers.index('cluster node name')
+    except ValueError:
+        cluster_node_name_pos = None
 
     manager_connection_details = []
     for result in results:
@@ -281,6 +285,10 @@ def get_profile_ssh_details(action):
             ),
             'ssh_port': result[ssh_port_pos],
             'key_path': result[ssh_key_path_pos],
+            'cluster_node_name': (
+                result[cluster_node_name_pos]
+                if cluster_node_name_pos else None
+            ),
         })
 
     return manager_connection_details
@@ -664,25 +672,42 @@ def get_patch_storage_path(timestamp):
 
 
 def abort_on_ssh_failure(manager_connection_string, ssh_port, keyfile, action,
-                         quiet=False):
+                         cluster_node_name=None, quiet=False):
     if not quiet:
         say("Checking SSH.")
     if not can_ssh(manager_connection_string, ssh_port, keyfile):
-        exit_with_sadness(
-            (
-                'Failed to SSH into manager.\n'
-                'Manager ssh profiles settings may be incorrect.\n'
-                'To view current profile settings, run: '
-                'cfy profiles show-current\n'
-                'Then ensure that ssh_user is correct.\n'
+        exit_message = (
+            'Failed to SSH into manager.\n'
+            'Manager ssh profiles settings may be incorrect.\n'
+            'To view current profile settings, run: '
+            'cfy profiles show-current\n'
+            'Then ensure that ssh_user is correct.\n'
+        )
+        if cluster_node_name:
+            exit_message += (
+                'cfy profiles set-cluster {node} --ssh-user '
+                '<SSH username>\n'.format(node=cluster_node_name)
+            )
+        else:
+            exit_message += (
                 'cfy profiles set --ssh-user <SSH username>\n'
-                'If your ssh port and keyfiles are not default, you should '
-                'also correct these settings:\n'
+            )
+        exit_message += (
+            'If your ssh port and keyfiles are not default, you should '
+            'also correct these settings:\n'
+        )
+        if cluster_node_name:
+            exit_message += (
+                'cfy profiles set-cluster {node} --ssh-key <SSH key path>\n'
+                'cfy profiles set-cluster {node} --ssh-port '
+                '<SSH port>'.format(node=cluster_node_name)
+            )
+        else:
+            exit_message += (
                 'cfy profiles set --ssh-key <SSH key path>\n'
                 'cfy profiles set --ssh-port <SSH port>'
-            ),
-            action,
-        )
+            )
+        exit_with_sadness(exit_message, action)
 
 
 def abort_on_unhealthy_services(action):
@@ -1401,46 +1426,148 @@ def list_patches(json_output):
     action = 'LISTING PATCHES'
 
     ssh_details = get_profile_ssh_details(action)
-    manager_connection_string = ssh_details[0]['connection_string']
-    keyfile = ssh_details[0]['key_path']
-    ssh_port = ssh_details[0]['ssh_port']
 
-    if not json_output:
-        say("Getting installed patch details from manager...")
-    abort_on_ssh_failure(manager_connection_string, ssh_port, keyfile, action,
-                         quiet=json_output)
-    registry = download_patch_registry(manager_connection_string, ssh_port,
-                                       keyfile, action, quiet=json_output)
-    patches = registry.get('current_patches', [])
+    manager_patches = {}
+
+    for mgr_ssh_details in ssh_details:
+        manager_connection_string = mgr_ssh_details['connection_string']
+        keyfile = mgr_ssh_details['key_path']
+        ssh_port = mgr_ssh_details['ssh_port']
+        cluster_node_name = mgr_ssh_details['cluster_node_name']
+
+        if not json_output:
+            if cluster_node_name:
+                say(
+                    "Getting installed patch details from {node}...".format(
+                        node=cluster_node_name,
+                    )
+                )
+            else:
+                say("Getting installed patch details from manager...")
+        abort_on_ssh_failure(manager_connection_string, ssh_port, keyfile,
+                             action, cluster_node_name=cluster_node_name,
+                             quiet=json_output)
+        registry = download_patch_registry(manager_connection_string, ssh_port,
+                                           keyfile, action, quiet=json_output)
+        manager_patches[cluster_node_name] = registry.get('current_patches',
+                                                          [])
 
     if json_output:
-        say(json.dumps(patches))
+        if len(manager_patches) > 1:
+            say(json.dumps(manager_patches))
+        else:
+            say(json.dumps(manager_patches[None]))
     else:
-        if patches:
+        for patches in manager_patches.values():
             uninstall_blocked = get_uninstall_blockers(patches)
             for patch in patches:
                 if patch['patch_id'] in uninstall_blocked:
-                    uninstall_restrictions = (
-                        ' Uninstall blocked by: {blockers}'.format(
-                            blockers=', '.join(
-                                uninstall_blocked[patch['patch_id']]
-                            ),
-                        )
-                    )
+                    patch['blockers'] = uninstall_blocked[patch['patch_id']]
                 else:
-                    uninstall_restrictions = ''
+                    patch['blockers'] = []
 
-                say(
-                    'Patch {name} (ID: {patch_id}) was installed on '
-                    '{timestamp}.{uninstall_restrictions}'.format(
-                        name=patch['patch_name'],
-                        patch_id=patch['patch_id'],
-                        timestamp=patch['timestamp'],
-                        uninstall_restrictions=uninstall_restrictions,
-                    )
-                )
+        # Determine if any of the cluster nodes have different patches
+        if len(manager_patches) > 1:
+            node_groups = []
+            for node, patches in manager_patches.items():
+                matches_others = False
+                # If we compare with timestamps included it is easy to get
+                # false positives
+                node_timestamps = [
+                    patch.pop('timestamp') for patch in patches
+                ]
+                # Strip out patch directories as they contain the timestamp
+                # and we don't display them in 'friendly' output anyway
+                for patch in patches:
+                    patch.pop('patch_directory')
+                for grp_nodes, grp_patches, grp_timestamps in node_groups:
+                    if patches == grp_patches:
+                        grp_nodes.append(node)
+                        grp_timestamps.append(node_timestamps)
+                        matches_others = True
+                if not matches_others:
+                    node_groups.append(([node], patches, [node_timestamps]))
+
+            # Sort the groups, putting the most frequently found patch
+            # combinations first, then by amount of patches if there is a
+            # collision
+            node_groups.sort(key=lambda x: (len(x[0]), len(x[1])),
+                             reverse=True)
+
+            # Merge the timestamps back in
+            for grp_nodes, grp_patches, grp_timestamps in node_groups:
+                for patch_num in range(len(grp_patches)):
+                    grp_patches[patch_num]['timestamp'] = [
+                        grp_timestamps[node_num][patch_num] +
+                        '(' + grp_nodes[node_num] + ')'
+                        for node_num in range(len(grp_nodes))
+                    ]
+
+            display_patches = node_groups[0][1]
+            differences = node_groups[1:]
         else:
-            say("No installed patches found on manager.")
+            display_patches = manager_patches[None]
+            differences = []
+
+        if display_patches:
+            say('')
+            display_patch_listing(display_patches)
+        else:
+            if len(manager_patches) > 1:
+                say("No installed patches found on cluster.")
+            else:
+                say("No installed patches found on manager.")
+
+        for different_nodes, different_patches, _ in differences:
+            sadly_say('')
+            if len(different_nodes) > 1:
+                sadly_say('Nodes {nodes} have different patches:'.format(
+                    nodes=', '.join(different_nodes),
+                ))
+            else:
+                sadly_say('Node {node} has different patches:'.format(
+                    node=different_nodes[0],
+                ))
+            if different_patches:
+                display_patch_listing(different_patches,
+                                      output_method=sadly_say)
+            else:
+                sadly_say('No patches installed.')
+            sadly_say('')
+
+        if differences:
+            sadly_say(
+                "Please try to resolve patch issues by applying or removing "
+                "patches from the cluster."
+            )
+            sys.exit(1)
+
+
+def display_patch_listing(patches, output_method=say):
+    for patch in patches:
+        if patch['blockers']:
+            uninstall_restrictions = (
+                ' Uninstall blocked by: {blockers}'.format(
+                    blockers=', '.join(patch['blockers']),
+                )
+            )
+        else:
+            uninstall_restrictions = ''
+
+        if isinstance(patch['timestamp'], list):
+            display_timestamp = ', '.join(patch['timestamp'])
+        else:
+            display_timestamp = patch['timestamp']
+
+        output_method(
+            'Patch {name} (ID: {patch_id}) was installed on '
+            '{timestamp}.{uninstall_restrictions}'.format(
+                name=patch['patch_name'],
+                patch_id=patch['patch_id'],
+                timestamp=display_timestamp,
+                uninstall_restrictions=uninstall_restrictions,
+            )
+        )
 
 
 def download_patch_registry(manager_connection_string, ssh_port, keyfile,
