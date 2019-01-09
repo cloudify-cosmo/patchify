@@ -1,13 +1,22 @@
 #! /usr/bin/env python
 # Note that cfy is used rather than the client so that the user does not have
 # to provide credentials, etc, to this script.
+from __future__ import print_function
 import argparse
+from contextlib import contextmanager
 import datetime
 import json
 import os
 import subprocess
 import sys
+import tempfile
 import time
+
+BASE_MANAGER_PATCH_STORAGE_PATH = '/etc/cloudify/patches'
+PATCH_REGISTRY_FILE_NAME = 'patch_registry.json'
+PATCH_REGISTRY_PATH = os.path.join(
+    BASE_MANAGER_PATCH_STORAGE_PATH, PATCH_REGISTRY_FILE_NAME
+)
 
 
 class VersionError(Exception):
@@ -18,9 +27,13 @@ class UploadError(Exception):
     pass
 
 
-def exit_with_sadness(message):
+class DownloadError(Exception):
+    pass
+
+
+def exit_with_sadness(message, action):
     sadly_say(message)
-    sadly_say('FAILED TO APPLY PATCH!')
+    sadly_say('FAILED {action}!'.format(action=action))
     sys.exit(1)
 
 
@@ -85,8 +98,6 @@ def load_patch_definition(filename):
     with open(filename) as definition_handle:
         definition = json.load(definition_handle)
 
-    # As this is a POC, I'm not creating a programmatic way to define schema
-    # yet.
     # Currently this only handles version 1.0.0 of patch definitions:
     # {
     #   "patch_version": 1.0.0,  # No other value supported yet
@@ -200,6 +211,22 @@ def load_patch_definition(filename):
     return definition
 
 
+def load_and_validate_patch_definition(filename, action):
+    definition = load_patch_definition(filename)
+
+    fatal_error = False
+    for error in definition.get('errors', []):
+        message = error['message']
+        if error['fatal']:
+            message = 'FATAL: ' + message
+            fatal_error = True
+        sadly_say(message)
+    if fatal_error:
+        exit_with_sadness('Patch definition error!', action)
+
+    return definition
+
+
 def add_definition_error(message, definition, fatal=False):
     errors = definition.get('errors', [])
     errors.append({
@@ -211,14 +238,64 @@ def add_definition_error(message, definition, fatal=False):
 
 def get_unhealthy_services():
     try:
-        status_output = subprocess.check_output(['cfy', 'status'])
+        _, results = get_cfy_output(['status'])
     except subprocess.CalledProcessError:
         return ['All processes (is cfy pointing at a working manager?)']
 
     unhealthy_services = []
 
+    for result in results:
+        service = result[1]
+        status = result[2]
+        if status not in ('running', 'up'):
+            unhealthy_services.append(service)
+
+    return unhealthy_services
+
+
+def get_profile_ssh_details(action):
+    try:
+        headers, results = get_cfy_output(['profiles', 'show-current'])
+    except subprocess.CalledProcessError as err:
+        exit_with_sadness(
+            (
+                'Failed to retrieve SSH details from profile, with error: '
+                '{err}'
+            ).format(
+                err=str(err),
+            ),
+            action,
+        )
+
+    ssh_user_pos = headers.index('ssh_user')
+    manager_ip_pos = headers.index('manager_ip')
+    ssh_port_pos = headers.index('ssh_port')
+    ssh_key_path_pos = headers.index('ssh_key_path')
+
+    manager_connection_details = []
+    for result in results:
+        manager_connection_details.append({
+            'manager_ip': result[manager_ip_pos],
+            'connection_string': (
+                result[ssh_user_pos] + '@' + result[manager_ip_pos]
+            ),
+            'ssh_port': result[ssh_port_pos],
+            'key_path': result[ssh_key_path_pos],
+        })
+
+    return manager_connection_details
+
+
+def get_cfy_output(subcommand_and_args):
+    command = ['cfy']
+    command.extend(subcommand_and_args)
+
+    command_output = subprocess.check_output(command)
+
+    headers = []
+    results = []
     dividers_found = 0
-    for line in status_output.splitlines():
+    for line in command_output.splitlines():
         if dividers_found == 3:
             # We reached the end of the output
             break
@@ -243,18 +320,17 @@ def get_unhealthy_services():
         # +--------------------------------+--------+
         if line.startswith('+--'):
             dividers_found += 1
+        elif dividers_found == 1:
+            # Headers are found after the first divider
+            headers = [element.strip() for element in line.split('|')]
         elif dividers_found == 2:
-            # Services are only shown after the second divider
-            line = line.split('|')
-            service = line[1].strip()
-            status = line[2].strip()
-            if status not in ('running', 'up'):
-                unhealthy_services.append(service)
+            # Results are only shown after the second divider
+            results.append([element.strip() for element in line.split('|')])
 
-    return unhealthy_services
+    return headers, results
 
 
-def get_file_md5sum(file_path, manager_connection_string, keyfile):
+def get_file_md5sum(file_path, manager_connection_string, ssh_port, keyfile):
     # Structure the command so that we return meaningful output in predictable
     # situations (where the path isn't a file (e.g. is a directory) or does
     # not exist), while still allowing failure for unexpected situations
@@ -273,14 +349,22 @@ def get_file_md5sum(file_path, manager_connection_string, keyfile):
             notexisting="DOESNOTEXIST",
         )
     )
-    return ssh(manager_connection_string, keyfile, md5command).split(' ')[0]
+    return ssh(
+        manager_connection_string, ssh_port, keyfile, md5command
+    ).split(' ')[0]
 
 
-def md5sums_match(check_list, manager_connection_string, keyfile):
+def get_local_md5sum(file_path):
+    return subprocess.check_output(['md5sum', file_path]).split(' ')[0]
+
+
+def md5sums_match(check_list, manager_connection_string, ssh_port, keyfile):
     matching = True
     for file_path, acceptable_md5sums in check_list.items():
         say('Checking md5sum for {path}'.format(path=file_path))
-        md5sum = get_file_md5sum(file_path, manager_connection_string, keyfile)
+        md5sum = get_file_md5sum(
+            file_path, manager_connection_string, ssh_port, keyfile
+        )
 
         if md5sum not in acceptable_md5sums:
             matching = False
@@ -305,85 +389,188 @@ def md5sums_match(check_list, manager_connection_string, keyfile):
     return matching
 
 
-def can_ssh(manager_connection_string, keyfile):
+def can_ssh(manager_connection_string, ssh_port, keyfile):
     try:
-        ssh(manager_connection_string, keyfile, 'echo "SSH works."')
+        ssh(manager_connection_string, ssh_port, keyfile, 'echo "SSH works."',
+            stderr=subprocess.STDOUT)
+        return True
+    except subprocess.CalledProcessError as err:
+        if err.returncode == 255 and 'usage' in err.output:
+            say(
+                "Invalid arguments to SSH command. Command was: {cmd}".format(
+                    cmd=' '.join(err.cmd),
+                )
+            )
+        return False
+
+
+def patch_command_available(manager_connection_string, ssh_port, keyfile):
+    try:
+        ssh(manager_connection_string, ssh_port, keyfile, 'which patch')
         return True
     except subprocess.CalledProcessError:
         return False
 
 
-def patch_command_available(manager_connection_string, keyfile):
-    try:
-        ssh(manager_connection_string, keyfile, 'which patch')
-        return True
-    except subprocess.CalledProcessError:
-        return False
-
-
-def ssh(manager_connection_string, keyfile, command):
-    ssh_command = ['ssh']
+def ssh(manager_connection_string, ssh_port, keyfile, command,
+        stderr=None):
+    ssh_command = ['ssh', '-p', ssh_port]
     if keyfile:
         ssh_command.extend(['-i', keyfile])
     ssh_command.extend([manager_connection_string, command])
-    return subprocess.check_output(ssh_command)
+    return subprocess.check_output(ssh_command, stderr=stderr)
 
 
-def stop_services(manager_connection_string, services, keyfile):
+@contextmanager
+def temporarily_own_directory(manager_connection_string, ssh_port, keyfile,
+                              path):
+    ssh(
+        manager_connection_string,
+        ssh_port,
+        keyfile,
+        'sudo chown $(whoami). ' + path,
+    )
+    try:
+        yield
+    finally:
+        ssh(
+            manager_connection_string,
+            ssh_port,
+            keyfile,
+            'sudo chown root. ' + path,
+        )
+
+
+@contextmanager
+def tempdir():
+    tmp_path = tempfile.mkdtemp(prefix='patchify-')
+    try:
+        yield tmp_path
+    finally:
+        for tmp_file in os.listdir(tmp_path):
+            os.unlink(os.path.join(tmp_path, tmp_file))
+        os.rmdir(tmp_path)
+
+
+def _scp(keyfile, ssh_port, source, dest, quiet=False):
+    scp_command = ['scp', '-P', ssh_port]
+    if keyfile:
+        scp_command.extend(['-i', keyfile])
+    scp_command.extend([source, dest])
+    if quiet:
+        subprocess.check_output(scp_command)
+    else:
+        subprocess.check_call(scp_command)
+
+
+def upload(file_name, source_path, dest_path,
+           manager_connection_string, ssh_port, keyfile,
+           expected_md5sum=None):
+    source = os.path.join(source_path, file_name)
+    dest = '{mgr}:{dest_path}'.format(
+        mgr=manager_connection_string,
+        dest_path=dest_path,
+    )
+    say("Uploading {source} to {dest}".format(source=source, dest=dest))
+
+    _scp(keyfile, ssh_port, source, dest)
+
+    if not expected_md5sum:
+        expected_md5sum = get_local_md5sum(source)
+
+    uploaded_md5sum = get_file_md5sum(
+        file_path=dest_path,
+        manager_connection_string=manager_connection_string,
+        ssh_port=ssh_port,
+        keyfile=keyfile,
+    )
+
+    if not uploaded_md5sum == expected_md5sum:
+        raise UploadError(
+            'Uploaded file {file_name} had md5sum {actual}, but should '
+            'have had {expected}.'.format(
+                file_name=file_name,
+                actual=uploaded_md5sum,
+                expected=expected_md5sum,
+            )
+        )
+
+
+def download(file_name, source_path, dest_path,
+             manager_connection_string, ssh_port, keyfile, quiet=False):
+    source = '{mgr}:{dest_path}'.format(
+        mgr=manager_connection_string,
+        dest_path=os.path.join(source_path, file_name),
+    )
+    dest = dest_path
+    if not quiet:
+        say("Downloading {source} to {dest}".format(source=source, dest=dest))
+
+    _scp(keyfile, ssh_port, source, dest, quiet=quiet)
+
+    original_md5sum = get_file_md5sum(
+        file_path=os.path.join(source_path, file_name),
+        manager_connection_string=manager_connection_string,
+        ssh_port=ssh_port,
+        keyfile=keyfile,
+    )
+
+    downloaded_md5sum = get_local_md5sum(dest)
+
+    if not original_md5sum == downloaded_md5sum:
+        raise DownloadError(
+            'Downloaded file {file_path} had md5sum {actual}, but should '
+            'have had {expected}.'.format(
+                file_path=os.path.join(dest_path, file_name),
+                actual=downloaded_md5sum,
+                expected=original_md5sum,
+            )
+        )
+
+
+def stop_services(manager_connection_string, ssh_port, services, keyfile):
     for service in services:
         ssh(
             manager_connection_string,
+            ssh_port,
             keyfile,
             'sudo systemctl stop {service}'.format(service=service),
         )
 
 
-def start_services(manager_connection_string, services, keyfile):
+def start_services(manager_connection_string, ssh_port, services, keyfile):
     # Ensure we're using any unit files we may have updated
     ssh(
         manager_connection_string,
+        ssh_port,
         keyfile,
         'sudo systemctl daemon-reload',
     )
     for service in services:
         ssh(
             manager_connection_string,
+            ssh_port,
             keyfile,
             'sudo systemctl start {service}'.format(service=service),
         )
 
 
-def upload_and_verify_patch_files(manager_connection_string, patch_dir,
-                                  patches, staging_dir, keyfile):
+def upload_and_verify_patch_files(manager_connection_string, ssh_port,
+                                  patch_dir, patches, staging_dir,
+                                  keyfile):
     for patch in patches:
         patch_name = patch['patch_file']
         expected_md5sum = patch['md5sum']
-        scp_command = ['scp']
-        if keyfile:
-            scp_command.extend(['-i', keyfile])
-        scp_command.extend([
-            os.path.join(patch_dir, patch_name),
-            '{mgr}:{staging_dir}'.format(
-                mgr=manager_connection_string,
-                staging_dir=staging_dir,
-            )
-        ])
-        subprocess.check_call(scp_command)
-        uploaded_md5sum = get_file_md5sum(
-            file_path=os.path.join(staging_dir, patch_name),
+
+        upload(
+            file_name=patch_name,
+            source_path=patch_dir,
+            dest_path=os.path.join(staging_dir, patch_name),
+            expected_md5sum=expected_md5sum,
             manager_connection_string=manager_connection_string,
+            ssh_port=ssh_port,
             keyfile=keyfile,
         )
-
-        if not uploaded_md5sum == expected_md5sum:
-            raise UploadError(
-                'Uploaded {patch} had md5sum {actual}, but should have had '
-                '{expected}.'.format(
-                    patch=patch_name,
-                    actual=uploaded_md5sum,
-                    expected=expected_md5sum,
-                )
-            )
 
 
 def build_manager_version_output_string(version, community):
@@ -395,8 +582,8 @@ def build_manager_version_output_string(version, community):
     return version_output
 
 
-def rollback(manager_connection_string, patch_definition, backup_root,
-             delete_root, keyfile, skip_services):
+def rollback(manager_connection_string, ssh_port, patch_definition,
+             backup_root, delete_root, keyfile, skip_services):
     if skip_services:
         sadly_say(
             "Not ensuring services are stopped due to skip-services flag."
@@ -407,6 +594,7 @@ def rollback(manager_connection_string, patch_definition, backup_root,
         sadly_say('Ensuring services are stopped for rollback.')
         stop_services(
             manager_connection_string,
+            ssh_port,
             patch_definition['affected_services'],
             keyfile,
         )
@@ -428,11 +616,12 @@ def rollback(manager_connection_string, patch_definition, backup_root,
         )
         ssh(
             manager_connection_string,
+            ssh_port,
             keyfile,
             'if sudo test -f {backup}; then '    # Only restore existing
             '  sudo cp {backup} {orig}; '        # and remove added files
             'else '
-            '  mkdir -p {delete_dest_parent} && '
+            '  sudo mkdir -p {delete_dest_parent} && '
             '  sudo mv {orig} {delete_dest}; '
             'fi'.format(
                 backup=backed_up_file,
@@ -448,6 +637,7 @@ def rollback(manager_connection_string, patch_definition, backup_root,
         sadly_say('Starting services after rollback.')
         start_services(
             manager_connection_string,
+            ssh_port,
             patch_definition['affected_services'],
             keyfile,
         )
@@ -467,27 +657,290 @@ def get_list_of_affected_files(patches):
 def get_patch_storage_path(timestamp):
     # Don't use os.path.join in case this gets run on windows (the path itself
     # is on the manager, which will be Linux)
-    return '/etc/cloudify/patches/{timestamp}'.format(timestamp=timestamp)
+    return '{base}/{timestamp}'.format(
+        base=BASE_MANAGER_PATCH_STORAGE_PATH,
+        timestamp=timestamp,
+    )
 
 
-def apply_patch(definition_file, manager_connection_string, keyfile,
-                skip_services):
+def abort_on_ssh_failure(manager_connection_string, ssh_port, keyfile, action,
+                         quiet=False):
+    if not quiet:
+        say("Checking SSH.")
+    if not can_ssh(manager_connection_string, ssh_port, keyfile):
+        exit_with_sadness(
+            (
+                'Failed to SSH into manager.\n'
+                'Manager ssh profiles settings may be incorrect.\n'
+                'To view current profile settings, run: '
+                'cfy profiles show-current\n'
+                'Then ensure that ssh_user is correct.\n'
+                'cfy profiles set --ssh-user <SSH username>\n'
+                'If your ssh port and keyfiles are not default, you should '
+                'also correct these settings:\n'
+                'cfy profiles set --ssh-key <SSH key path>\n'
+                'cfy profiles set --ssh-port <SSH port>'
+            ),
+            action,
+        )
+
+
+def abort_on_unhealthy_services(action):
+    say("Checking service state.")
+    unhealthy_services = get_unhealthy_services()
+    if unhealthy_services:
+        exit_with_sadness(
+            'Not all services are healthy. '
+            'Unhealthy services: {services}'.format(
+                services=', '.join(unhealthy_services),
+            ),
+            action,
+        )
+
+
+def abort_on_missing_patch_command(manager_connection_string, ssh_port,
+                                   keyfile, action, install_patch_command):
+    say('Confirming patch command exists on server.')
+    if not patch_command_available(manager_connection_string, ssh_port,
+                                   keyfile):
+        if install_patch_command:
+            say("Patch command not found. Installing patch command.")
+            ssh(
+                manager_connection_string,
+                ssh_port,
+                keyfile,
+                'sudo yum install -y patch',
+            )
+        else:
+            exit_with_sadness(
+                'Could not find "patch" command on server. '
+                'On the manager, you may need to run: '
+                '"sudo yum install -y patch" or call this script with '
+                'the --install-patch-command flag.',
+                action,
+            )
+
+
+def check_md5sums_before(patch_definition, manager_connection_string,
+                         ssh_port, keyfile, action):
+    say("Checking md5sums are as expected.")
+    if not md5sums_match(patch_definition['md5sums_before'],
+                         manager_connection_string,
+                         ssh_port,
+                         keyfile):
+        exit_with_sadness(
+            'Unexpected md5sums found before starting patch installation.',
+            action,
+        )
+
+
+def generate_patch_data_dir(patch_name, patch_definition, timestamp,
+                            manager_connection_string, ssh_port, keyfile,
+                            definition_file, action):
+    patch_dirs = {}
+
+    patch_path = get_patch_storage_path(timestamp)
+    patch_dirs['patch_path'] = patch_path
+
+    say("Creating patch directory in: {path}".format(path=patch_path))
+    # We will also put some patch details to aid any later troubleshooting
+    patch_info = 'attempting to apply ' + patch_name
+    ssh(
+        manager_connection_string,
+        ssh_port,
+        keyfile,
+        'sudo mkdir -p ' + patch_path +
+        ' && echo ' + patch_info +
+        ' | sudo tee ' + patch_path + '/patch_info >/dev/null',
+    )
+    with temporarily_own_directory(manager_connection_string, ssh_port,
+                                   keyfile, patch_path):
+        source_path, file_name = os.path.split(definition_file)
+        upload(
+            file_name=file_name,
+            source_path=source_path,
+            dest_path=os.path.join(patch_path, 'patch_definition'),
+            manager_connection_string=manager_connection_string,
+            ssh_port=ssh_port,
+            keyfile=keyfile,
+        )
+
+    patch_dirs['backup_root'] = '{base}/backups'.format(
+        base=patch_path,
+    )
+    patch_dirs['delete_root'] = '{base}/deleted_files'.format(
+        base=patch_path,
+    )
+    say(
+        "Backing up affected files to {path}".format(
+            path=patch_dirs['backup_root']
+        )
+    )
+    ssh(
+        manager_connection_string,
+        ssh_port,
+        keyfile,
+        'sudo mkdir -p ' + patch_dirs['backup_root'],
+    )
+    ssh(
+        manager_connection_string,
+        ssh_port,
+        keyfile,
+        'sudo mkdir -p ' + patch_dirs['delete_root'],
+    )
+    affected_files = get_list_of_affected_files(patch_definition['patches'])
+    for affected_file in affected_files:
+        say(
+            "Backing up {file_path} to {destination}".format(
+                file_path=affected_file,
+                destination=os.path.join(
+                    patch_dirs['backup_root'],
+                    affected_file.lstrip('/'),
+                ),
+            )
+        )
+        # We sudo (root) the copy because of user differences in different
+        # versions of cloudify, but we probably should define this better
+        # based on which version it's targetting.
+        ssh(
+            manager_connection_string,
+            ssh_port,
+            keyfile,
+            'if sudo test -f {source}; then '  # Only if the file exists
+            'sudo cp --parents {source} {destination}; fi'.format(
+                source=affected_file,
+                destination=patch_dirs['backup_root'],
+            ),
+        )
+
+    if action == 'APPLYING PATCH':
+        patch_dirs['staging_dir'] = '{base}/patch_files'.format(
+            base=patch_path,
+        )
+        ssh(
+            manager_connection_string,
+            ssh_port,
+            keyfile,
+            'sudo mkdir -p ' + patch_dirs['staging_dir'],
+        )
+        with temporarily_own_directory(manager_connection_string, ssh_port,
+                                       keyfile, patch_dirs['staging_dir']):
+            patch_dir = os.path.join(os.path.dirname(definition_file),
+                                     'patches')
+            say("Uploading and verifying patch files.")
+            try:
+                upload_and_verify_patch_files(manager_connection_string,
+                                              ssh_port,
+                                              patch_dir,
+                                              patch_definition['patches'],
+                                              patch_dirs['staging_dir'],
+                                              keyfile)
+            except UploadError as err:
+                exit_with_sadness(
+                    'Failed to upload patch files: {err}'.format(
+                        err=str(err),
+                    ),
+                    action,
+                )
+
+    return patch_dirs
+
+
+def generate_timestamp():
+    # Avoiding : in timestamp to avoid needing to escape it for bash
+    return datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S%z')
+
+
+def possibly_stop_services(patch_definition, skip_services,
+                           manager_connection_string, ssh_port, keyfile):
+    if skip_services:
+        say("Not stopping services due to skip-services flag.")
+    else:
+        say("Stopping services.")
+        stop_services(manager_connection_string,
+                      ssh_port,
+                      patch_definition['affected_services'],
+                      keyfile)
+
+
+def possibly_start_services(patch_definition, skip_services,
+                            manager_connection_string, ssh_port, keyfile):
+    if skip_services:
+        say("Not starting services due to skip-services flag.")
+    else:
+        say("Starting services.")
+        start_services(manager_connection_string,
+                       ssh_port,
+                       patch_definition['affected_services'],
+                       keyfile)
+
+
+def check_md5sums_after(patch_definition,
+                        manager_connection_string, ssh_port, keyfile,
+                        action, backup_root, delete_root, skip_services):
+    say("Checking post-patch md5sums.")
+    if not md5sums_match(patch_definition['md5sums_after'],
+                         manager_connection_string,
+                         ssh_port,
+                         keyfile):
+        rollback(manager_connection_string, ssh_port, patch_definition,
+                 backup_root, delete_root, keyfile, skip_services)
+        exit_with_sadness(
+            'Unexpected md5sums found after patch installation.\n'
+            'Changes rolled back.',
+            action,
+        )
+
+
+def wait_for_healthy_services(patch_definition, backup_root, delete_root,
+                              skip_services, action,
+                              manager_connection_string, ssh_port, keyfile):
+    say(
+        "Checking service state with patches {action}.".format(
+            action=action.lower(),
+        )
+    )
+    unhealthy_services = []
+    max_attempts = 10
+    for attempt in range(1, max_attempts + 1):
+        if unhealthy_services:
+            say(
+                "Services still restarting [{at}/{mx}]...".format(
+                    at=attempt,
+                    mx=max_attempts,
+                )
+            )
+            time.sleep(3)
+        unhealthy_services = get_unhealthy_services()
+    if unhealthy_services:
+        rollback(manager_connection_string, ssh_port, patch_definition,
+                 backup_root, delete_root, keyfile, skip_services)
+        exit_with_sadness(
+            'Services did not restart correctly. '
+            'Unhealthy services: {services}\n'
+            'Changes rolled back.'.format(
+                services=', '.join(unhealthy_services),
+            ),
+            action,
+        )
+
+
+def apply_patch(definition_file, skip_services, install_patch_command):
+    action = 'APPLYING PATCH'
+
+    ssh_details = get_profile_ssh_details(action)
+    manager_connection_string = ssh_details[0]['connection_string']
+    keyfile = ssh_details[0]['key_path']
+    ssh_port = ssh_details[0]['ssh_port']
+
     say("Loading patch definition.")
-    patch_definition = load_patch_definition(definition_file)
+    patch_definition = load_and_validate_patch_definition(definition_file,
+                                                          action)
+
     patch_name = os.path.basename(definition_file)
     if patch_name.endswith('.json'):
         # Remove patch name extension
         patch_name = os.path.splitext(patch_name)[0]
-
-    fatal_error = False
-    for error in patch_definition.get('errors', []):
-        message = error['message']
-        if error['fatal']:
-            message = 'FATAL: ' + message
-            fatal_error = True
-        sadly_say(message)
-    if fatal_error:
-        exit_with_sadness('Patch definition error!')
 
     say("Checking manager version is valid.")
     manager_version = get_manager_version()
@@ -496,7 +949,8 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
         exit_with_sadness(
             'Could not get manager version! '
             'Are you in an environment with cfy using a profile for the '
-            'manager you intend to patch?'
+            'manager you intend to patch?',
+            action,
         )
     supported_versions = []
     if patch_definition['premium']:
@@ -523,7 +977,8 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
                 'Could not determine manager version.\n'
                 'Version check output was: {raw_output}'.format(
                     raw_output=raw_version_output,
-                )
+                ),
+                action,
             )
         supported_versions_output = ', '.join([
             build_manager_version_output_string(
@@ -538,135 +993,36 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
             '{supported_versions}'.format(
                 manager_version=manager_version_output,
                 supported_versions=supported_versions_output,
-            )
-        )
-
-    say("Checking service state.")
-    unhealthy_services = get_unhealthy_services()
-    if unhealthy_services:
-        exit_with_sadness(
-            'Not all services are healthy. '
-            'Unhealthy services: {services}'.format(
-                services=', '.join(unhealthy_services),
-            )
-        )
-
-    say("Checking SSH.")
-    if not can_ssh(manager_connection_string, keyfile):
-        exit_with_sadness(
-            'Failed to SSH into manager.',
-        )
-
-    say('Confirming patch command exists on server.')
-    if not patch_command_available(manager_connection_string, keyfile):
-        exit_with_sadness(
-            'Could not find "patch" command on server. '
-            'On the manager, you may need to run: sudo yum install -y patch'
-        )
-
-    say("Checking md5sums are as expected.")
-    if not md5sums_match(patch_definition['md5sums_before'],
-                         manager_connection_string,
-                         keyfile):
-        exit_with_sadness(
-            'Unexpected md5sums found before starting patch installation.'
-        )
-
-    # Avoiding : in timestamp to avoid needing to escape it for bash
-    timestamp = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S%z')
-    say("Patching timestamp is: {timestamp}".format(timestamp=timestamp))
-    patch_path = get_patch_storage_path(timestamp)
-
-    say("Creating patch directory in: {path}".format(path=patch_path))
-    # We will also put the name of the patch to aid with later investigation
-    ssh(
-        manager_connection_string,
-        keyfile,
-        'sudo mkdir -p ' + patch_path +
-        ' && sudo touch ' + patch_path + '/' + patch_name,
-    )
-
-    backup_root = '{base}/backups'.format(
-        base=patch_path,
-    )
-    delete_root = '{base}/deleted_files'.format(
-        base=patch_path,
-    )
-    say("Backing up affected files to {path}".format(path=backup_root))
-    ssh(
-        manager_connection_string,
-        keyfile,
-        'sudo mkdir -p ' + backup_root,
-    )
-    ssh(
-        manager_connection_string,
-        keyfile,
-        'sudo mkdir -p ' + delete_root,
-    )
-    affected_files = get_list_of_affected_files(patch_definition['patches'])
-    for affected_file in affected_files:
-        say(
-            "Backing up {file_path} to {destination}".format(
-                file_path=affected_file,
-                destination=os.path.join(
-                    backup_root,
-                    affected_file.lstrip('/'),
-                ),
-            )
-        )
-        # We sudo (root) the copy because of user differences in different
-        # versions of cloudify, but we probably should define this better
-        # based on which version it's targetting.
-        ssh(
-            manager_connection_string,
-            keyfile,
-            'if sudo test -f {source}; then '  # Only if the file exists
-            'sudo cp --parents {source} {destination}; fi'.format(
-                source=affected_file,
-                destination=backup_root,
             ),
+            action,
         )
 
-    staging_dir = '{base}/patch_files'.format(
-        base=patch_path,
-    )
-    ssh(
-        manager_connection_string,
-        keyfile,
-        'sudo mkdir -p ' + staging_dir,
-    )
-    ssh(
-        manager_connection_string,
-        keyfile,
-        'sudo chown $(whoami). ' + staging_dir,
-    )
-    patch_dir = os.path.join(os.path.dirname(definition_file), 'patches')
-    say("Uploading and verifying patch files.")
-    try:
-        upload_and_verify_patch_files(manager_connection_string,
-                                      patch_dir,
-                                      patch_definition['patches'],
-                                      staging_dir,
-                                      keyfile)
-    except UploadError as err:
-        exit_with_sadness(
-            'Failed to upload patch files: {err}'.format(
-                err=str(err),
-            )
-        )
-    ssh(
-        manager_connection_string,
-        keyfile,
-        'sudo chown root. ' + staging_dir,
-    )
+    abort_on_unhealthy_services(action)
 
-    if skip_services:
-        say("Not stopping services due to skip-services flag.")
-    else:
-        say("Stopping services.")
-        stop_services(manager_connection_string,
-                      patch_definition['affected_services'],
-                      keyfile)
+    abort_on_ssh_failure(manager_connection_string, ssh_port, keyfile, action)
+
+    abort_on_missing_patch_command(manager_connection_string, ssh_port,
+                                   keyfile, action, install_patch_command)
+
+    check_md5sums_before(patch_definition, manager_connection_string,
+                         ssh_port, keyfile, action)
+
+    say("Retrieving patch registry information.")
+    registry = download_patch_registry(manager_connection_string, ssh_port,
+                                       keyfile, action)
+
+    timestamp = generate_timestamp()
+    say("Patching timestamp is: {timestamp}".format(timestamp=timestamp))
+    patch_dirs = generate_patch_data_dir(patch_name, patch_definition,
+                                         timestamp,
+                                         manager_connection_string, ssh_port,
+                                         keyfile, definition_file, action)
+    backup_root = patch_dirs['backup_root']
+    delete_root = patch_dirs['delete_root']
+    staging_dir = patch_dirs['staging_dir']
+
+    possibly_stop_services(patch_definition, skip_services,
+                           manager_connection_string, ssh_port, keyfile)
 
     say("Applying patches.")
     for patch in patch_definition['patches']:
@@ -680,6 +1036,7 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
             try:
                 ssh(
                     manager_connection_string,
+                    ssh_port,
                     keyfile,
                     'sudo patch {destination} {patch}'.format(
                         destination=destination,
@@ -690,88 +1047,440 @@ def apply_patch(definition_file, manager_connection_string, keyfile,
                     )
                 )
             except subprocess.CalledProcessError as err:
-                rollback(manager_connection_string, patch_definition,
-                         backup_root, delete_root, keyfile, skip_services)
+                rollback(manager_connection_string, ssh_port,
+                         patch_definition, backup_root, delete_root, keyfile,
+                         skip_services)
                 exit_with_sadness(
                     'Failed to apply patch {patch} to {target}\n'
-                    'Changes rolled back.'.format(
+                    'Changes rolled back.\n'
+                    'Error was: {err}\n'.format(
                         patch=patch['patch_file'],
                         target=destination,
-                    )
+                        err=str(err),
+                    ),
+                    action,
                 )
 
-    say("Checking post-patch md5sums.")
-    if not md5sums_match(patch_definition['md5sums_after'],
-                         manager_connection_string,
-                         keyfile):
-        rollback(manager_connection_string, patch_definition, backup_root,
-                 delete_root, keyfile, skip_services)
-        exit_with_sadness(
-            'Unexpected md5sums found after patch installation.\n'
-            'Changes rolled back.'
-        )
+    check_md5sums_after(patch_definition,
+                        manager_connection_string, ssh_port, keyfile,
+                        action, backup_root, delete_root, skip_services)
 
-    if skip_services:
-        say("Not starting services due to skip-services flag.")
-    else:
-        say("Starting services.")
-        start_services(manager_connection_string,
-                       patch_definition['affected_services'],
-                       keyfile)
+    possibly_start_services(patch_definition, skip_services,
+                            manager_connection_string, ssh_port, keyfile)
 
-    say("Checking service state with patches applied.")
-    unhealthy_services = []
-    for attempt in range(0, 10):
-        if unhealthy_services:
-            say("Services still restarting...")
-            time.sleep(3)
-        unhealthy_services = get_unhealthy_services()
-    if unhealthy_services:
-        rollback(manager_connection_string, patch_definition, backup_root,
-                 delete_root, keyfile, skip_services)
-        exit_with_sadness(
-            'Services did not restart correctly. '
-            'Unhealthy services: {services}\n'
-            'Changes rolled back.'.format(
-                services=', '.join(unhealthy_services),
-            )
-        )
+    wait_for_healthy_services(patch_definition, backup_root, delete_root,
+                              skip_services, action,
+                              manager_connection_string, ssh_port, keyfile)
+
+    say("Patch installed and services healthy.")
+
+    say("Updating patch information and registry.")
+    patch_info = "applied " + patch_name
+    ssh(
+        manager_connection_string,
+        ssh_port,
+        keyfile,
+        'echo ' + patch_info +
+        ' | sudo tee ' + patch_dirs['patch_path'] + '/patch_info >/dev/null',
+    )
+    add_patch_to_registry(registry, timestamp, patch_name,
+                          patch_dirs['patch_path'], patch_definition,
+                          manager_connection_string, ssh_port, keyfile,
+                          action)
 
     say('Patch applied!')
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Apply a patch to a cloudify manager.',
-    )
-    # TODO: We should probably want the patch supplied as a zip containing
-    # the patch definition and the patch file, but for POC purposes we just
-    # put everything in the POC folder
+def remove_patch(target_patch_id, skip_services):
+    action = 'REMOVING PATCH'
 
-    parser.add_argument(
-        '-c', '--manager_connection_string',
-        help="The manager connection string for ssh, e.g. centos@192.0.2.4",
-        required=True,
+    ssh_details = get_profile_ssh_details(action)
+    manager_connection_string = ssh_details[0]['connection_string']
+    keyfile = ssh_details[0]['key_path']
+    ssh_port = ssh_details[0]['ssh_port']
+
+    abort_on_unhealthy_services(action)
+
+    abort_on_ssh_failure(manager_connection_string, ssh_port, keyfile, action)
+
+    say("Retrieving patch registry information.")
+    registry = download_patch_registry(manager_connection_string, ssh_port,
+                                       keyfile, action)
+
+    say("Getting target patch information...")
+    current_patches = registry.get('current_patches')
+    target_patch = None
+    for patch in current_patches:
+        if patch['patch_id'] == target_patch_id:
+            say('Target patch information located.')
+            target_patch = patch
+            break
+    if target_patch is None:
+        all_patch_ids = [patch['patch_id'] for patch in current_patches]
+        exit_with_sadness(
+            'Could not locate patch with ID {patch_id}.\n'
+            'Currently installed patches were: {patches}\n'
+            'For more details, run {prog} with the list subcommand.'.format(
+                patch_id=target_patch_id,
+                patches=', '.join(all_patch_ids),
+                prog=sys.argv[0],
+            ),
+            action,
+        )
+
+    say("Checking for blocking patches...")
+    blockers = get_uninstall_blockers(current_patches).get(target_patch_id)
+    if blockers is not None:
+        exit_with_sadness(
+            'Could not uninstall patch with ID {patch_id}.\n'
+            'Patch uninstall blocked by patches: {blockers}'.format(
+                patch_id=target_patch_id,
+                blockers=', '.join(blockers),
+            ),
+            action,
+        )
+    say("No blockers, patch is valid candidate for uninstall.")
+
+    say("Retrieving old patch definition.")
+    with tempdir() as tmp_path:
+        local_patch_definition = os.path.join(tmp_path, 'patch_definition')
+        download(
+            file_name='patch_definition',
+            source_path=patch['patch_directory'],
+            dest_path=local_patch_definition,
+            manager_connection_string=manager_connection_string,
+            ssh_port=ssh_port,
+            keyfile=keyfile,
+        )
+        try:
+            with open(local_patch_definition) as def_handle:
+                old_definition = json.load(def_handle)
+        except ValueError:
+            exit_with_sadness(
+                'Could not parse old patch definition retrieved from '
+                '{patch_def_location}.'.format(
+                    patch_def_location=os.path.join(
+                        patch['patch_directory'], 'patch_definition',
+                    ),
+                ),
+                action,
+            )
+
+    say("Building removal definition.")
+    backup_path = os.path.join(
+        patch['patch_directory'],
+        'backups',
     )
-    parser.add_argument(
-        '-p', '--patch_file',
-        help=(
-            'The patch file to use. Note that for POC purposes this is just '
-            'a definition file, but this should probably be changed to a zip '
-            'for real world use (so that it can work on Windows as well as '
-            'Linux.'
-        ),
-        required=True,
+    new_definition = {
+        'md5sums_before': old_definition['md5sums_after'],
+        'md5sums_after': old_definition['md5sums_before'],
+        'patches': [
+            {'destinations': old_patch['destinations']}
+            for old_patch in old_definition['patches']
+        ],
+        'affected_services': old_definition['affected_services'],
+        'removed_patch_backups_path': backup_path,
+    }
+
+    say("Checking for correct files to restore.")
+    files_to_delete = []
+    files_to_restore = []
+    for target_file, valid_md5sums in new_definition['md5sums_after'].items():
+        target_backup_path = os.path.join(
+            backup_path,
+            target_file.lstrip('/'),
+        )
+
+        backup_md5sum = get_file_md5sum(
+            file_path=target_backup_path,
+            manager_connection_string=manager_connection_string,
+            ssh_port=ssh_port,
+            keyfile=keyfile,
+        )
+        if backup_md5sum not in valid_md5sums:
+            exit_with_sadness(
+                'File to be restored does not match any acceptable MD5sums.\n'
+                'File to be restored was: {target_file}\n'
+                'MD5sum was "{backup_md5sum}", but valid MD5sums were: '
+                '{valid}'.format(
+                    target_file=target_backup_path,
+                    backup_md5sum=backup_md5sum,
+                    valid=', '.join(valid_md5sums),
+                ),
+                action,
+            )
+
+        if backup_md5sum == 'DOESNOTEXIST':
+            files_to_delete.append(target_file)
+        else:
+            files_to_restore.append((target_backup_path, target_file))
+
+    say("Validating current files.")
+    check_md5sums_before(new_definition, manager_connection_string,
+                         ssh_port, keyfile, action)
+
+    possibly_stop_services(new_definition, skip_services,
+                           manager_connection_string, ssh_port, keyfile)
+
+    say("Deploying removal directory.")
+    with tempdir() as tmp_dir:
+        temporary_definition_file = os.path.join(tmp_dir, 'patch_definition')
+        with open(temporary_definition_file, 'w') as def_handle:
+            def_handle.write(json.dumps(new_definition))
+        patch_dirs = generate_patch_data_dir(
+            patch_name='remove-' + patch['patch_name'],
+            patch_definition=new_definition,
+            timestamp=generate_timestamp(),
+            manager_connection_string=manager_connection_string,
+            ssh_port=ssh_port,
+            keyfile=keyfile,
+            definition_file=temporary_definition_file,
+            action=action,
+        )
+
+    if files_to_delete:
+        say("Removing files added by target patch.")
+        for delete_file in files_to_delete:
+            ssh(
+                manager_connection_string,
+                ssh_port,
+                keyfile,
+                'sudo rm -f {delete_file} '.format(
+                    delete_file=delete_file,
+                )
+            )
+            delete_file_base, extension = os.path.splitext(delete_file)
+            if extension == '.py':
+                ssh(
+                    manager_connection_string,
+                    ssh_port,
+                    keyfile,
+                    'sudo rm -f {pyartefacts}'.format(
+                        pyartefacts=delete_file_base + '.py[co]',
+                    )
+                )
+
+    if files_to_restore:
+        say("Restoring files modified by target patch.'")
+        for file_backup, target_file in files_to_restore:
+            ssh(
+                manager_connection_string,
+                ssh_port,
+                keyfile,
+                'sudo cp {backup} {restored}'.format(
+                    backup=file_backup,
+                    restored=target_file,
+                )
+            )
+            restore_file_base, extension = os.path.splitext(target_file)
+            if extension == '.py':
+                ssh(
+                    manager_connection_string,
+                    ssh_port,
+                    keyfile,
+                    'sudo rm -f {pyartefacts}'.format(
+                        pyartefacts=restore_file_base + '.py[co]',
+                    )
+                )
+
+    backup_root = patch_dirs['backup_root']
+    delete_root = patch_dirs['delete_root']
+    check_md5sums_after(new_definition,
+                        manager_connection_string, ssh_port, keyfile,
+                        action, backup_root, delete_root, skip_services)
+
+    possibly_start_services(new_definition, skip_services,
+                            manager_connection_string, ssh_port, keyfile)
+
+    wait_for_healthy_services(new_definition, backup_root, delete_root,
+                              skip_services, action,
+                              manager_connection_string, ssh_port, keyfile)
+
+    say("Patch removed, updating registry.")
+
+    remove_patch_from_registry(registry, target_patch_id,
+                               manager_connection_string, ssh_port, keyfile,
+                               action)
+
+    say("Patch removed successfully.")
+
+
+def add_patch_to_registry(registry, timestamp,
+                          patch_name, patch_path, patch_definition,
+                          manager_connection_string, ssh_port, keyfile,
+                          action):
+    current_patches = registry.get('current_patches', [])
+
+    affected_files = patch_definition['md5sums_after'].keys()
+
+    block_uninstall = []
+    for existing_patch in current_patches:
+        if any(affected_file in existing_patch['modified_files']
+               for affected_file in affected_files):
+            block_uninstall.append(existing_patch['patch_id'])
+
+    definition_md5sum = get_file_md5sum(
+        file_path=os.path.join(patch_path, 'patch_definition'),
+        manager_connection_string=manager_connection_string,
+        ssh_port=ssh_port,
+        keyfile=keyfile,
     )
-    parser.add_argument(
-        '-i', '--keyfile',
-        help=(
-            'The path to the ssh keyfile to use. If not set, no keyfile will '
-            'be specified.'
-        ),
-        default=None,
-        required=False,
+
+    new_patch = {
+        'patch_id': patch_name + '-' + definition_md5sum,
+        'patch_name': patch_name,
+        'timestamp': timestamp,
+        'patch_directory': patch_path,
+        'modified_files': patch_definition['md5sums_after'],
+        'blocks_uninstall_of': block_uninstall,
+    }
+
+    current_patches.append(new_patch)
+
+    registry['current_patches'] = current_patches
+
+    update_registry(registry, manager_connection_string, ssh_port, keyfile,
+                    action)
+
+
+def update_registry(registry, manager_connection_string, ssh_port, keyfile,
+                    action):
+    with tempdir() as tmp_path:
+        local_reg_path = os.path.join(tmp_path, PATCH_REGISTRY_FILE_NAME)
+
+        try:
+            with open(local_reg_path, 'w') as local_reg_handle:
+                local_reg_handle.write(json.dumps(registry))
+        except Exception as err:
+            exit_with_sadness(
+                'FAILED TO GENERATE NEW REGISTRY!\n'
+                'PATCH STATE HAS BEEN UPDATED BUT REGISTRY IS INCORRECT!\n'
+                'Error was: {err}'.format(err=err),
+                action,
+            )
+
+        with temporarily_own_directory(manager_connection_string, ssh_port,
+                                       keyfile,
+                                       BASE_MANAGER_PATCH_STORAGE_PATH):
+            upload(
+                file_name=PATCH_REGISTRY_FILE_NAME,
+                source_path=tmp_path,
+                dest_path=PATCH_REGISTRY_PATH,
+                manager_connection_string=manager_connection_string,
+                ssh_port=ssh_port,
+                keyfile=keyfile,
+            )
+
+
+def remove_patch_from_registry(registry, patch_id, manager_connection_string,
+                               ssh_port, keyfile, action):
+    current_patches = []
+    for patch in registry['current_patches']:
+        if patch['patch_id'] == patch_id:
+            continue
+        else:
+            current_patches.append(patch)
+
+    registry['current_patches'] = current_patches
+
+    update_registry(registry, manager_connection_string, ssh_port, keyfile,
+                    action)
+
+
+def get_uninstall_blockers(patches):
+    blockers = {}
+    for patch in patches:
+        for blocked in patch.get('blocks_uninstall_of', []):
+            if blocked not in blockers:
+                blockers[blocked] = []
+            blockers[blocked].append(patch['patch_id'])
+    return blockers
+
+
+def list_patches(json_output):
+    action = 'LISTING PATCHES'
+
+    ssh_details = get_profile_ssh_details(action)
+    manager_connection_string = ssh_details[0]['connection_string']
+    keyfile = ssh_details[0]['key_path']
+    ssh_port = ssh_details[0]['ssh_port']
+
+    if not json_output:
+        say("Getting installed patch details from manager...")
+    abort_on_ssh_failure(manager_connection_string, ssh_port, keyfile, action,
+                         quiet=json_output)
+    registry = download_patch_registry(manager_connection_string, ssh_port,
+                                       keyfile, action, quiet=json_output)
+    patches = registry.get('current_patches', [])
+
+    if json_output:
+        say(json.dumps(patches))
+    else:
+        if patches:
+            uninstall_blocked = get_uninstall_blockers(patches)
+            for patch in patches:
+                if patch['patch_id'] in uninstall_blocked:
+                    uninstall_restrictions = (
+                        ' Uninstall blocked by: {blockers}'.format(
+                            blockers=', '.join(
+                                uninstall_blocked[patch['patch_id']]
+                            ),
+                        )
+                    )
+                else:
+                    uninstall_restrictions = ''
+
+                say(
+                    'Patch {name} (ID: {patch_id}) was installed on '
+                    '{timestamp}.{uninstall_restrictions}'.format(
+                        name=patch['patch_name'],
+                        patch_id=patch['patch_id'],
+                        timestamp=patch['timestamp'],
+                        uninstall_restrictions=uninstall_restrictions,
+                    )
+                )
+        else:
+            say("No installed patches found on manager.")
+
+
+def download_patch_registry(manager_connection_string, ssh_port, keyfile,
+                            action, quiet=False):
+    patch_registry_md5 = get_file_md5sum(
+        PATCH_REGISTRY_PATH,
+        manager_connection_string,
+        ssh_port,
+        keyfile,
     )
+    if patch_registry_md5 == 'DOESNOTEXIST':
+        registry = {
+            'current_patches': [],
+        }
+    else:
+        with tempdir() as tmp_path:
+            local_reg_path = os.path.join(tmp_path, PATCH_REGISTRY_FILE_NAME)
+
+            download(
+                file_name=PATCH_REGISTRY_FILE_NAME,
+                source_path=BASE_MANAGER_PATCH_STORAGE_PATH,
+                dest_path=local_reg_path,
+                manager_connection_string=manager_connection_string,
+                ssh_port=ssh_port,
+                keyfile=keyfile,
+                quiet=quiet,
+            )
+
+            try:
+                with open(local_reg_path) as local_reg_handle:
+                    registry = json.load(local_reg_handle)
+            except ValueError:
+                exit_with_sadness(
+                    'Could not parse existing patch registry.',
+                    action,
+                )
+    return registry
+
+
+def add_apply_and_remove_args(parser):
     parser.add_argument(
         '-s', '--skip-services',
         help=(
@@ -783,7 +1492,81 @@ if __name__ == '__main__':
         required=False,
     )
 
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Apply a patch to a cloudify manager.',
+    )
+    # TODO: We should probably want the patch supplied as a zip containing
+    # the patch definition and the patch file, but for POC purposes we just
+    # put everything in the POC folder
+
+    subparsers = parser.add_subparsers(help='Patch action',
+                                       dest='action')
+
+    list_patch_args = subparsers.add_parser('list',
+                                            help='List installed patches')
+    list_patch_args.add_argument(
+        '-j', '--json',
+        help=(
+            'Whether to output the patch list in json. '
+            'If true, a json dict mapping timestamps to patch names will be '
+            'the output.'
+        ),
+        action='store_true',
+        default=False,
+        required=False,
+    )
+
+    apply_patch_args = subparsers.add_parser('apply',
+                                             help='Apply a patch')
+    apply_patch_args.add_argument(
+        '-p', '--patch_file',
+        help=(
+            'The patch file to use. Note that for POC purposes this is just '
+            'a definition file, but this should probably be changed to a zip '
+            'for real world use (so that it can work on Windows as well as '
+            'Linux.'
+        ),
+        required=True,
+    )
+    apply_patch_args.add_argument(
+        '-P', '--install-patch-command',
+        help=(
+            'Set this flag to yum install the patch command if it is not '
+            'present.'
+        ),
+        action='store_true',
+        default=False,
+        required=False,
+    )
+    add_apply_and_remove_args(apply_patch_args)
+
+    remove_patch_args = subparsers.add_parser('remove',
+                                              help='Remove a patch')
+    remove_patch_args.add_argument(
+        '-p', '--patch-id',
+        help=(
+            'The ID of the patch to remove. This can be obtained using the '
+            'list subcommand.'
+        ),
+        required=True,
+    )
+    add_apply_and_remove_args(remove_patch_args)
+
     args = parser.parse_args()
 
-    apply_patch(args.patch_file, args.manager_connection_string,
-                args.keyfile, args.skip_services)
+    if args.action == 'apply':
+        apply_patch(args.patch_file, args.skip_services,
+                    args.install_patch_command)
+    elif args.action == 'remove':
+        remove_patch(args.patch_id, args.skip_services)
+    elif args.action == 'list':
+        list_patches(args.json)
+    else:
+        # You can't get here without messing about with the code above
+        raise RuntimeError('Invalid action specified in parser.')
+
+
+if __name__ == '__main__':
+    main()
