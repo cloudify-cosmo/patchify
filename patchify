@@ -294,6 +294,97 @@ def get_profile_ssh_details(action):
     return manager_connection_details
 
 
+class ClusterUnhealthy(Exception):
+    pass
+
+
+class ClusterLeaderChangeFailure(Exception):
+    pass
+
+
+class ClusterLeaderChangeToCurrent(Exception):
+    pass
+
+
+def get_cluster_members():
+    headers, results = get_cfy_output(['cluster', 'nodes', 'list'])
+
+    state_pos = headers.index('state')
+    name_pos = headers.index('name')
+
+    leader_node = None
+    member_nodes = []
+    offline_nodes = []
+    for result in results:
+        node_name = result[name_pos]
+        node_state = result[state_pos]
+        if node_state == 'leader':
+            if leader_node is not None:
+                raise ClusterUnhealthy(
+                    'Found multiple leader nodes in the cluster. This should '
+                    'not happen! Both {leader1} and {leader2} had their '
+                    'state set to "leader".'.format(
+                        leader1=leader_node,
+                        leader2=node_name,
+                    ),
+                )
+            leader_node = node_name
+        elif node_state == 'replica':
+            member_nodes.append(node_name)
+        elif node_state == 'offline':
+            offline_nodes.append(node_name)
+        else:
+            raise ClusterUnhealthy(
+                'Unexpected cluster node state found: '
+                '{node} is in state {state}.'.format(
+                    node=node_name,
+                    state=node_state,
+                ),
+            )
+
+    return leader_node, member_nodes, offline_nodes
+
+
+def change_cluster_leader(new_leader):
+    leader, _, _ = get_cluster_members()
+    if leader == new_leader:
+        raise ClusterLeaderChangeToCurrent()
+
+    say("Changing cluster leader to {new}.".format(new=new_leader))
+    subprocess.check_call(['cfy', 'cluster', 'set-active', new_leader])
+
+    # It can take a minute or more for failovers to occur. We'll allow for
+    # five minutes in case of excessively slow changes on a large manager
+    max_attempts = 100
+    for attempt in range(1, max_attempts + 1):
+        leader, _, offline = get_cluster_members()
+        if offline:
+            say(
+                "Waiting for cluster members to come back online "
+                "[{at}/{mx}]...".format(at=attempt, mx=max_attempts)
+            )
+        elif leader == new_leader:
+            say("Cluster leader is now {new}.".format(new=new_leader))
+            break
+        else:
+            say(
+                "Waiting for {new} to become leader "
+                "(current leader: {current}) [{at}/{mx}]...".format(
+                    new=new_leader,
+                    current=leader,
+                    at=attempt,
+                    mx=max_attempts,
+                )
+            )
+        time.sleep(3)
+
+    if leader != new_leader:
+        raise ClusterLeaderChangeFailure(
+            'Cluster leader did not become {new} within the timeout '
+            'period.'.format(new=new_leader),
+        )
+
+
 def get_cfy_output(subcommand_and_args):
     command = ['cfy']
     command.extend(subcommand_and_args)
