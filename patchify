@@ -1916,6 +1916,12 @@ def list_patches(json_output):
 
     ssh_details = get_profile_ssh_details(action)
 
+    if len(ssh_details) > 1:
+        say("Determining cluster leader.")
+        leader, _, _ = get_cluster_members()
+    else:
+        leader = None
+
     manager_patches = {}
 
     for mgr_ssh_details in ssh_details:
@@ -1949,7 +1955,7 @@ def list_patches(json_output):
                                                           [])
 
     if json_output:
-        if len(manager_patches) > 1:
+        if leader:
             say(json.dumps(manager_patches))
         else:
             say(json.dumps(manager_patches[None]))
@@ -1963,7 +1969,7 @@ def list_patches(json_output):
                     patch['blockers'] = []
 
         # Determine if any of the cluster nodes have different patches
-        if len(manager_patches) > 1:
+        if leader:
             node_groups = []
             for node, patches in manager_patches.items():
                 matches_others = False
@@ -1989,6 +1995,15 @@ def list_patches(json_output):
             # collision
             node_groups.sort(key=lambda x: (len(x[0]), len(x[1])),
                              reverse=True)
+            # And then put the group with the leader at the top of the list
+            for idx, entry in enumerate(node_groups):
+                if leader in entry[0]:
+                    leader_group_pos = idx
+                    break
+            node_groups.insert(
+                0,
+                node_groups.pop(leader_group_pos),
+            )
 
             # Merge the timestamps back in
             for grp_nodes, grp_patches, grp_timestamps in node_groups:
@@ -2007,21 +2022,28 @@ def list_patches(json_output):
 
         if display_patches:
             say('')
+            if leader:
+                say("Cluster patches:")
             display_patch_listing(display_patches)
         else:
-            if len(manager_patches) > 1:
-                say("No installed patches found on cluster.")
+            if leader:
+                say('')
+                say("Cluster patches:")
+                if differences:
+                    say("No installed patches found on leader.")
+                else:
+                    say("No installed patches found on cluster.")
             else:
                 say("No installed patches found on manager.")
 
         for different_nodes, different_patches, _ in differences:
             sadly_say('')
             if len(different_nodes) > 1:
-                sadly_say('Nodes {nodes} have different patches:'.format(
+                sadly_say('Replicas {nodes} have different patches:'.format(
                     nodes=', '.join(different_nodes),
                 ))
             else:
-                sadly_say('Node {node} has different patches:'.format(
+                sadly_say('Replica {node} has different patches:'.format(
                     node=different_nodes[0],
                 ))
             if different_patches:
