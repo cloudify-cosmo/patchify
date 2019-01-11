@@ -79,6 +79,14 @@ class RegistryGenerationFailure(Exception):
     pass
 
 
+class PatchApplyFailed(Exception):
+    pass
+
+
+class PatchAlreadyApplied(Exception):
+    pass
+
+
 def exit_with_sadness(message, action):
     sadly_say(message)
     sadly_say('FAILED {action}!'.format(action=action))
@@ -1075,13 +1083,10 @@ def wait_for_healthy_services(patch_definition, backup_root, delete_root,
         )
 
 
-def apply_patch(definition_file, skip_services, install_patch_command):
+def patch_applier(definition_file, skip_services, install_patch_command):
     action = 'APPLYING PATCH'
 
     ssh_details = get_profile_ssh_details(action)
-    manager_connection_string = ssh_details[0]['connection_string']
-    keyfile = ssh_details[0]['key_path']
-    ssh_port = ssh_details[0]['ssh_port']
 
     say("Loading patch definition.")
     patch_definition = load_and_validate_patch_definition(definition_file,
@@ -1122,11 +1127,13 @@ def apply_patch(definition_file, skip_services, install_patch_command):
                 version=manager_version['version'],
                 community=manager_version['community'],
             )
-        except Exception:
+        except Exception as err:
             exit_with_sadness(
                 'Could not determine manager version.\n'
-                'Version check output was: {raw_output}'.format(
+                'Version check output was: {raw_output}\n'
+                'Error was: {err}'.format(
                     raw_output=raw_version_output,
+                    err=str(err),
                 ),
                 action,
             )
@@ -1147,31 +1154,208 @@ def apply_patch(definition_file, skip_services, install_patch_command):
             action,
         )
 
-    try:
-        abort_on_unhealthy_services()
-    except ServiceHealthFailure as err:
-        exit_with_sadness(str(err), action)
+    if len(ssh_details) > 1:
+        say("Attempting to apply patch to cluster.")
+        leader, members, offline = get_cluster_members()
 
-    try:
-        abort_on_ssh_failure(manager_connection_string, ssh_port, keyfile)
-    except SSHCheckFailure as err:
-        exit_with_sadness(str(err), action)
+        if offline:
+            exit_with_sadness(
+                (
+                    'Cluster members {offline} are offline. Please ensure '
+                    'cluster is healthy before attempting to apply the '
+                    'patch.'.format(
+                        offline=', '.join(offline),
+                    )
+                ),
+                action,
+            )
 
-    abort_on_missing_patch_command(manager_connection_string, ssh_port,
-                                   keyfile, action, install_patch_command)
+        # We will process the members in arbitrary order, followed by the
+        # current leader, as we need to switch the leader after each
+        # application to ensure services still work without the patch
+        members.append(leader)
+        member_ssh = {
+            entry['cluster_node_name']: entry for entry in ssh_details
+        }
+        say("Validating SSH connectivity to members.")
+        for member in members:
+            try:
+                abort_on_ssh_failure(
+                    member_ssh[member]['connection_string'],
+                    member_ssh[member]['ssh_port'],
+                    member_ssh[member]['key_path'],
+                    cluster_node_name=member,
+                )
+                abort_on_missing_patch_command(
+                    member_ssh[member]['connection_string'],
+                    member_ssh[member]['ssh_port'],
+                    member_ssh[member]['key_path'],
+                    action,
+                    install_patch_command,
+                )
+            except SSHCheckFailure as err:
+                exit_with_sadness(str(err), action)
 
-    try:
-        check_md5sums_before(patch_definition, manager_connection_string,
-                             ssh_port, keyfile)
-    except MD5CheckFailure as err:
-        exit_with_sadness(str(err), action)
+        apply_not_required = 0
+
+        for member in members:
+            applied_to_this_node = True
+            say(
+                "Attempting to apply patch to {member}".format(
+                    member=member,
+                )
+            )
+            try:
+                rollback_args = apply_patch(
+                    patch_definition,
+                    patch_name,
+                    definition_file,
+                    # Don't play with services or the cluster will get unhappy
+                    True,
+                    member_ssh[member],
+                    action,
+                )
+            except (
+                ServiceHealthFailure,
+                PatchAlreadyApplied,
+                PatchApplyFailed,
+                PatchDefinitionParseFailure,
+                MD5CheckFailure,
+                RegistryGenerationFailure,
+            ) as err:
+                if isinstance(err, PatchAlreadyApplied):
+                    say(
+                        "Patch did not need applying to {member}.".format(
+                            member=member,
+                        )
+                    )
+                    applied_to_this_node = False
+                    apply_not_required += 1
+                else:
+                    exit_with_sadness(
+                        (
+                            'Failed to apply patch to node.\n'
+                            'Aborting patch application attempt.'
+                        ),
+                        action,
+                    )
+            # Confirming health of cluster member
+            try:
+                if applied_to_this_node:
+                    # If no other nodes needed modifying, the leader will
+                    # still be the original leader, so we must switch away
+                    # then back
+                    if member == leader \
+                       and apply_not_required == len(members) - 1:
+                        say(
+                            "Switching away from old leader temporarily to "
+                            "confirm services are healthy after modification."
+                        )
+                        change_cluster_leader(members[0])
+                    change_cluster_leader(member)
+            except ClusterLeaderChangeFailure as err:
+                sadly_say(
+                    "Failed to switch to {member}.\n"
+                    "Attempting to roll back patch on this manager.".format(
+                        member=member,
+                    )
+                )
+                rollback(*rollback_args)
+                exit_with_sadness(
+                    (
+                        "Rolled back {member}. Patch has not been fully "
+                        "applied to cluster.\n"
+                        "Please verify cluster healthy before re-attempting "
+                        "this action."
+                    ),
+                    action,
+                )
+            except ClusterLeaderChangeToCurrent as err:
+                exit_with_sadness(
+                    (
+                        "Failure attempting to change leader to {member}, "
+                        "because this node was already the leader.\n"
+                        "Cluster appears to be undergoing unexpected leader "
+                        "changes while patching.".format(
+                            member=member,
+                        )
+                    ),
+                    action,
+                )
+        if apply_not_required == len(members):
+            exit_with_sadness(
+                'Patch was already installed on all nodes in the cluster!',
+                action,
+            )
+        else:
+            say("Patch applied to cluster.")
+    else:
+        say("Attempting to apply patch to manager.")
+        ssh_details = ssh_details[0]
+        try:
+            abort_on_unhealthy_services()
+            abort_on_ssh_failure(
+                ssh_details['connection_string'],
+                ssh_details['ssh_port'],
+                ssh_details['key_path'],
+            )
+            abort_on_missing_patch_command(
+                ssh_details['connection_string'],
+                ssh_details['ssh_port'],
+                ssh_details['key_path'],
+                action,
+                install_patch_command,
+            )
+            apply_patch(
+                patch_definition,
+                patch_name,
+                definition_file,
+                skip_services,
+                ssh_details,
+                action,
+            )
+        except (
+            ServiceHealthFailure,
+            SSHCheckFailure,
+            PatchApplyFailed,
+            PatchAlreadyApplied,
+            PatchDefinitionParseFailure,
+            MD5CheckFailure,
+            RegistryGenerationFailure,
+        ) as err:
+            exit_with_sadness(str(err), action)
+
+
+def apply_patch(patch_definition, patch_name, definition_file, skip_services,
+                ssh_details, action):
+    manager_connection_string = ssh_details['connection_string']
+    keyfile = ssh_details['key_path']
+    ssh_port = ssh_details['ssh_port']
 
     say("Retrieving patch registry information.")
-    try:
-        registry = download_patch_registry(manager_connection_string,
-                                           ssh_port, keyfile)
-    except PatchRegistryParseFailure as err:
-        exit_with_sadness(str(err), action)
+    registry = download_patch_registry(manager_connection_string,
+                                       ssh_port, keyfile)
+
+    say("Checking whether patch has already been applied.")
+    definition_md5sum = get_local_md5sum(definition_file)
+    patch_id = generate_patch_id(patch_name, definition_md5sum)
+    current_patches = registry.get('current_patches')
+    this_patch = None
+    for patch in current_patches:
+        if patch['patch_id'] == patch_id:
+            say('New patch ID located.')
+            this_patch = patch
+            break
+    if this_patch is not None:
+        raise PatchAlreadyApplied(
+            'Existing patch found with ID {patch_id}.\n'
+            'This patch appears to already be installed.'.format(
+                patch_id=patch_id,
+            )
+        )
+
+    check_md5sums_before(patch_definition, manager_connection_string,
+                         ssh_port, keyfile)
 
     timestamp = generate_timestamp()
     say("Patching timestamp is: {timestamp}".format(timestamp=timestamp))
@@ -1212,7 +1396,7 @@ def apply_patch(definition_file, skip_services, install_patch_command):
                 rollback(manager_connection_string, ssh_port,
                          patch_definition, backup_root, delete_root, keyfile,
                          skip_services)
-                exit_with_sadness(
+                raise PatchApplyFailed(
                     'Failed to apply patch {patch} to {target}\n'
                     'Changes rolled back.\n'
                     'Error was: {err}\n'.format(
@@ -1220,25 +1404,18 @@ def apply_patch(definition_file, skip_services, install_patch_command):
                         target=destination,
                         err=str(err),
                     ),
-                    action,
                 )
 
-    try:
-        check_md5sums_after(patch_definition,
-                            manager_connection_string, ssh_port, keyfile,
-                            backup_root, delete_root, skip_services)
-    except MD5CheckFailure as err:
-        exit_with_sadness(str(err), action)
+    check_md5sums_after(patch_definition,
+                        manager_connection_string, ssh_port, keyfile,
+                        backup_root, delete_root, skip_services)
 
     possibly_start_services(patch_definition, skip_services,
                             manager_connection_string, ssh_port, keyfile)
 
-    try:
-        wait_for_healthy_services(patch_definition, backup_root, delete_root,
-                                  skip_services, manager_connection_string,
-                                  ssh_port, keyfile)
-    except ServiceHealthFailure as err:
-        exit_with_sadness(str(err), action)
+    wait_for_healthy_services(patch_definition, backup_root, delete_root,
+                              skip_services, manager_connection_string,
+                              ssh_port, keyfile)
 
     say("Patch installed and services healthy.")
 
@@ -1251,14 +1428,23 @@ def apply_patch(definition_file, skip_services, install_patch_command):
         'echo ' + patch_info +
         ' | sudo tee ' + patch_dirs['patch_path'] + '/patch_info >/dev/null',
     )
-    try:
-        add_patch_to_registry(registry, timestamp, patch_name,
-                              patch_dirs['patch_path'], patch_definition,
-                              manager_connection_string, ssh_port, keyfile)
-    except RegistryGenerationFailure as err:
-        exit_with_sadness(str(err), action)
+    add_patch_to_registry(registry, patch_id, timestamp, patch_name,
+                          patch_dirs['patch_path'], patch_definition,
+                          manager_connection_string, ssh_port, keyfile)
 
     say('Patch applied!')
+
+    # Return arguments required for rollback to allow rollback in cluster
+    # patching
+    return (
+        manager_connection_string,
+        ssh_port,
+        patch_definition,
+        backup_root,
+        delete_root,
+        keyfile,
+        skip_services,
+    )
 
 
 def patch_remover(target_patch_id, skip_services):
@@ -1641,7 +1827,11 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
     )
 
 
-def add_patch_to_registry(registry, timestamp,
+def generate_patch_id(patch_name, definition_md5sum):
+    return patch_name + '-' + definition_md5sum
+
+
+def add_patch_to_registry(registry, patch_id, timestamp,
                           patch_name, patch_path, patch_definition,
                           manager_connection_string, ssh_port, keyfile):
     current_patches = registry.get('current_patches', [])
@@ -1654,15 +1844,8 @@ def add_patch_to_registry(registry, timestamp,
                for affected_file in affected_files):
             block_uninstall.append(existing_patch['patch_id'])
 
-    definition_md5sum = get_file_md5sum(
-        file_path=os.path.join(patch_path, 'patch_definition'),
-        manager_connection_string=manager_connection_string,
-        ssh_port=ssh_port,
-        keyfile=keyfile,
-    )
-
     new_patch = {
-        'patch_id': patch_name + '-' + definition_md5sum,
+        'patch_id': patch_id,
         'patch_name': patch_name,
         'timestamp': timestamp,
         'patch_directory': patch_path,
@@ -1996,8 +2179,8 @@ def main():
     args = parser.parse_args()
 
     if args.action == 'apply':
-        apply_patch(args.patch_file, args.skip_services,
-                    args.install_patch_command)
+        patch_applier(args.patch_file, args.skip_services,
+                      args.install_patch_command)
     elif args.action == 'remove':
         patch_remover(args.patch_id, args.skip_services)
     elif args.action == 'list':
