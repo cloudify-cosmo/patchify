@@ -261,7 +261,7 @@ def get_profile_ssh_details():
     return manager_connection_details
 
 
-def determine_manager_paths(diff_files):
+def determine_manager_paths(diff_files, location_mappings):
     """Find locations for a file on the manager based on its name and md5sum.
     """
     ssh_details = get_profile_ssh_details()[0]
@@ -273,24 +273,28 @@ def determine_manager_paths(diff_files):
         base_command.extend(['-i', ssh_details['key_path']])
 
     for details in diff_files.values():
-        command = base_command + [
-            'sudo find /opt /etc/cloudify '
-            '-name {filename} -exec md5sum {{}} \\;'.format(
-                filename=os.path.split(details['path_in_repo'])[1],
-            )
-        ]
+        path_in_repo = details['path_in_repo']
+        if path_in_repo in location_mappings:
+            details['destinations'] = location_mappings[path_in_repo]
+        else:
+            command = base_command + [
+                'sudo find /opt /etc/cloudify '
+                '-name {filename} -exec md5sum {{}} \\;'.format(
+                    filename=os.path.split(path_in_repo)[1],
+                )
+            ]
 
-        locations = []
-        result = subprocess.check_output(command)
-        for line in result.strip().splitlines():
-            if line == '':
-                continue
-            line = line.strip()
-            line_md5sum, path = line.split(' ', 1)
-            if line_md5sum.strip() == details['before_md5sum']:
-                locations.append(path.strip())
+            locations = []
+            result = subprocess.check_output(command)
+            for line in result.strip().splitlines():
+                if line == '':
+                    continue
+                line = line.strip()
+                line_md5sum, path = line.split(' ', 1)
+                if line_md5sum.strip() == details['before_md5sum']:
+                    locations.append(path.strip())
 
-        details['destinations'] = locations
+            details['destinations'] = locations
 
 
 def determine_affected_services(diff_files):
@@ -307,7 +311,7 @@ def determine_affected_services(diff_files):
     return list(affected_services)
 
 
-def generate_patch(patch_name, path_to_repo, commit):
+def generate_patch(patch_name, path_to_repo, commit, location_mappings):
     """Generate the patch."""
     patch_definition = {'patch_version': '1.0.0'}
 
@@ -327,7 +331,7 @@ def generate_patch(patch_name, path_to_repo, commit):
 
     generate_after_patch_md5sums(path_to_repo, diff_files)
 
-    determine_manager_paths(diff_files)
+    determine_manager_paths(diff_files, location_mappings)
 
     patch_definition['affected_services'] = determine_affected_services(
         diff_files,
@@ -391,6 +395,19 @@ def attempt_to_apply_patch(patch_definition, patch_files):
     )
 
 
+def process_location_mappings(location_mappings):
+    """Put location mappings in a usable format for the rest of the wizard."""
+    if location_mappings is None:
+        location_mappings = []
+    processed_mappings = {}
+    for mapping in location_mappings:
+        repo_path, manager_path = mapping.strip().split(':')
+        if repo_path not in processed_mappings:
+            processed_mappings[repo_path] = []
+        processed_mappings[repo_path].append(manager_path)
+    return processed_mappings
+
+
 def check_patch_name(name):
     """Confirm the patch name is valid."""
     for char in name:
@@ -432,15 +449,30 @@ def main():
         ),
         required=True,
     )
-    # TODO: Alternatively if user provides file mappings, use those for
-    # location mappings
+    parser.add_argument(
+        '-m', '--manager-location-mappings',
+        help=(
+            '<path in repo>:<location on manager> mapping. '
+            'This can be specified multiple times for different repo files '
+            'and different manager destinations. '
+            'If this is not specified, the wizard will attempt to determine '
+            'these paths automatically. '
+            'This argument can be specified multiple times.'
+        ),
+        action='append',
+    )
 
     args = parser.parse_args()
+
+    location_mappings = process_location_mappings(
+        args.manager_location_mappings,
+    )
 
     patch_definition, patch_files = generate_patch(
         args.name,
         args.path_to_repo,
         args.commit,
+        location_mappings,
     )
     attempt_to_apply_patch(patch_definition, patch_files)
 
