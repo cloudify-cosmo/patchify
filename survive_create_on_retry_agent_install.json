@@ -1,0 +1,28 @@
+{
+  "patch_version": "1.0.0",
+  "manager_versions": ["4.3.2", "4.5"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "survive_create_on_retry_agent_install",
+      "md5sum": "20f01eb2310316a379533a689c4f3d3d",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-mgmtworker"
+  ],
+  "md5sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template": [
+      "a4e11a0f0c2f4be7af5e73a0ed21648e",
+      "4101967c482accea6ab438fa26d8de33"
+    ]
+  },
+  "md5sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template": [
+      "bb0348a420e84a7c0afdf410171398d2",
+      "48326f51f83dadf2c73342a023aa736a"
+    ]
+  }
+}

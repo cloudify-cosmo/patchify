@@ -1,0 +1,481 @@
+#! /usr/bin/env python
+"""Tool for generating patchify patches based on git commits."""
+import argparse
+import json
+import os
+import string
+import subprocess
+import sys
+
+VALID_IN_PATCH_NAME = (
+    string.uppercase + string.lowercase + string.digits + '_'
+)
+LOCATION_TO_SERVICE = {
+    '/opt/manager': 'cloudify-restservice',
+    '/opt/mgmtworker': 'cloudify-mgmtworker',
+    '/opt/cloudify-stage': 'cloudify-stage',
+    '/etc/cloudify/rabbitmq': 'cloudify-rabbitmq',
+    '/opt/influxdb': 'cloudify-influxdb',
+    '/opt/cloudify-composer': 'cloudify-composer',
+    '/opt/amqpinflux': 'cloudify-amqpinflux',
+    '/opt/manager/env/lib/python2.7/site-packages/amqp_postgres': (
+        'cloudify-amqp-postgres'
+    ),
+}
+
+
+def get_manager_version():
+    """Get the version of the manager for testing the patch on."""
+    try:
+        version_output = subprocess.check_output(['cfy', '--version'])
+    except subprocess.CalledProcessError as err:
+        sys.stderr.write(
+            'Cannot call cfy --version.\n'
+            'Please ensure you have access to the cfy command and have an '
+            'active profile for the manager you wish to test a patch on.\n'
+            'Error was: {err}\n'.format(err=str(err))
+        )
+        sys.exit(1)
+
+    community = 'Community edition' in version_output
+    version = None
+
+    for line in version_output.splitlines():
+        if line.lower().startswith('cloudify manager'):
+            # Expecting line to be similar to:
+            # Cloudify Manager 4.2.0 [ip=10.239.3.199]
+            version = line.split(' ')[2]
+            break
+
+    return {
+        'version': version,
+        'community': community,
+        'raw': version_output,
+    }
+
+
+def check_current_location():
+    """Make sure we're in the same directory as patchify, to simplify the rest
+    of the script."""
+    local_files = os.listdir(os.getcwd())
+    if not all(required in local_files for required in
+               ['patchify', 'patches']):
+        sys.stderr.write(
+            'This must be run from the root of the patchify repo.\n'
+            'patchify and patches were expected to be found in the current '
+            'working dir.\n'
+        )
+        sys.exit(1)
+
+
+def check_name_available(patch_name):
+    """Confirm specified patch name is available."""
+    existing_patch_names = [
+        os.path.splitext(patch_file)[0] for patch_file in
+        os.listdir(os.getcwd())
+        if patch_file.endswith('.json')
+    ]
+    if patch_name in existing_patch_names:
+        sys.stderr.write(
+            'Cannot name patch "{patch_name}", as a patch exists with this '
+            'name.\n'
+            'Already existing patch names are: {existing}\n'.format(
+                patch_name=patch_name,
+                existing=', '.join(existing_patch_names),
+            )
+        )
+        sys.exit(1)
+
+
+def generate_patch_diff_files(patch_name, path_to_repo, commit):
+    """Generate diff files for the specified commit to use for the patch."""
+    different_files = subprocess.check_output(
+        [
+            'git', 'diff', '--name-only', commit + '^..' + commit,
+        ],
+        cwd=path_to_repo,
+    )
+
+    diff_files = {}
+    for different_file in different_files.splitlines():
+        diff = subprocess.check_output(
+            [
+                'git', 'diff', commit + '^..' + commit, different_file,
+            ],
+            cwd=path_to_repo,
+        )
+        diff_file_name = patch_name + '_' + different_file.replace('/', '_')
+        diff_path = os.path.join('patches', diff_file_name)
+        with open(diff_path, 'w') as diff_handle:
+            diff_handle.write(diff)
+        diff_files[diff_file_name] = {
+            'path_in_repo': different_file,
+            'before_md5sum': None,
+            'after_md5sum': None,
+            'diff_md5sum': subprocess.check_output(
+                ['md5sum', os.path.join('patches', diff_file_name)],
+            ).split(' ')[1],
+            'destinations': [],
+        }
+    return diff_files
+
+
+def get_md5sum_command(file_path):
+    """Generate md5sums in the same way as patchify."""
+    return (
+        'if [[ -f {path} ]]; '
+        # sudo this so that we can avoid permissions issues
+        '  then sudo md5sum {path}; '
+        'elif [[ -e {path} ]]; '
+        '  then echo -n "{notafile}"; '
+        'else '
+        '  echo -n "{notexisting}"; '
+        'fi'.format(
+            path=file_path,
+            notafile="NOTAFILE",
+            notexisting="DOESNOTEXIST",
+        )
+    )
+
+
+def generate_before_patch_md5sums(path_to_repo, diff_files):
+    """Generate MD5sums for each file before patch application."""
+    for diff_file, details in diff_files.items():
+        # Reverse the diff to see what the file looked like before
+        subprocess.check_call(
+            [
+                'patch', '-R', details['path_in_repo'],
+                os.path.join(os.getcwd(), 'patches', diff_file),
+            ],
+            cwd=path_to_repo,
+        )
+        details['before_md5sum'] = subprocess.check_output(
+            get_md5sum_command(details['path_in_repo']),
+            cwd=path_to_repo,
+            shell=True,
+            executable='/bin/bash',
+        ).split(' ')[0]
+        # Now restore the file to what it should be
+        subprocess.check_call(
+            [
+                'patch', details['path_in_repo'],
+                os.path.join(os.getcwd(), 'patches', diff_file),
+            ],
+            cwd=path_to_repo,
+        )
+
+
+def generate_after_patch_md5sums(path_to_repo, diff_files):
+    """Generate expected MD5sums for each file after patches are applied."""
+    for details in diff_files.values():
+        details['after_md5sum'] = subprocess.check_output(
+            get_md5sum_command(details['path_in_repo']),
+            cwd=path_to_repo,
+            shell=True,
+            executable='/bin/bash',
+        ).split(' ')[0]
+
+
+def get_cfy_output(subcommand_and_args):
+    """Get output from cfy, parsed."""
+    command = ['cfy']
+    command.extend(subcommand_and_args)
+
+    command_output = subprocess.check_output(command)
+
+    headers = []
+    results = []
+    dividers_found = 0
+    for line in command_output.splitlines():
+        if dividers_found == 3:
+            # We reached the end of the output
+            break
+
+        line = line.strip()
+
+        # Expecting something like:
+        # Getting management services status... [ip=192.0.2.4]
+        #
+        # Services:
+        # +--------------------------------+--------+
+        # |            service             | status |
+        # +--------------------------------+--------+
+        # | Riemann                        |   up   |
+        # | Celery Management              |   up   |
+        # | Manager Rest-Service           |   up   |
+        # | AMQP InfluxDB                  |   up   |
+        # | RabbitMQ                       |   up   |
+        # | Elasticsearch                  |   up   |
+        # | Webserver                      |   up   |
+        # | Logstash                       |   up   |
+        # +--------------------------------+--------+
+        if line.startswith('+--'):
+            dividers_found += 1
+        elif dividers_found == 1:
+            # Headers are found after the first divider
+            headers = [element.strip() for element in line.split('|')]
+        elif dividers_found == 2:
+            # Results are only shown after the second divider
+            results.append([element.strip() for element in line.split('|')])
+
+    return headers, results
+
+
+def get_profile_ssh_details():
+    """Get SSH details from the active cfy profile."""
+    try:
+        headers, results = get_cfy_output(['profiles', 'show-current'])
+    except subprocess.CalledProcessError as err:
+        sys.stderr.write(
+            'Failed to retrieve SSH details from profile, with error: '
+            '{err}'
+        ).format(
+            err=str(err),
+        )
+        sys.exit(1)
+
+    ssh_user_pos = headers.index('ssh_user')
+    manager_ip_pos = headers.index('manager_ip')
+    ssh_port_pos = headers.index('ssh_port')
+    ssh_key_path_pos = headers.index('ssh_key_path')
+    try:
+        cluster_node_name_pos = headers.index('cluster node name')
+    except ValueError:
+        cluster_node_name_pos = None
+
+    manager_connection_details = []
+    for result in results:
+        manager_connection_details.append({
+            'manager_ip': result[manager_ip_pos],
+            'connection_string': (
+                result[ssh_user_pos] + '@' + result[manager_ip_pos]
+            ),
+            'ssh_port': result[ssh_port_pos],
+            'key_path': result[ssh_key_path_pos],
+            'cluster_node_name': (
+                result[cluster_node_name_pos]
+                if cluster_node_name_pos else None
+            ),
+        })
+
+    return manager_connection_details
+
+
+def determine_manager_paths(diff_files, location_mappings):
+    """Find locations for a file on the manager based on its name and md5sum.
+    """
+    ssh_details = get_profile_ssh_details()[0]
+
+    base_command = [
+        'ssh', '-p', ssh_details['ssh_port'], ssh_details['connection_string']
+    ]
+    if ssh_details['key_path']:
+        base_command.extend(['-i', ssh_details['key_path']])
+
+    for details in diff_files.values():
+        path_in_repo = details['path_in_repo']
+        if path_in_repo in location_mappings:
+            details['destinations'] = location_mappings[path_in_repo]
+        else:
+            command = base_command + [
+                'sudo find /opt /etc/cloudify '
+                '-name {filename} -exec md5sum {{}} \\;'.format(
+                    filename=os.path.split(path_in_repo)[1],
+                )
+            ]
+
+            locations = []
+            result = subprocess.check_output(command)
+            for line in result.strip().splitlines():
+                if line == '':
+                    continue
+                line = line.strip()
+                line_md5sum, path = line.split(' ', 1)
+                if line_md5sum.strip() == details['before_md5sum']:
+                    locations.append(path.strip())
+
+            details['destinations'] = locations
+
+
+def determine_affected_services(diff_files):
+    """Determine which servies will need restarting based on the files
+    modified by the patches."""
+    affected_services = set()
+
+    for details in diff_files.values():
+        for destination in details['destinations']:
+            for service_location, service_name in LOCATION_TO_SERVICE.items():
+                if destination.startswith(service_location):
+                    affected_services.add(service_name)
+
+    return list(affected_services)
+
+
+def generate_patch(patch_name, path_to_repo, commit, location_mappings):
+    """Generate the patch."""
+    patch_definition = {'patch_version': '1.0.0'}
+
+    manager_version_details = get_manager_version()
+    patch_definition['manager_versions'] = [manager_version_details['version']]
+    patch_definition['community'] = manager_version_details['community']
+    # Everything on a filesystem level should work with premium
+    patch_definition['premium'] = True
+
+    check_current_location()
+
+    check_name_available(patch_name)
+
+    diff_files = generate_patch_diff_files(patch_name, path_to_repo, commit)
+
+    generate_before_patch_md5sums(path_to_repo, diff_files)
+
+    generate_after_patch_md5sums(path_to_repo, diff_files)
+
+    determine_manager_paths(diff_files, location_mappings)
+
+    patch_definition['affected_services'] = determine_affected_services(
+        diff_files,
+    )
+
+    patch_definition['patches'] = [
+        {
+            'patch_file': os.path.split(diff_file)[1],
+            'md5sum': details['diff_md5sum'],
+            'destinations': details['destinations'],
+        } for diff_file, details in diff_files.items()
+    ]
+
+    patch_definition['md5sums_before'] = {}
+    before = patch_definition['md5sums_before']
+    patch_definition['md5sums_after'] = {}
+    after = patch_definition['md5sums_after']
+    for details in diff_files.values():
+        for destination in details['destinations']:
+            before[destination] = [details['before_md5sum']]
+            after[destination] = [details['after_md5sum']]
+
+    patch_path = patch_name + '.json'
+    with open(patch_path, 'w') as def_handle:
+        def_handle.write(
+            json.dumps(patch_definition, indent=4)
+        )
+
+    patch_files = diff_files.keys()
+    return patch_path, patch_files
+
+
+def attempt_to_apply_patch(patch_definition, patch_files):
+    """Test application of the patch."""
+    command = [
+        './patchify', 'apply', '-p', patch_definition,
+        '--install-patch-command',
+    ]
+    try:
+        subprocess.check_call(command)
+    except subprocess.CalledProcessError as err:
+        sys.stderr.write(
+            'Failed to apply patch.\n'
+            'Error should appear above.\n'
+            'Patch definition is in: {definition}.\n'
+            'Patch files are in: {patch_files}\n'
+            'Error output was: {err}\n'
+            'Please correct issues then retry applying the patch with: '
+            '{command}\n'.format(
+                definition=patch_definition,
+                patch_files=', '.join(patch_files),
+                command=' '.join(command),
+                err=str(err),
+            )
+        )
+        sys.exit(1)
+    print(
+        'Patch generated and applies successfully.\n'
+        'Please confirm behaviour with patch applied is correct before '
+        'committing and PRing the new patch.'
+    )
+
+
+def process_location_mappings(location_mappings):
+    """Put location mappings in a usable format for the rest of the wizard."""
+    if location_mappings is None:
+        location_mappings = []
+    processed_mappings = {}
+    for mapping in location_mappings:
+        repo_path, manager_path = mapping.strip().split(':')
+        if repo_path not in processed_mappings:
+            processed_mappings[repo_path] = []
+        processed_mappings[repo_path].append(manager_path)
+    return processed_mappings
+
+
+def check_patch_name(name):
+    """Confirm the patch name is valid."""
+    for char in name:
+        if char not in VALID_IN_PATCH_NAME:
+            raise argparse.ArgumentTypeError(
+                'Patch name must consist only of the following characters: '
+                '{valid}'.format(valid=VALID_IN_PATCH_NAME),
+            )
+    return name
+
+
+def main():
+    """Get arguments, generate, and test the patch."""
+    parser = argparse.ArgumentParser(
+        description='Generate a patch for patchify.',
+    )
+    parser.add_argument(
+        '-n', '--name',
+        help=(
+            'What to name the generated patch. '
+            'Valid characters: {valid}.'.format(
+                valid=VALID_IN_PATCH_NAME,
+            )
+        ),
+        type=check_patch_name,
+        required=True,
+    )
+    parser.add_argument(
+        '-p', '--path-to-repo',
+        help=(
+            'Path to the repo to generate the patch from.'
+        ),
+        required=True,
+    )
+    parser.add_argument(
+        '-c', '--commit',
+        help=(
+            'ID of commit to generate a patch from, e.g. a1b2c3'
+        ),
+        required=True,
+    )
+    parser.add_argument(
+        '-m', '--manager-location-mappings',
+        help=(
+            '<path in repo>:<location on manager> mapping. '
+            'This can be specified multiple times for different repo files '
+            'and different manager destinations. '
+            'If this is not specified, the wizard will attempt to determine '
+            'these paths automatically. '
+            'This argument can be specified multiple times.'
+        ),
+        action='append',
+    )
+
+    args = parser.parse_args()
+
+    location_mappings = process_location_mappings(
+        args.manager_location_mappings,
+    )
+
+    patch_definition, patch_files = generate_patch(
+        args.name,
+        args.path_to_repo,
+        args.commit,
+        location_mappings,
+    )
+    attempt_to_apply_patch(patch_definition, patch_files)
+
+
+if __name__ == '__main__':
+    main()
