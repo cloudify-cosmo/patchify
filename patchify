@@ -111,7 +111,8 @@ def get_manager_version():
     version = None
 
     for line in version_output.splitlines():
-        if line.lower().startswith('cloudify manager'):
+        if line.lower().startswith('cloudify manager') or \
+           line.lower().startswith('vnf manager'):
             # Expecting line to be similar to:
             # Cloudify Manager 4.2.0 [ip=10.239.3.199]
             version = line.split(' ')[2]
