@@ -111,8 +111,7 @@ def get_manager_version():
     version = None
 
     for line in version_output.splitlines():
-        if line.lower().startswith('cloudify manager') or \
-           line.lower().startswith('vnf manager'):
+        if line.lower().startswith('cloudify manager'):
             # Expecting line to be similar to:
             # Cloudify Manager 4.2.0 [ip=10.239.3.199]
             version = line.split(' ')[2]
@@ -1084,7 +1083,8 @@ def wait_for_healthy_services(patch_definition, backup_root, delete_root,
         )
 
 
-def patch_applier(definition_file, skip_services, install_patch_command):
+def patch_applier(definition_file, skip_services, install_patch_command,
+                  skip_version_check):
     action = 'APPLYING PATCH'
 
     ssh_details = get_profile_ssh_details(action)
@@ -1098,62 +1098,63 @@ def patch_applier(definition_file, skip_services, install_patch_command):
         # Remove patch name extension
         patch_name = os.path.splitext(patch_name)[0]
 
-    say("Checking manager version is valid.")
-    manager_version = get_manager_version()
-    raw_version_output = manager_version.pop('raw')
-    if manager_version is None:
-        exit_with_sadness(
-            'Could not get manager version! '
-            'Are you in an environment with cfy using a profile for the '
-            'manager you intend to patch?',
-            action,
-        )
-    supported_versions = []
-    if patch_definition['premium']:
-        for version in patch_definition['manager_versions']:
-            supported_versions.append({
-                'version': version,
-                'community': False,
-            })
-    if patch_definition['community']:
-        for version in patch_definition['manager_versions']:
-            supported_versions.append({
-                'version': version,
-                'community': True,
-            })
-    if manager_version not in supported_versions:
-        manager_version_output = manager_version['version']
-        try:
-            manager_version_output = build_manager_version_output_string(
-                version=manager_version['version'],
-                community=manager_version['community'],
-            )
-        except Exception as err:
+    if not skip_version_check:
+        say("Checking manager version is valid.")
+        manager_version = get_manager_version()
+        raw_version_output = manager_version.pop('raw')
+        if manager_version is None:
             exit_with_sadness(
-                'Could not determine manager version.\n'
-                'Version check output was: {raw_output}\n'
-                'Error was: {err}'.format(
-                    raw_output=raw_version_output,
-                    err=str(err),
+                'Could not get manager version! '
+                'Are you in an environment with cfy using a profile for the '
+                'manager you intend to patch?',
+                action,
+            )
+        supported_versions = []
+        if patch_definition['premium']:
+            for version in patch_definition['manager_versions']:
+                supported_versions.append({
+                    'version': version,
+                    'community': False,
+                })
+        if patch_definition['community']:
+            for version in patch_definition['manager_versions']:
+                supported_versions.append({
+                    'version': version,
+                    'community': True,
+                })
+        if manager_version not in supported_versions:
+            manager_version_output = manager_version['version']
+            try:
+                manager_version_output = build_manager_version_output_string(
+                    version=manager_version['version'],
+                    community=manager_version['community'],
+                )
+            except Exception as err:
+                exit_with_sadness(
+                    'Could not determine manager version.\n'
+                    'Version check output was: {raw_output}\n'
+                    'Error was: {err}'.format(
+                        raw_output=raw_version_output,
+                        err=str(err),
+                    ),
+                    action,
+                )
+            supported_versions_output = ', '.join([
+                build_manager_version_output_string(
+                    version=version['version'],
+                    community=version['community'],
+                )
+                for version in supported_versions
+            ])
+            exit_with_sadness(
+                'Manager version mismatch. '
+                'Manager is {manager_version}, but patch only supports '
+                '{supported_versions}'.format(
+                    manager_version=manager_version_output,
+                    supported_versions=supported_versions_output,
                 ),
                 action,
             )
-        supported_versions_output = ', '.join([
-            build_manager_version_output_string(
-                version=version['version'],
-                community=version['community'],
-            )
-            for version in supported_versions
-        ])
-        exit_with_sadness(
-            'Manager version mismatch. '
-            'Manager is {manager_version}, but patch only supports '
-            '{supported_versions}'.format(
-                manager_version=manager_version_output,
-                supported_versions=supported_versions_output,
-            ),
-            action,
-        )
 
     if len(ssh_details) > 1:
         say("Attempting to apply patch to cluster.")
@@ -2136,6 +2137,16 @@ def add_apply_and_remove_args(parser):
         default=False,
         required=False,
     )
+    parser.add_argument(
+        '-S', '--skip-version-check',
+        help=(
+            'Set this flag to not check manager version. This is only to be '
+            'used when instructed by Cloudify support.'
+        ),
+        action='store_true',
+        default=False,
+        required=False,
+    )
 
 
 def main():
@@ -2203,7 +2214,7 @@ def main():
 
     if args.action == 'apply':
         patch_applier(args.patch_file, args.skip_services,
-                      args.install_patch_command)
+                      args.install_patch_command, args.skip_version_check)
     elif args.action == 'remove':
         patch_remover(args.patch_id, args.skip_services)
     elif args.action == 'list':
