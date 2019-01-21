@@ -539,8 +539,16 @@ def can_ssh(manager_connection_string, ssh_port, keyfile):
         return True
     except subprocess.CalledProcessError as err:
         if err.returncode == 255 and 'usage' in err.output:
-            say(
+            sadly_say(
                 "Invalid arguments to SSH command. Command was: {cmd}".format(
+                    cmd=' '.join(err.cmd),
+                )
+            )
+        else:
+            sadly_say(
+                'SSH attempt failed due to error:\n{err}\nCommand was: '
+                '{cmd}'.format(
+                    err=err.output,
                     cmd=' '.join(err.cmd),
                 )
             )
