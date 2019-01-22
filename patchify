@@ -150,7 +150,6 @@ def parse_version_string(version):
 
 
 def load_patch_definition(filename):
-    # TODO: Load the patch definition straight from the patch zip file
     with open(filename) as definition_handle:
         definition = json.load(definition_handle)
 
@@ -218,11 +217,11 @@ def load_patch_definition(filename):
         )
         return definition
 
-    if patch_version > (1, 0, 0):
+    if patch_version > (1, 1, 0):
         add_definition_error(
             message=(
-                'Only version 1.0.0 patches are supported currently. '
-                'Found version: {version}'.format(
+                'Only version 1.1.0 and earlier patches are supported '
+                'currently. Found version: {version}'.format(
                     version='.'.join([str(i) for i in patch_version]),
                 )
             ),
@@ -231,37 +230,68 @@ def load_patch_definition(filename):
         )
         return definition
 
-    required_keys = ['manager_versions', 'community', 'premium']
-    recommended_keys = []
+    required_keys = set(['manager_versions', 'community', 'premium',
+                         'patch_version'])
+    recommended_keys = set()
     if patch_version[0] == 1:
-        required_keys.extend(['patches', 'affected_services'])
-        recommended_keys.extend(['md5sums_before', 'md5sums_after'])
+        required_keys.update(['patches', 'affected_services'])
+        recommended_keys.update(['md5sums_before', 'md5sums_after'])
+        if patch_version[1] >= 1:
+            required_keys.add('description')
 
-    for key in required_keys:
-        if key not in definition:
+    missing_keys = required_keys - set(definition)
+    if missing_keys:
+        add_definition_error(
+            message=(
+                'Patch definition must contain {keys}. '
+                'Keys found: {found}'.format(
+                    keys=', '.join(missing_keys),
+                    found=', '.join(definition.keys()),
+                )
+            ),
+            definition=definition,
+            fatal=True,
+        )
+
+    missing_recommended = recommended_keys - set(definition)
+    if missing_recommended:
+        add_definition_error(
+            message=(
+                'Patch definition should contain {keys}. '
+                'Keys found: {found}'.format(
+                    keys=', '.join(missing_recommended),
+                    found=', '.join(definition.keys()),
+                )
+            ),
+            definition=definition,
+        )
+
+    # Unexpected keys might cause interesting behaviour. We'll avoid that.
+    allowed_keys = required_keys | recommended_keys
+    allowed_keys.add('errors')
+    unsupported_keys = set(definition) - allowed_keys
+    if unsupported_keys:
+        add_definition_error(
+            message=(
+                "Patch definition version {version} must not contain "
+                "{keys}. Supported keys are: {supported}".format(
+                    keys=', '.join(unsupported_keys),
+                    version=definition['patch_version'],
+                    supported=', '.join(allowed_keys),
+                )
+            ),
+            definition=definition,
+            fatal=True,
+        )
+
+    if definition.get('description'):
+        # To make anything that displays the description with any other
+        # information (such as display_patch) easier to structure.
+        if not definition['description'].endswith('.'):
             add_definition_error(
-                message=(
-                    'Patch definition must contain {key}. '
-                    'Keys found: {found}'.format(
-                        key=key,
-                        found=', '.join(definition.keys()),
-                    )
-                ),
+                message='Patch description must end with a full stop.',
                 definition=definition,
                 fatal=True,
-            )
-
-    for key in recommended_keys:
-        if key not in definition:
-            add_definition_error(
-                message=(
-                    'Patch definition should contain {key}. '
-                    'Keys found: {found}'.format(
-                        key=key,
-                        found=', '.join(definition.keys()),
-                    )
-                ),
-                definition=definition,
             )
 
     return definition
@@ -1861,6 +1891,7 @@ def add_patch_to_registry(registry, patch_id, timestamp,
         'patch_directory': patch_path,
         'modified_files': patch_definition['md5sums_after'],
         'blocks_uninstall_of': block_uninstall,
+        'description': patch_definition.get('description'),
     }
 
     current_patches.append(new_patch)
@@ -2082,6 +2113,15 @@ def display_patch_listing(patches, output_method=say):
         else:
             uninstall_restrictions = ''
 
+        if patch.get('description'):
+            description = (
+                ' Patch description: {description}'.format(
+                    description=patch['description'],
+                )
+            )
+        else:
+            description = ''
+
         if isinstance(patch['timestamp'], list):
             display_timestamp = ', '.join(patch['timestamp'])
         else:
@@ -2089,11 +2129,12 @@ def display_patch_listing(patches, output_method=say):
 
         output_method(
             'Patch {name} (ID: {patch_id}) was installed on '
-            '{timestamp}.{uninstall_restrictions}'.format(
+            '{timestamp}.{description}{uninstall_restrictions}'.format(
                 name=patch['patch_name'],
                 patch_id=patch['patch_id'],
                 timestamp=display_timestamp,
                 uninstall_restrictions=uninstall_restrictions,
+                description=description,
             )
         )
 
@@ -2161,9 +2202,6 @@ def main():
     parser = argparse.ArgumentParser(
         description='Apply a patch to a cloudify manager.',
     )
-    # TODO: We should probably want the patch supplied as a zip containing
-    # the patch definition and the patch file, but for POC purposes we just
-    # put everything in the POC folder
 
     subparsers = parser.add_subparsers(help='Patch action',
                                        dest='action')

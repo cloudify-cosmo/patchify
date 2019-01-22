@@ -311,15 +311,17 @@ def determine_affected_services(diff_files):
     return list(affected_services)
 
 
-def generate_patch(patch_name, path_to_repo, commit, location_mappings):
+def generate_patch(patch_name, patch_description, path_to_repo, commit,
+                   location_mappings):
     """Generate the patch."""
-    patch_definition = {'patch_version': '1.0.0'}
+    patch_definition = {'patch_version': '1.1.0'}
 
     manager_version_details = get_manager_version()
     patch_definition['manager_versions'] = [manager_version_details['version']]
     patch_definition['community'] = manager_version_details['community']
     # Everything on a filesystem level should work with premium
     patch_definition['premium'] = True
+    patch_definition['description'] = patch_description
 
     check_current_location()
 
@@ -419,6 +421,15 @@ def check_patch_name(name):
     return name
 
 
+def check_patch_description(description):
+    """Confirm that the patch description is valid."""
+    if not description.endswith('.'):
+        raise argparse.ArgumentTypeError(
+            'The description must end with a full stop.'
+        )
+    return description
+
+
 def main():
     """Get arguments, generate, and test the patch."""
     parser = argparse.ArgumentParser(
@@ -461,6 +472,16 @@ def main():
         ),
         action='append',
     )
+    parser.add_argument(
+        '-d', '--description',
+        help=(
+            'Description of the patch, to help users understand its purpose. '
+            'The description should be relatively clear and concise. '
+            'The description must end with a full stop.'
+        ),
+        type=check_patch_description,
+        required=True,
+    )
 
     args = parser.parse_args()
 
@@ -470,6 +491,7 @@ def main():
 
     patch_definition, patch_files = generate_patch(
         args.name,
+        args.description,
         args.path_to_repo,
         args.commit,
         location_mappings,
