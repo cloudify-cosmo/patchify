@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 """Tool for generating patchify patches based on git commits."""
+from __future__ import print_function
 import argparse
 import json
 import os
@@ -27,6 +28,7 @@ LOCATION_TO_SERVICE = {
 
 def get_manager_version():
     """Get the version of the manager for testing the patch on."""
+    print('Checking version of active profile test manager.')
     try:
         version_output = subprocess.check_output(['cfy', '--version'])
     except subprocess.CalledProcessError as err:
