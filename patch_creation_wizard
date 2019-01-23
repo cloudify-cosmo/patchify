@@ -7,6 +7,7 @@ import string
 import subprocess
 import sys
 
+PATCH_DIFF_PATH = os.path.join('patch_files', 'patches')
 VALID_IN_PATCH_NAME = (
     string.uppercase + string.lowercase + string.digits + '_'
 )
@@ -59,11 +60,11 @@ def check_current_location():
     of the script."""
     local_files = os.listdir(os.getcwd())
     if not all(required in local_files for required in
-               ['patchify', 'patches']):
+               ['patchify', 'patch_files']):
         sys.stderr.write(
             'This must be run from the root of the patchify repo.\n'
-            'patchify and patches were expected to be found in the current '
-            'working dir.\n'
+            'patchify and patch_files were expected to be found in the '
+            'current working dir.\n'
         )
         sys.exit(1)
 
@@ -72,7 +73,7 @@ def check_name_available(patch_name):
     """Confirm specified patch name is available."""
     existing_patch_names = [
         os.path.splitext(patch_file)[0] for patch_file in
-        os.listdir(os.getcwd())
+        os.listdir(os.path.join(os.getcwd(), 'patch_files'))
         if patch_file.endswith('.json')
     ]
     if patch_name in existing_patch_names:
@@ -105,7 +106,7 @@ def generate_patch_diff_files(patch_name, path_to_repo, commit):
             cwd=path_to_repo,
         )
         diff_file_name = patch_name + '_' + different_file.replace('/', '_')
-        diff_path = os.path.join('patches', diff_file_name)
+        diff_path = os.path.join(PATCH_DIFF_PATH, diff_file_name)
         with open(diff_path, 'w') as diff_handle:
             diff_handle.write(diff)
         diff_files[diff_file_name] = {
@@ -113,7 +114,8 @@ def generate_patch_diff_files(patch_name, path_to_repo, commit):
             'before_md5sum': None,
             'after_md5sum': None,
             'diff_md5sum': subprocess.check_output(
-                ['md5sum', os.path.join('patches', diff_file_name)],
+                ['md5sum',
+                 os.path.join(PATCH_DIFF_PATH, diff_file_name)],
             ).split(' ')[1],
             'destinations': [],
         }
@@ -145,7 +147,7 @@ def generate_before_patch_md5sums(path_to_repo, diff_files):
         subprocess.check_call(
             [
                 'patch', '-R', details['path_in_repo'],
-                os.path.join(os.getcwd(), 'patches', diff_file),
+                os.path.join(os.getcwd(), PATCH_DIFF_PATH, diff_file),
             ],
             cwd=path_to_repo,
         )
@@ -159,7 +161,7 @@ def generate_before_patch_md5sums(path_to_repo, diff_files):
         subprocess.check_call(
             [
                 'patch', details['path_in_repo'],
-                os.path.join(os.getcwd(), 'patches', diff_file),
+                os.path.join(os.getcwd(), PATCH_DIFF_PATH, diff_file),
             ],
             cwd=path_to_repo,
         )
@@ -311,15 +313,17 @@ def determine_affected_services(diff_files):
     return list(affected_services)
 
 
-def generate_patch(patch_name, path_to_repo, commit, location_mappings):
+def generate_patch(patch_name, patch_description, path_to_repo, commit,
+                   location_mappings):
     """Generate the patch."""
-    patch_definition = {'patch_version': '1.0.0'}
+    patch_definition = {'patch_version': '1.1.0'}
 
     manager_version_details = get_manager_version()
     patch_definition['manager_versions'] = [manager_version_details['version']]
     patch_definition['community'] = manager_version_details['community']
     # Everything on a filesystem level should work with premium
     patch_definition['premium'] = True
+    patch_definition['description'] = patch_description
 
     check_current_location()
 
@@ -354,7 +358,10 @@ def generate_patch(patch_name, path_to_repo, commit, location_mappings):
             before[destination] = [details['before_md5sum']]
             after[destination] = [details['after_md5sum']]
 
-    patch_path = patch_name + '.json'
+    patch_path = os.path.join(
+        'patch_files',
+        patch_name + '.json'
+    )
     with open(patch_path, 'w') as def_handle:
         def_handle.write(
             json.dumps(patch_definition, indent=4)
@@ -419,6 +426,15 @@ def check_patch_name(name):
     return name
 
 
+def check_patch_description(description):
+    """Confirm that the patch description is valid."""
+    if not description.endswith('.'):
+        raise argparse.ArgumentTypeError(
+            'The description must end with a full stop.'
+        )
+    return description
+
+
 def main():
     """Get arguments, generate, and test the patch."""
     parser = argparse.ArgumentParser(
@@ -461,6 +477,16 @@ def main():
         ),
         action='append',
     )
+    parser.add_argument(
+        '-d', '--description',
+        help=(
+            'Description of the patch, to help users understand its purpose. '
+            'The description should be relatively clear and concise. '
+            'The description must end with a full stop.'
+        ),
+        type=check_patch_description,
+        required=True,
+    )
 
     args = parser.parse_args()
 
@@ -470,6 +496,7 @@ def main():
 
     patch_definition, patch_files = generate_patch(
         args.name,
+        args.description,
         args.path_to_repo,
         args.commit,
         location_mappings,
