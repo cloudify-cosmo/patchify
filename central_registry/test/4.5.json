@@ -1,0 +1,39 @@
+{
+  "patch_root_path": "https://raw.githubusercontent.com/cloudify-cosmo/patchify/master/patch_files/", 
+  "patches": [
+    {
+      "patch_files": [
+        "test_patch_1"
+      ], 
+      "patch_definition_path": "test_patch_1.json", 
+      "patch_md5sum": "test_patch_1-3769321dd45ae9180c17fa731fded4ea", 
+      "supports_community": true, 
+      "patch_id": "test_patch_1-3769321dd45ae9180c17fa731fded4ea",
+      "patch_name": "test_patch_1", 
+      "patch_description": "Patch for testing patchify."
+    }, 
+    {
+      "patch_files": [
+        "test_patch_2"
+      ], 
+      "patch_description": "Test patch for testing patchify.", 
+      "patch_definition_path": "test_patch_2.json", 
+      "supports_community": true, 
+      "patch_name": "test_patch_2", 
+      "patch_id": "test_patch_2-e12335a6544fa70a2928f227a7b1aeea", 
+      "patch_md5sum": "e12335a6544fa70a2928f227a7b1aeea"
+    }, 
+    {
+      "patch_files": [
+        "test_patch_3_replace_1", 
+        "test_patch_3_replace_2"
+      ], 
+      "patch_md5sum": "ac87fbf839de4a97e8d7f94a7b7e21fa", 
+      "supports_community": true, 
+      "patch_id": "test_patch_3-ac87fbf839de4a97e8d7f94a7b7e21fa", 
+      "patch_name": "test_patch_3", 
+      "patch_definition_path": "test_patch_3.json", 
+      "patch_description": "Test patch modifying existing patches for testing patchify."
+    }
+  ]
+}

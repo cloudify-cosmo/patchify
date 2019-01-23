@@ -7,10 +7,12 @@ from contextlib import contextmanager
 import datetime
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
 import time
+import urllib2
 
 BASE_MANAGER_PATCH_STORAGE_PATH = '/etc/cloudify/patches'
 PATCH_REGISTRY_FILE_NAME = 'patch_registry.json'
@@ -628,9 +630,7 @@ def tempdir():
     try:
         yield tmp_path
     finally:
-        for tmp_file in os.listdir(tmp_path):
-            os.unlink(os.path.join(tmp_path, tmp_file))
-        os.rmdir(tmp_path)
+        shutil.rmtree(tmp_path)
 
 
 def _scp(keyfile, ssh_port, source, dest, quiet=False):
@@ -1868,6 +1868,8 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
 
 
 def generate_patch_id(patch_name, definition_md5sum):
+    """Generate the ID of a patch. This method should match that used in the
+    central registry update tool."""
     return patch_name + '-' + definition_md5sum
 
 
@@ -1952,13 +1954,11 @@ def get_uninstall_blockers(patches):
     return blockers
 
 
-def list_patches(json_output):
-    action = 'LISTING PATCHES'
-
+def retrieve_manager_patch_details(json_output, action):
     ssh_details = get_profile_ssh_details(action)
-
     if len(ssh_details) > 1:
-        say("Determining cluster leader.")
+        if not json_output:
+            say("Determining cluster leader.")
         leader, _, _ = get_cluster_members()
     else:
         leader = None
@@ -1995,11 +1995,20 @@ def list_patches(json_output):
         manager_patches[cluster_node_name] = registry.get('current_patches',
                                                           [])
 
+    return manager_patches, leader
+
+
+def list_patches(json_output):
+    action = 'LISTING PATCHES'
+
+    manager_patches, leader = retrieve_manager_patch_details(json_output,
+                                                             action)
+
     if json_output:
         if leader:
-            say(json.dumps(manager_patches))
+            say(json.dumps(manager_patches, indent=2))
         else:
-            say(json.dumps(manager_patches[None]))
+            say(json.dumps(manager_patches[None], indent=2))
     else:
         for patches in manager_patches.values():
             uninstall_blocked = get_uninstall_blockers(patches)
@@ -2175,6 +2184,339 @@ def download_patch_registry(manager_connection_string, ssh_port, keyfile,
     return registry
 
 
+def determine_central_registry_location(central_repository_location,
+                                        manager_version):
+    return (
+        central_repository_location + manager_version['version'] + '.json'
+    )
+
+
+def retrieve_central_patch_listing(registry_location, action,
+                                   manager_version,
+                                   json_output=False):
+    if not json_output:
+        say('Retrieving central patch registry.')
+    try:
+        raw_listing = urllib2.urlopen(
+            registry_location,
+        ).read()
+    except urllib2.HTTPError as err:
+        exit_with_sadness(
+            (
+                'Failed to retrieve central registry from: {location}\n'
+                'Failed with {code}: {reason}.'.format(
+                    location=registry_location,
+                    code=err.code,
+                    reason=err.reason,
+                )
+            ),
+            action,
+        )
+
+    try:
+        central_listing = json.loads(raw_listing)
+    except ValueError as err:
+        exit_with_sadness(
+            (
+                'Failed to parse central registry as json.\n'
+                'Error was: {err}\n'
+                'Raw central registry was: {raw}'.format(
+                    err=str(err),
+                    raw=raw_listing,
+                )
+            ),
+            action,
+        )
+
+    if manager_version['community']:
+        if not json_output:
+            say('Filtering out premium-only patches.')
+        central_listing['patches'] = [
+            patch for patch in central_listing['patches']
+            if patch['supports_community']
+        ]
+
+    return central_listing
+
+
+def apply_central_manager_patches(central_repository_location,
+                                  repo_root_location, limited_install_count,
+                                  install_patch_command):
+    action = "APPLYING RECOMMENDED PATCHES"
+
+    say('Getting manager version to download correct patches.')
+    manager_version = get_manager_version()
+
+    central_registry_location = determine_central_registry_location(
+        central_repository_location, manager_version,
+    )
+
+    central_listing = retrieve_central_patch_listing(
+        central_registry_location,
+        action,
+        manager_version,
+    )
+
+    say('Determining which patches need installing.')
+    _, leader = set_recommended_patch_status(
+        central_listing,
+        action,
+    )
+    # Filter out the patches that are not missing from any managers in this
+    # profile
+    central_listing['patches'] = [
+        patch for patch in central_listing['patches']
+        if patch['missing_on_manager']
+    ]
+
+    if leader:
+        target = 'cluster'
+    else:
+        target = 'manager'
+
+    if len(central_listing['patches']) == 0:
+        say(
+            'No patches to install, the {target} has all recommended '
+            'patches.'.format(target=target)
+        )
+        sys.exit(0)
+
+    if limited_install_count is None:
+        limited_install_count = len(central_listing['patches'])
+    elif limited_install_count == 0:
+        exit_with_sadness(
+            (
+                'Cannot install 0 patches. Please set a higher install limit.'
+            ),
+            action,
+        )
+
+    with tempdir() as tmp_path:
+        if repo_root_location and repo_root_location.startswith('file://'):
+            say('Patches are already locally stored. Skipping download.')
+            local_patch_storage = repo_root_location[len('file://'):]
+        else:
+            local_patch_storage = tmp_path
+            download_central_manager_patches(
+                central_repository_location,
+                repo_root_location,
+                destination=tmp_path,
+                action=action,
+                central_listing=central_listing,
+            )
+
+        installed_patches = 0
+        for patch in central_listing['patches'][:limited_install_count]:
+            patch_definition = os.path.join(
+                local_patch_storage, patch['patch_definition_path']
+            )
+            say('Applying {patch}'.format(patch=patch['patch_name']))
+            patch_applier(
+                patch_definition,
+                skip_services=False,
+                install_patch_command=install_patch_command,
+                skip_version_check=True,  # We already checked this
+            )
+            say('Applied {patch}'.format(patch=patch['patch_name']))
+            installed_patches += 1
+        say(
+            'Successfully installed {num} patches.'.format(
+                num=installed_patches,
+            )
+        )
+        if installed_patches == len(central_listing['patches']):
+            say(
+                'All patches are installed, the {target} has all '
+                'recommended patches!'.format(target=target)
+            )
+        else:
+            say(
+                'There are still {count} recommended patches that should be '
+                'installed.'.format(
+                    count=str(
+                        len(central_listing['patches']) - installed_patches
+                    ),
+                )
+            )
+
+
+def download_central_manager_patches(
+    central_repository_location,
+    repo_root_location,
+    destination,
+    action='DOWNLOADING RECOMMENDED PATCHES',
+    central_listing=None,
+):
+    say('Checking and preparing destination directory.')
+    # We won't just create it with mkdir -p because that won't work on windows
+    if not os.path.isdir(destination):
+        exit_with_sadness(
+            (
+                'Destination directory does not exist or is not a directory!'
+            ),
+            action,
+        )
+    patch_destination = os.path.join(destination, 'patches')
+    if not os.path.exists(patch_destination):
+        os.mkdir(patch_destination)
+
+    if not central_listing:
+        say('Getting manager version to download correct patches.')
+        manager_version = get_manager_version()
+
+        central_registry_location = determine_central_registry_location(
+            central_repository_location, manager_version,
+        )
+
+        central_listing = retrieve_central_patch_listing(
+            central_registry_location,
+            action,
+            manager_version,
+        )
+
+    say('Determining all required file locations.')
+    repo_root = repo_root_location or central_listing['patch_root_path']
+    definition_files = []
+    patch_files = []
+    for patch in central_listing['patches']:
+        definition_files.append(patch['patch_definition_path'])
+        for patch_file in patch['patch_files']:
+            patch_files.append(patch_file)
+
+    say('Downloading definitions')
+    for definition_file in definition_files:
+        file_data = urllib2.urlopen(repo_root + definition_file).read()
+        with open(os.path.join(destination, definition_file), 'w') as fh:
+            fh.write(file_data)
+
+    say('Downloading patch files')
+    repo_root += 'patches/'
+    for patch_file in patch_files:
+        file_data = urllib2.urlopen(repo_root + patch_file).read()
+        with open(os.path.join(patch_destination, patch_file), 'w') as fh:
+            fh.write(file_data)
+
+    say(
+        'All patches downloaded to {destination}'.format(
+            destination=destination
+        )
+    )
+
+
+def set_recommended_patch_status(central_listing, action,
+                                 json_output=False):
+    say('Getting current patch state from manager.')
+    manager_patches, leader = retrieve_manager_patch_details(
+        json_output,
+        action,
+    )
+    central_patches = set(
+        patch['patch_id'] for patch in central_listing['patches']
+    )
+
+    patch_id_mapping = {}
+    for patch_idx, patch in enumerate(central_listing['patches']):
+        patch['missing_on_manager'] = []
+        if leader:
+            patch['missing_on_current_leader'] = False
+        patch_id_mapping[patch['patch_id']] = patch_idx
+
+    for manager in manager_patches:
+        installed_on_manager = set(
+            patch['patch_id'] for patch in manager_patches[manager]
+        )
+        missing_patches = central_patches - installed_on_manager
+
+        for patch in missing_patches:
+            patch = central_listing['patches'][patch_id_mapping[patch]]
+            patch['missing_on_manager'].append(manager)
+            if leader and manager == leader:
+                patch['missing_on_current_leader'] = True
+
+    # Return these for comparisons with missing patch details
+    return manager_patches, leader
+
+
+def list_central_manager_patches(central_repository_location,
+                                 skip_checking_manager,
+                                 json_output):
+    action = 'LISTING CENTRAL PATCHES'
+
+    if not json_output:
+        say('Getting manager version to list correct patches.')
+    manager_version = get_manager_version()
+
+    central_registry_location = determine_central_registry_location(
+        central_repository_location, manager_version,
+    )
+
+    central_listing = retrieve_central_patch_listing(
+        central_registry_location,
+        action,
+        manager_version,
+        json_output,
+    )
+
+    if skip_checking_manager:
+        say('Not checking patches on manager.')
+        leader = None
+    else:
+        manager_patches, leader = set_recommended_patch_status(
+            central_listing,
+            action,
+            json_output,
+        )
+
+    if json_output:
+        say(json.dumps(central_listing, indent=2))
+    else:
+        say('')
+        say(
+            'Recommended patches for {version}:'.format(
+                version=manager_version['version'],
+            )
+        )
+        missing_patches = False
+        for patch in central_listing['patches']:
+            patch_message = '  '
+            if leader:
+                if len(patch['missing_on_manager']) == len(manager_patches):
+                    missing_patches = True
+                    patch_message += '(PATCH NOT INSTALLED ON CLUSTER)'
+                elif patch['missing_on_manager']:
+                    missing_patches = True
+                    if patch['missing_on_current_leader']:
+                        patch_message += (
+                            '(PATCH MISSING FROM LEADER, BUT PRESENT ON '
+                            'ONE OR MORE REPLICAS)'
+                        )
+                    else:
+                        patch_message += (
+                            '(PATCH INSTALLED ON LEADER, BUT MISSING FROM '
+                            'ONE OR MORE REPLICAS)'
+                        )
+            else:
+                # If we aren't a cluster then having the patch missing on any
+                # manager means it's missing on the only manager
+                if patch['missing_on_manager']:
+                    missing_patches = True
+                    patch_message += '(PATCH NOT INSTALLED ON MANAGER)'
+            patch_message += (
+                'Patch {name} (ID: {patch_id}). Description: {description}'
+            )
+            say(
+                patch_message.format(
+                    name=patch['patch_name'],
+                    patch_id=patch['patch_id'],
+                    description=patch['patch_description'],
+                )
+            )
+
+        if (not missing_patches) and (not skip_checking_manager):
+            say('')
+            say('All recommended patches are installed.')
+
+
 def add_apply_and_remove_args(parser):
     parser.add_argument(
         '-s', '--skip-services',
@@ -2196,6 +2538,55 @@ def add_apply_and_remove_args(parser):
         default=False,
         required=False,
     )
+
+
+def add_manager_updates_args(parser, repo_root=True):
+    parser.add_argument(
+        '-c', '--central-repository-location',
+        help=(
+            'Location of central patch listings. If this is a local file, it '
+            'must be specified as file:///path/to/central_registry_root/.'
+        ),
+        default=(
+            'https://raw.githubusercontent.com/'
+            'cloudify-cosmo/patchify/master/central_registry/'
+        ),
+    )
+
+    if repo_root:
+        parser.add_argument(
+            '-r', '--repo-root-location',
+            help=(
+                'Location to retrieve patch files from. '
+                'If not set, the location will be retrieved with the patch '
+                'listings.'
+            ),
+        )
+
+
+def add_install_patch_command_arg(parser):
+    parser.add_argument(
+        '-P', '--install-patch-command',
+        help=(
+            'Set this flag to yum install the patch command if it is not '
+            'present.'
+        ),
+        action='store_true',
+        default=False,
+        required=False,
+    )
+
+
+def nullable_int(value):
+    if value is not None:
+        try:
+            value = int(value)
+        except ValueError:
+            raise argparse.ArgumentTypeError(
+                # The null is a default
+                'Expected an integer input.'
+            )
+    return value
 
 
 def main():
@@ -2232,16 +2623,7 @@ def main():
         ),
         required=True,
     )
-    apply_patch_args.add_argument(
-        '-P', '--install-patch-command',
-        help=(
-            'Set this flag to yum install the patch command if it is not '
-            'present.'
-        ),
-        action='store_true',
-        default=False,
-        required=False,
-    )
+    add_install_patch_command_arg(apply_patch_args)
     add_apply_and_remove_args(apply_patch_args)
 
     remove_patch_args = subparsers.add_parser('remove',
@@ -2256,6 +2638,77 @@ def main():
     )
     add_apply_and_remove_args(remove_patch_args)
 
+    manager_updates = subparsers.add_parser(
+        'manager-updates',
+        help='Check, apply, or download recommended updates.'
+    )
+    manager_updates_subparsers = manager_updates.add_subparsers(
+        dest='subaction'
+    )
+    list_mgr_updates_args = manager_updates_subparsers.add_parser(
+        'list',
+        help=(
+            'List recommended manager patches and show whether they are '
+            'installed on the currently active cfy profiles.'
+        ),
+    )
+    list_mgr_updates_args.add_argument(
+        '-s', '--skip-checking-manager',
+        help=(
+            'Skip checking manager patches. Only list possible patches for '
+            'this manager version.'
+        ),
+        default=False,
+        action='store_true',
+    )
+    list_mgr_updates_args.add_argument(
+        '-j', '--json',
+        help=(
+            'Whether to output the patch list in json.'
+        ),
+        action='store_true',
+        default=False,
+        required=False,
+    )
+    add_manager_updates_args(list_mgr_updates_args, repo_root=False)
+
+    download_mgr_updates_args = manager_updates_subparsers.add_parser(
+        'download',
+        help=(
+            'Download all recommended manager patches for the manager '
+            'version in the currently active cfy profile.'
+        ),
+    )
+    download_mgr_updates_args.add_argument(
+        '-d', '--destination',
+        help=(
+            'Destination directory for downloaded patches. This must be a '
+            'writeable location for the current user.'
+        ),
+        required=True,
+    )
+    add_manager_updates_args(download_mgr_updates_args)
+
+    apply_mgr_updates_args = manager_updates_subparsers.add_parser(
+        'apply',
+        help=(
+            'Apply some or all recommended updates for the manager in the '
+            'currently active cfy profile. These patches will be installed '
+            'in the order they are listed in the manager-updates list.'
+        )
+    )
+    apply_mgr_updates_args.add_argument(
+        '-l', '--limit-install-count',
+        help=(
+            'Only install some of the specified patches. This number of '
+            'patches that are currently not installed will be installed.'
+        ),
+        type=nullable_int,
+        default=None,
+    )
+    add_install_patch_command_arg(apply_mgr_updates_args)
+    add_manager_updates_args(apply_mgr_updates_args)
+
     args = parser.parse_args()
 
     if args.action == 'apply':
@@ -2265,6 +2718,25 @@ def main():
         patch_remover(args.patch_id, args.skip_services)
     elif args.action == 'list':
         list_patches(args.json)
+    elif args.action == 'manager-updates' and args.subaction == 'list':
+        list_central_manager_patches(
+            args.central_repository_location,
+            args.skip_checking_manager,
+            args.json,
+        )
+    elif args.action == 'manager-updates' and args.subaction == 'download':
+        download_central_manager_patches(
+            args.central_repository_location,
+            args.repo_root_location,
+            args.destination,
+        )
+    elif args.action == 'manager-updates' and args.subaction == 'apply':
+        apply_central_manager_patches(
+            args.central_repository_location,
+            args.repo_root_location,
+            args.limit_install_count,
+            args.install_patch_command,
+        )
     else:
         # You can't get here without messing about with the code above
         raise RuntimeError('Invalid action specified in parser.')
