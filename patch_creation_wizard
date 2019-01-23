@@ -145,28 +145,51 @@ def get_md5sum_command(file_path):
 def generate_before_patch_md5sums(path_to_repo, diff_files):
     """Generate MD5sums for each file before patch application."""
     for diff_file, details in diff_files.items():
-        # Reverse the diff to see what the file looked like before
-        subprocess.check_call(
-            [
-                'patch', '-R', details['path_in_repo'],
-                os.path.join(os.getcwd(), PATCH_DIFF_PATH, diff_file),
-            ],
-            cwd=path_to_repo,
-        )
-        details['before_md5sum'] = subprocess.check_output(
-            get_md5sum_command(details['path_in_repo']),
-            cwd=path_to_repo,
-            shell=True,
-            executable='/bin/bash',
-        ).split(' ')[0]
-        # Now restore the file to what it should be
-        subprocess.check_call(
-            [
-                'patch', details['path_in_repo'],
-                os.path.join(os.getcwd(), PATCH_DIFF_PATH, diff_file),
-            ],
-            cwd=path_to_repo,
-        )
+        try:
+            # Reverse the diff to see what the file looked like before
+            subprocess.check_call(
+                [
+                    'patch', '-R', details['path_in_repo'],
+                    os.path.join(os.getcwd(), PATCH_DIFF_PATH, diff_file),
+                ],
+                cwd=path_to_repo,
+            )
+        except subprocess.CalledProcessError as err:
+            sys.stderr.write(
+                'Error reversing patch: {err}\n'
+                'Could not reverse patch. If you are attempting to generate '
+                'a patch from a commit that is not the final checked out '
+                'commit you may need to check out the specific commit and '
+                'confirm a clean "git status" output before '
+                'running the wizard again.\n'.format(
+                    err=str(err),
+                )
+            )
+            sys.exit(1)
+        finally:
+            # Clean up failed patch files
+            subprocess.check_call(
+                ['rm', '-f', details['path_in_repo'] + '.orig']
+            )
+            subprocess.check_call(
+                ['rm', '-f', details['path_in_repo'] + '.rej']
+            )
+        try:
+            details['before_md5sum'] = subprocess.check_output(
+                get_md5sum_command(details['path_in_repo']),
+                cwd=path_to_repo,
+                shell=True,
+                executable='/bin/bash',
+            ).split(' ')[0]
+        finally:
+            # Now restore the file to what it should be
+            subprocess.check_call(
+                [
+                    'patch', details['path_in_repo'],
+                    os.path.join(os.getcwd(), PATCH_DIFF_PATH, diff_file),
+                ],
+                cwd=path_to_repo,
+            )
 
 
 def generate_after_patch_md5sums(path_to_repo, diff_files):
@@ -269,6 +292,13 @@ def determine_manager_paths(diff_files, location_mappings):
     """Find locations for a file on the manager based on its name and md5sum.
     """
     ssh_details = get_profile_ssh_details()[0]
+    if ssh_details['connection_string'].startswith('@'):
+        sys.stderr.write(
+            'It looks like your SSH user is not set in your cfy profile.\n'
+            'Set it with "cfy profiles set --ssh-user <username>" so that '
+            'file paths can be determined.\n'
+        )
+        sys.exit(1)
 
     base_command = [
         'ssh', '-p', ssh_details['ssh_port'], ssh_details['connection_string']
@@ -400,7 +430,8 @@ def attempt_to_apply_patch(patch_definition, patch_files):
     print(
         'Patch generated and applies successfully.\n'
         'Please confirm behaviour with patch applied is correct before '
-        'committing and PRing the new patch.'
+        'committing and PRing the new patch.\n'
+        'Run "git status" to see which files were created.'
     )
 
 
