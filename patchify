@@ -19,6 +19,18 @@ PATCH_REGISTRY_FILE_NAME = 'patch_registry.json'
 PATCH_REGISTRY_PATH = os.path.join(
     BASE_MANAGER_PATCH_STORAGE_PATH, PATCH_REGISTRY_FILE_NAME
 )
+PATCH_VERSIONS = {
+    1: {
+        'required': set(['manager_versions', 'community', 'premium',
+                         'patch_version', 'affected_services', 'patches']),
+        'recommended': set(['md5sums_before', 'md5sums_after']),
+        'minor_versions': {
+            1: {
+                'required': set(['description']),
+            },
+        },
+    },
+}
 
 
 class VersionError(Exception):
@@ -155,9 +167,10 @@ def load_patch_definition(filename):
     with open(filename) as definition_handle:
         definition = json.load(definition_handle)
 
-    # Currently this only handles version 1.0.0 of patch definitions:
+    # Currently this handles version 1.0.0, 1.1.0, and 2.0.0 of patch
+    # definitions:
     # {
-    #   "patch_version": 1.0.0,  # No other value supported yet
+    #   "patch_version": 1.0.0,  # or 1.1.0 or 2.0.0
     #   "manager_versions": [4.2],  # List of supported cloudify managers
     #   "community": <true|false>,  # Whether community is supported
     #   "premium": <true|false>,  # Whether premium is supported
@@ -166,7 +179,8 @@ def load_patch_definition(filename):
     #                 # understands
     #     {
     #       "patch_file": "<patch file name in patch archive 'patches' dir>",
-    #       "md5sum": "<md5sum of patch file>",
+    #       "md5sum": "<md5sum of patch file>",  # This must be sha256sum for
+    #                                              2.0.0 and above definitions
     #       "destinations": [  # List of locations that this file should patch
     #         "/path/to/location/on/manager",
     #         "/path/to/other/location/on/manager",
@@ -181,7 +195,10 @@ def load_patch_definition(filename):
     #     "cloudify-service-1",
     #     "cloudify-service-2"
     #   ],
-    #   # Following sections are optional, but recommended
+    #   # Note that for 2.0.0 and above, sha256sums are used instead of MD5s.
+    #   # Therefore, these sections will be "sha256sums_before" and
+    #   # "sha256sums_after", and will contain lists of SHA256sums instead of
+    #   # MD5sums.
     #   "md5sums_before": {  # Each file will have md5sum checked before
     #                        # applying the patches. If a file on the
     #                        # manager is specified in this list and does not
@@ -219,11 +236,27 @@ def load_patch_definition(filename):
         )
         return definition
 
-    if patch_version > (1, 1, 0):
+    try:
+        patch_schema = PATCH_VERSIONS[patch_version[0]]
+        if patch_version[1] > 0:
+            minor_schema = patch_schema['minor_versions'][patch_version[1]]
+        else:
+            minor_schema = {}
+    except (KeyError, AttributeError):
+        supported_versions = []
+        for major, schema in PATCH_VERSIONS.items():
+            minor_versions = [0]
+            minor_versions.extend(schema.get('minor_versions', {}).keys())
+            for minor in minor_versions:
+                supported_versions.append(
+                    '.'.join(str(v) for v in [major, minor, 0]),
+                )
+
         add_definition_error(
             message=(
-                'Only version 1.1.0 and earlier patches are supported '
+                'Only definition versions {supported} are supported '
                 'currently. Found version: {version}'.format(
+                    supported=', '.join(supported_versions),
                     version='.'.join([str(i) for i in patch_version]),
                 )
             ),
@@ -232,14 +265,15 @@ def load_patch_definition(filename):
         )
         return definition
 
-    required_keys = set(['manager_versions', 'community', 'premium',
-                         'patch_version'])
-    recommended_keys = set()
-    if patch_version[0] == 1:
-        required_keys.update(['patches', 'affected_services'])
-        recommended_keys.update(['md5sums_before', 'md5sums_after'])
-        if patch_version[1] >= 1:
-            required_keys.add('description')
+    required_keys = patch_schema.get('required', set())
+    required_keys.update(minor_schema.get('required', set()))
+
+    recommended_keys = patch_schema.get('recommended', set())
+    recommended_keys.update(minor_schema.get('recommended', set()))
+
+    # Unexpected keys might cause interesting behaviour. We'll avoid that.
+    allowed_keys = required_keys | recommended_keys
+    allowed_keys.add('errors')
 
     missing_keys = required_keys - set(definition)
     if missing_keys:
@@ -268,9 +302,6 @@ def load_patch_definition(filename):
             definition=definition,
         )
 
-    # Unexpected keys might cause interesting behaviour. We'll avoid that.
-    allowed_keys = required_keys | recommended_keys
-    allowed_keys.add('errors')
     unsupported_keys = set(definition) - allowed_keys
     if unsupported_keys:
         add_definition_error(
