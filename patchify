@@ -5,6 +5,7 @@ from __future__ import print_function
 import argparse
 from contextlib import contextmanager
 import datetime
+import hashlib
 import json
 import os
 import shutil
@@ -19,6 +20,13 @@ PATCH_REGISTRY_FILE_NAME = 'patch_registry.json'
 PATCH_REGISTRY_PATH = os.path.join(
     BASE_MANAGER_PATCH_STORAGE_PATH, PATCH_REGISTRY_FILE_NAME
 )
+SHA256SUM_SCRIPT = """#! /usr/bin/env python
+import hashlib
+import sys
+target = sys.argv[1]
+with open(target, 'rb') as data_handle:
+   print(hashlib.sha256(data_handle.read()).hexdigest() + ' ' + target)
+"""
 PATCH_VERSIONS = {
     1: {
         'required': set(['manager_versions', 'community', 'premium',
@@ -85,7 +93,7 @@ class PatchRegistryParseFailure(Exception):
     pass
 
 
-class MD5CheckFailure(Exception):
+class HashCheckFailure(Exception):
     pass
 
 
@@ -242,7 +250,7 @@ def load_patch_definition(filename):
             minor_schema = patch_schema['minor_versions'][patch_version[1]]
         else:
             minor_schema = {}
-    except (KeyError, AttributeError):
+    except KeyError:
         supported_versions = []
         for major, schema in PATCH_VERSIONS.items():
             minor_versions = [0]
@@ -536,7 +544,19 @@ def get_cfy_output(subcommand_and_args):
     return headers, results
 
 
-def get_file_md5sum(file_path, manager_connection_string, ssh_port, keyfile):
+def get_file_hash(file_path, manager_connection_string, ssh_port, keyfile,
+                  hash_type):
+    if hash_type == 'md5':
+        command = 'md5sum'
+    elif hash_type == 'sha256':
+        command = '/opt/cloudify/pysha256sum'
+    else:
+        # This shouldn't be user-visible unless someone really messes up the
+        # calling code
+        raise RuntimeError('Hash type {hash_type} not supported.'.format(
+            hash_type=hash_type,
+        ))
+
     # Structure the command so that we return meaningful output in predictable
     # situations (where the path isn't a file (e.g. is a directory) or does
     # not exist), while still allowing failure for unexpected situations
@@ -544,12 +564,13 @@ def get_file_md5sum(file_path, manager_connection_string, ssh_port, keyfile):
     md5command = (
         'if [[ -f {path} ]]; '
         # sudo this so that we can avoid permissions issues
-        '  then sudo md5sum {path}; '
+        '  then sudo {command} {path}; '
         'elif [[ -e {path} ]]; '
         '  then echo -n "{notafile}"; '
         'else '
         '  echo -n "{notexisting}"; '
         'fi'.format(
+            command=command,
             path=file_path,
             notafile="NOTAFILE",
             notexisting="DOESNOTEXIST",
@@ -560,37 +581,117 @@ def get_file_md5sum(file_path, manager_connection_string, ssh_port, keyfile):
     ).split(' ')[0]
 
 
-def get_local_md5sum(file_path):
-    return subprocess.check_output(['md5sum', file_path]).split(' ')[0]
+def get_local_hash(file_path, hash_type):
+    if hash_type == 'md5':
+        with open(file_path) as data_handle:
+            return hashlib.md5(data_handle.read()).hexdigest()
+    elif hash_type == 'sha256':
+        with open(file_path) as data_handle:
+            return hashlib.sha256(data_handle.read()).hexdigest()
+    else:
+        # This shouldn't be user-visible unless someone really messes up the
+        # calling code
+        raise RuntimeError('Hash type {hash_type} not supported.'.format(
+            hash_type=hash_type,
+        ))
 
 
-def md5sums_match(check_list, manager_connection_string, ssh_port, keyfile):
+def upload_hash_commands(manager_connection_string, ssh_port, keyfile):
+    target_folder = '/opt/cloudify'
+    # Don't break if this script is run on windows (os.path.join will
+    # cause problems in that case)
+    script_path = target_folder + '/pysha256sum'
+
+    say('Checking hash commands on server.')
+    expected_hash = hashlib.md5(SHA256SUM_SCRIPT).hexdigest()
+    server_hash = get_file_hash(
+        script_path, manager_connection_string, ssh_port, keyfile,
+        # Using md5 because if the script isn't there then calling it will be
+        # an error
+        hash_type='md5',
+    )
+
+    if expected_hash == server_hash:
+        say('Hash check script on server is up to date.')
+        return
+
+    say("Uploading hash check script.")
+    with tempdir() as tmp_path:
+        with temporarily_own_directory(
+            manager_connection_string, ssh_port, keyfile, '/opt/cloudify',
+        ):
+            with open(
+                os.path.join(tmp_path, 'pysha256sum'),
+                'w',
+            ) as script_handle:
+                script_handle.write(SHA256SUM_SCRIPT)
+
+            upload(
+                'pysha256sum',
+                tmp_path,
+                script_path,
+                manager_connection_string,
+                ssh_port,
+                keyfile,
+                # Using md5 because otherwise we'll be trying to validate that
+                # the script uploaded without corruption using the possibly
+                # corrupt script
+                hash_type='md5',
+            )
+
+            ssh(
+                manager_connection_string, ssh_port, keyfile,
+                'sudo chown root. {target}'.format(
+                    target=script_path,
+                )
+            )
+            ssh(
+                manager_connection_string, ssh_port, keyfile,
+                'sudo chmod 555 {target}'.format(
+                    target=script_path,
+                )
+            )
+
+
+def hashes_match(check_list, manager_connection_string, ssh_port, keyfile,
+                 hash_type):
     matching = True
-    for file_path, acceptable_md5sums in check_list.items():
-        say('Checking md5sum for {path}'.format(path=file_path))
-        md5sum = get_file_md5sum(
-            file_path, manager_connection_string, ssh_port, keyfile
+    for file_path, acceptable_hashes in check_list.items():
+        say(
+            'Checking {hash_type}sum for {path}'.format(
+                path=file_path,
+                hash_type=hash_type,
+            )
+        )
+        file_hash = get_file_hash(
+            file_path, manager_connection_string, ssh_port, keyfile,
+            hash_type,
         )
 
-        if md5sum not in acceptable_md5sums:
-            matching = False
-            if acceptable_md5sums == ["DOESNOTEXIST"]:
-                message = (
-                    '{file_path} should not exist, but file with md5sum '
-                    '{md5sum} was found.'
-                )
-            else:
-                message = (
-                    '{file_path} has an incorrect md5sum. '
-                    'md5sum was {md5sum}. '
-                    'Allowed md5sums are {acceptable}'
-                )
+        if file_hash in acceptable_hashes:
+            # This file is fine, don't complain
+            continue
 
-            sadly_say(message.format(
-                file_path=file_path,
-                md5sum=md5sum,
-                acceptable=', '.join(acceptable_md5sums),
-            ))
+        # Hash mismatch, give helpful error messages
+        matching = False
+        if acceptable_hashes == ["DOESNOTEXIST"]:
+            message = (
+                '{file_path} should not exist, but file with '
+                '{hash_type}sum {file_hash} was found.'
+            )
+        else:
+            message = (
+                '{file_path} has an incorrect {hash_type}sum. '
+                '{hash_type}sum was {file_hash}. '
+                'Allowed {hash_type}sums are {acceptable}'
+            )
+
+        sadly_say(message.format(
+            file_path=file_path,
+            file_hash=file_hash,
+            acceptable=', '.join(acceptable_hashes),
+            hash_type=hash_type,
+        ))
 
     return matching
 
@@ -677,7 +778,7 @@ def _scp(keyfile, ssh_port, source, dest, quiet=False):
 
 def upload(file_name, source_path, dest_path,
            manager_connection_string, ssh_port, keyfile,
-           expected_md5sum=None):
+           hash_type='sha256', expected_hash=None):
     source = os.path.join(source_path, file_name)
     dest = '{mgr}:{dest_path}'.format(
         mgr=manager_connection_string,
@@ -687,23 +788,24 @@ def upload(file_name, source_path, dest_path,
 
     _scp(keyfile, ssh_port, source, dest)
 
-    if not expected_md5sum:
-        expected_md5sum = get_local_md5sum(source)
+    if not expected_hash:
+        expected_hash = get_local_hash(source, hash_type=hash_type)
 
-    uploaded_md5sum = get_file_md5sum(
+    uploaded_hash = get_file_hash(
         file_path=dest_path,
         manager_connection_string=manager_connection_string,
         ssh_port=ssh_port,
         keyfile=keyfile,
+        hash_type=hash_type,
     )
 
-    if not uploaded_md5sum == expected_md5sum:
+    if uploaded_hash != expected_hash:
         raise UploadError(
-            'Uploaded file {file_name} had md5sum {actual}, but should '
+            'Uploaded file {file_name} had hash {actual}, but should '
             'have had {expected}.'.format(
                 file_name=file_name,
-                actual=uploaded_md5sum,
-                expected=expected_md5sum,
+                actual=uploaded_hash,
+                expected=expected_hash,
             )
         )
 
@@ -720,14 +822,15 @@ def download(file_name, source_path, dest_path,
 
     _scp(keyfile, ssh_port, source, dest, quiet=quiet)
 
-    original_md5sum = get_file_md5sum(
+    original_md5sum = get_file_hash(
         file_path=os.path.join(source_path, file_name),
         manager_connection_string=manager_connection_string,
         ssh_port=ssh_port,
         keyfile=keyfile,
+        hash_type='md5',
     )
 
-    downloaded_md5sum = get_local_md5sum(dest)
+    downloaded_md5sum = get_local_hash(dest, hash_type='md5')
 
     if not original_md5sum == downloaded_md5sum:
         raise DownloadError(
@@ -772,13 +875,14 @@ def upload_and_verify_patch_files(manager_connection_string, ssh_port,
                                   keyfile):
     for patch in patches:
         patch_name = patch['patch_file']
-        expected_md5sum = patch['md5sum']
+        expected_hash = patch['md5sum']
 
         upload(
             file_name=patch_name,
             source_path=patch_dir,
             dest_path=os.path.join(staging_dir, patch_name),
-            expected_md5sum=expected_md5sum,
+            expected_hash=expected_hash,
+            hash_type='md5',
             manager_connection_string=manager_connection_string,
             ssh_port=ssh_port,
             keyfile=keyfile,
@@ -956,15 +1060,18 @@ def abort_on_missing_patch_command(manager_connection_string, ssh_port,
             )
 
 
-def check_md5sums_before(patch_definition, manager_connection_string,
-                         ssh_port, keyfile):
-    say("Checking md5sums are as expected.")
-    if not md5sums_match(patch_definition['md5sums_before'],
-                         manager_connection_string,
-                         ssh_port,
-                         keyfile):
-        raise MD5CheckFailure(
-            'Unexpected md5sums found before starting patch installation.',
+def check_hashes_before(patch_definition, manager_connection_string,
+                        ssh_port, keyfile, hash_type):
+    definition_key = hash_type + 'sums_before'
+
+    say("Checking hashes are as expected.")
+    if not hashes_match(patch_definition[definition_key],
+                        manager_connection_string,
+                        ssh_port,
+                        keyfile,
+                        hash_type=hash_type):
+        raise HashCheckFailure(
+            'Unexpected hashes found before starting patch installation.',
         )
 
 
@@ -1108,18 +1215,22 @@ def possibly_start_services(patch_definition, skip_services,
                        keyfile)
 
 
-def check_md5sums_after(patch_definition,
-                        manager_connection_string, ssh_port, keyfile,
-                        backup_root, delete_root, skip_services):
-    say("Checking post-patch md5sums.")
-    if not md5sums_match(patch_definition['md5sums_after'],
-                         manager_connection_string,
-                         ssh_port,
-                         keyfile):
+def check_hashes_after(patch_definition,
+                       manager_connection_string, ssh_port, keyfile,
+                       backup_root, delete_root, skip_services,
+                       hash_type):
+    definition_key = hash_type + 'sums_after'
+
+    say("Checking post-patch hashes.")
+    if not hashes_match(patch_definition[definition_key],
+                        manager_connection_string,
+                        ssh_port,
+                        keyfile,
+                        hash_type):
         rollback(manager_connection_string, ssh_port, patch_definition,
                  backup_root, delete_root, keyfile, skip_services)
-        raise MD5CheckFailure(
-            'Unexpected md5sums found after patch installation.\n'
+        raise HashCheckFailure(
+            'Unexpected hashes found after patch installation.\n'
             'Changes rolled back.',
         )
 
@@ -1291,7 +1402,7 @@ def patch_applier(definition_file, skip_services, install_patch_command,
                 PatchAlreadyApplied,
                 PatchApplyFailed,
                 PatchDefinitionParseFailure,
-                MD5CheckFailure,
+                HashCheckFailure,
                 RegistryGenerationFailure,
             ) as err:
                 if isinstance(err, PatchAlreadyApplied):
@@ -1391,7 +1502,7 @@ def patch_applier(definition_file, skip_services, install_patch_command,
             PatchApplyFailed,
             PatchAlreadyApplied,
             PatchDefinitionParseFailure,
-            MD5CheckFailure,
+            HashCheckFailure,
             RegistryGenerationFailure,
         ) as err:
             exit_with_sadness(str(err), action)
@@ -1403,12 +1514,19 @@ def apply_patch(patch_definition, patch_name, definition_file, skip_services,
     keyfile = ssh_details['key_path']
     ssh_port = ssh_details['ssh_port']
 
+    # Use the correct hash type for this patch definition version
+    if 'sha256sums_before' in patch_definition:
+        hash_type = 'sha256'
+        upload_hash_commands(manager_connection_string, ssh_port, keyfile)
+    else:
+        hash_type = 'md5'
+
     say("Retrieving patch registry information.")
     registry = download_patch_registry(manager_connection_string,
                                        ssh_port, keyfile)
 
     say("Checking whether patch has already been applied.")
-    definition_md5sum = get_local_md5sum(definition_file)
+    definition_md5sum = get_local_hash(definition_file, hash_type='md5')
     patch_id = generate_patch_id(patch_name, definition_md5sum)
     current_patches = registry.get('current_patches')
     this_patch = None
@@ -1425,8 +1543,8 @@ def apply_patch(patch_definition, patch_name, definition_file, skip_services,
             )
         )
 
-    check_md5sums_before(patch_definition, manager_connection_string,
-                         ssh_port, keyfile)
+    check_hashes_before(patch_definition, manager_connection_string,
+                        ssh_port, keyfile, hash_type=hash_type)
 
     timestamp = generate_timestamp()
     say("Patching timestamp is: {timestamp}".format(timestamp=timestamp))
@@ -1477,9 +1595,10 @@ def apply_patch(patch_definition, patch_name, definition_file, skip_services,
                     ),
                 )
 
-    check_md5sums_after(patch_definition,
-                        manager_connection_string, ssh_port, keyfile,
-                        backup_root, delete_root, skip_services)
+    check_hashes_after(patch_definition,
+                       manager_connection_string, ssh_port, keyfile,
+                       backup_root, delete_root, skip_services,
+                       hash_type=hash_type)
 
     possibly_start_services(patch_definition, skip_services,
                             manager_connection_string, ssh_port, keyfile)
@@ -1583,7 +1702,7 @@ def patch_remover(target_patch_id, skip_services):
                 PatchRemovalBlocked,
                 PatchDefinitionParseFailure,
                 InvalidBackup,
-                MD5CheckFailure,
+                HashCheckFailure,
                 RegistryGenerationFailure,
             ) as err:
                 if isinstance(err, PatchNotFound):
@@ -1675,7 +1794,7 @@ def patch_remover(target_patch_id, skip_services):
             PatchRemovalBlocked,
             PatchDefinitionParseFailure,
             InvalidBackup,
-            MD5CheckFailure,
+            HashCheckFailure,
             RegistryGenerationFailure,
         ) as err:
             exit_with_sadness(str(err), action)
@@ -1755,8 +1874,6 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
         'backups',
     )
     new_definition = {
-        'md5sums_before': old_definition['md5sums_after'],
-        'md5sums_after': old_definition['md5sums_before'],
         'patches': [
             {'destinations': old_patch['destinations']}
             for old_patch in old_definition['patches']
@@ -1764,6 +1881,19 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
         'affected_services': old_definition['affected_services'],
         'removed_patch_backups_path': backup_path,
     }
+
+    if 'md5sums_before' in old_definition:
+        new_definition['md5sums_after'] = old_definition['md5sums_before']
+    if 'md5sums_after' in old_definition:
+        new_definition['md5sums_before'] = old_definition['md5sums_after']
+    if 'sha256sums_after' in old_definition:
+        # In a patch definition with SHA256 hashes
+        new_definition['sha256sums_after'] = (
+            old_definition['sha256sums_before']
+        )
+        new_definition['sha256sums_before'] = (
+            old_definition['sha256sums_after']
+        )
 
     say("Checking for correct files to restore.")
     files_to_delete = []
@@ -1774,11 +1904,12 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
             target_file.lstrip('/'),
         )
 
-        backup_md5sum = get_file_md5sum(
+        backup_md5sum = get_file_hash(
             file_path=target_backup_path,
             manager_connection_string=manager_connection_string,
             ssh_port=ssh_port,
             keyfile=keyfile,
+            hash_type='md5',
         )
         if backup_md5sum not in valid_md5sums:
             raise InvalidBackup(
@@ -1798,8 +1929,8 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
             files_to_restore.append((target_backup_path, target_file))
 
     say("Validating current files.")
-    check_md5sums_before(new_definition, manager_connection_string,
-                         ssh_port, keyfile)
+    check_hashes_before(new_definition, manager_connection_string,
+                        ssh_port, keyfile, hash_type='md5')
 
     possibly_stop_services(new_definition, skip_services,
                            manager_connection_string, ssh_port, keyfile)
@@ -1867,9 +1998,10 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
 
     backup_root = patch_dirs['backup_root']
     delete_root = patch_dirs['delete_root']
-    check_md5sums_after(new_definition,
-                        manager_connection_string, ssh_port, keyfile,
-                        backup_root, delete_root, skip_services)
+    check_hashes_after(new_definition,
+                       manager_connection_string, ssh_port, keyfile,
+                       backup_root, delete_root, skip_services,
+                       hash_type='md5')
 
     possibly_start_services(new_definition, skip_services,
                             manager_connection_string, ssh_port, keyfile)
@@ -2181,11 +2313,12 @@ def display_patch_listing(patches, output_method=say):
 
 def download_patch_registry(manager_connection_string, ssh_port, keyfile,
                             quiet=False):
-    patch_registry_md5 = get_file_md5sum(
+    patch_registry_md5 = get_file_hash(
         PATCH_REGISTRY_PATH,
         manager_connection_string,
         ssh_port,
         keyfile,
+        'md5',
     )
     if patch_registry_md5 == 'DOESNOTEXIST':
         registry = {
