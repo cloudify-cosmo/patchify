@@ -129,6 +129,51 @@ def sadly_say(message):
     sys.stderr.write('%s\n' % message)
 
 
+def output_json(data):
+    print(json.dumps(data, indent=2))
+
+
+def output_table(data, fields):
+    field_lengths = []
+    for field in fields:
+        field_length = max(
+            2 + len(str(entry[field])) for entry in data
+        )
+        field_length = max(
+            field_length,
+            2 + len(field)
+        )
+        field_lengths.append(field_length)
+
+    output_table_divider(field_lengths)
+    # Column headings
+    output_table_row(field_lengths, fields)
+    output_table_divider(field_lengths)
+
+    for entry in data:
+        row = [
+            entry[field] for field in fields
+        ]
+        output_table_row(field_lengths, row)
+    output_table_divider(field_lengths)
+
+
+def output_table_divider(lengths):
+    output = '+'
+    for length in lengths:
+        output += '-' * length
+        output += '+'
+    print(output)
+
+
+def output_table_row(lengths, entries):
+    output = '|'
+    for i in range(len(lengths)):
+        output += str(entries[i]).center(lengths[i])
+        output += '|'
+    print(output)
+
+
 def get_manager_version():
     try:
         version_output = subprocess.check_output(['cfy', '--version'])
@@ -2192,9 +2237,9 @@ def list_patches(json_output):
 
     if json_output:
         if leader:
-            say(json.dumps(manager_patches, indent=2))
+            output_json(manager_patches)
         else:
-            say(json.dumps(manager_patches[None], indent=2))
+            output_json(manager_patches[None])
     else:
         for patches in manager_patches.values():
             uninstall_blocked = get_uninstall_blockers(patches)
@@ -2655,7 +2700,7 @@ def list_central_manager_patches(central_repository_location,
         )
 
     if json_output:
-        say(json.dumps(central_listing, indent=2))
+        output_json(central_listing)
     else:
         say('')
         say(
@@ -2663,45 +2708,21 @@ def list_central_manager_patches(central_repository_location,
                 version=manager_version['version'],
             )
         )
-        missing_patches = False
-        for patch in central_listing['patches']:
-            patch_message = '  '
-            if leader:
-                if len(patch['missing_on_manager']) == len(manager_patches):
-                    missing_patches = True
-                    patch_message += '(PATCH NOT INSTALLED ON CLUSTER)'
-                elif patch['missing_on_manager']:
-                    missing_patches = True
-                    if patch['missing_on_current_leader']:
-                        patch_message += (
-                            '(PATCH MISSING FROM LEADER, BUT PRESENT ON '
-                            'ONE OR MORE REPLICAS)'
-                        )
-                    else:
-                        patch_message += (
-                            '(PATCH INSTALLED ON LEADER, BUT MISSING FROM '
-                            'ONE OR MORE REPLICAS)'
-                        )
-            else:
-                # If we aren't a cluster then having the patch missing on any
-                # manager means it's missing on the only manager
-                if patch['missing_on_manager']:
-                    missing_patches = True
-                    patch_message += '(PATCH NOT INSTALLED ON MANAGER)'
-            patch_message += (
-                'Patch {name} (ID: {patch_id}). Description: {description}'
-            )
-            say(
-                patch_message.format(
-                    name=patch['patch_name'],
-                    patch_id=patch['patch_id'],
-                    description=patch['patch_description'],
-                )
-            )
 
-        if (not missing_patches) and (not skip_checking_manager):
-            say('')
-            say('All recommended patches are installed.')
+        if leader:
+            base_fields = ['missing_on_current_leader', 'missing_on_manager']
+            for patch in central_listing['patches']:
+                patch['missing_on_manager'] = ', '.join(
+                    patch['missing_on_manager']
+                )
+        else:
+            base_fields = ['installed']
+            for patch in central_listing['patches']:
+                patch['installed'] = not patch['missing_on_manager']
+        output_table(
+            central_listing['patches'],
+            base_fields + ['patch_name', 'patch_id', 'patch_description'],
+        )
 
 
 def add_apply_and_remove_args(parser):
