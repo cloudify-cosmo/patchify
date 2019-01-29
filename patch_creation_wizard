@@ -2,6 +2,7 @@
 """Tool for generating patchify patches based on git commits."""
 from __future__ import print_function
 import argparse
+import hashlib
 import json
 import os
 import string
@@ -113,23 +114,22 @@ def generate_patch_diff_files(patch_name, path_to_repo, commit):
             diff_handle.write(diff)
         diff_files[diff_file_name] = {
             'path_in_repo': different_file,
-            'before_md5sum': None,
-            'after_md5sum': None,
-            'diff_md5sum': subprocess.check_output(
-                ['md5sum',
+            'before_sha256sum': None,
+            'after_sha256sum': None,
+            'diff_sha256sum': subprocess.check_output(
+                ['./pysha256sum',
                  os.path.join(PATCH_DIFF_PATH, diff_file_name)],
-            ).split(' ')[1],
+            ).split(' ')[0],
             'destinations': [],
         }
     return diff_files
 
 
-def get_md5sum_command(file_path):
-    """Generate md5sums in the same way as patchify."""
-    return (
+def get_hash(file_path, path_to_repo):
+    """Generate hashes in the same way as patchify."""
+    result = subprocess.check_output(
         'if [[ -f {path} ]]; '
-        # sudo this so that we can avoid permissions issues
-        '  then sudo md5sum {path}; '
+        '  then echo -n {path}; '
         'elif [[ -e {path} ]]; '
         '  then echo -n "{notafile}"; '
         'else '
@@ -138,12 +138,25 @@ def get_md5sum_command(file_path):
             path=file_path,
             notafile="NOTAFILE",
             notexisting="DOESNOTEXIST",
-        )
+        ),
+        cwd=path_to_repo,
+        shell=True,
+        executable='/bin/bash',
     )
 
+    if result not in ('NOTAFILE', 'DOESNOTEXIST'):
+        file_path = os.path.join(
+            path_to_repo,
+            file_path,
+        )
+        with open(file_path) as handle:
+            result = hashlib.sha256(handle.read()).hexdigest()
 
-def generate_before_patch_md5sums(path_to_repo, diff_files):
-    """Generate MD5sums for each file before patch application."""
+    return result
+
+
+def generate_before_patch_hashes(path_to_repo, diff_files):
+    """Generate hashes for each file before patch application."""
     for diff_file, details in diff_files.items():
         try:
             # Reverse the diff to see what the file looked like before
@@ -175,14 +188,12 @@ def generate_before_patch_md5sums(path_to_repo, diff_files):
                 ['rm', '-f', details['path_in_repo'] + '.rej']
             )
 
-        # Generate md5sum without the new patch and clean up
+        # Generate hash without the new patch and clean up
         try:
-            details['before_md5sum'] = subprocess.check_output(
-                get_md5sum_command(details['path_in_repo']),
-                cwd=path_to_repo,
-                shell=True,
-                executable='/bin/bash',
-            ).split(' ')[0]
+            details['before_sha256sum'] = get_hash(
+                details['path_in_repo'],
+                path_to_repo,
+            )
         finally:
             # Now restore the file to what it should be
             subprocess.check_call(
@@ -194,15 +205,13 @@ def generate_before_patch_md5sums(path_to_repo, diff_files):
             )
 
 
-def generate_after_patch_md5sums(path_to_repo, diff_files):
-    """Generate expected MD5sums for each file after patches are applied."""
+def generate_after_patch_hashes(path_to_repo, diff_files):
+    """Generate expected hashes for each file after patches are applied."""
     for details in diff_files.values():
-        details['after_md5sum'] = subprocess.check_output(
-            get_md5sum_command(details['path_in_repo']),
-            cwd=path_to_repo,
-            shell=True,
-            executable='/bin/bash',
-        ).split(' ')[0]
+        details['after_sha256sum'] = get_hash(
+            details['path_in_repo'],
+            path_to_repo,
+        )
 
 
 def get_cfy_output(subcommand_and_args):
@@ -291,7 +300,7 @@ def get_profile_ssh_details():
 
 
 def determine_manager_paths(diff_files, location_mappings):
-    """Find locations for a file on the manager based on its name and md5sum.
+    """Find locations for a file on the manager based on its name and hash.
     """
     ssh_details = get_profile_ssh_details()[0]
     if ssh_details['connection_string'].startswith('@'):
@@ -302,11 +311,23 @@ def determine_manager_paths(diff_files, location_mappings):
         )
         sys.exit(1)
 
+    scp_command = [
+        # Use -p to preserve the executable permission
+        # ...and -P for the port (yes, it's a little ugly)
+        'scp', '-p', '-P', ssh_details['ssh_port'],
+    ]
     base_command = [
         'ssh', '-p', ssh_details['ssh_port'], ssh_details['connection_string']
     ]
     if ssh_details['key_path']:
         base_command.extend(['-i', ssh_details['key_path']])
+        scp_command.extend(['-i', ssh_details['key_path']])
+
+    # Upload shasum script and ensure it is executable
+    scp_command.extend(
+        ['pysha256sum', ssh_details['connection_string'] + ':']
+    )
+    subprocess.check_call(scp_command)
 
     for details in diff_files.values():
         path_in_repo = details['path_in_repo']
@@ -315,7 +336,7 @@ def determine_manager_paths(diff_files, location_mappings):
         else:
             command = base_command + [
                 'sudo find /opt /etc/cloudify '
-                '-name {filename} -exec md5sum {{}} \\;'.format(
+                '-name {filename} -exec ./pysha256sum {{}} \\;'.format(
                     filename=os.path.split(path_in_repo)[1],
                 )
             ]
@@ -326,8 +347,8 @@ def determine_manager_paths(diff_files, location_mappings):
                 if line == '':
                     continue
                 line = line.strip()
-                line_md5sum, path = line.split(' ', 1)
-                if line_md5sum.strip() == details['before_md5sum']:
+                line_hash, path = line.split(' ', 1)
+                if line_hash.strip() == details['before_sha256sum']:
                     locations.append(path.strip())
 
             details['destinations'] = locations
@@ -350,7 +371,7 @@ def determine_affected_services(diff_files):
 def generate_patch(patch_name, patch_description, path_to_repo, commit,
                    location_mappings):
     """Generate the patch."""
-    patch_definition = {'patch_version': '1.1.0'}
+    patch_definition = {'patch_version': '2.0.0'}
 
     manager_version_details = get_manager_version()
     patch_definition['manager_versions'] = [manager_version_details['version']]
@@ -365,9 +386,9 @@ def generate_patch(patch_name, patch_description, path_to_repo, commit,
 
     diff_files = generate_patch_diff_files(patch_name, path_to_repo, commit)
 
-    generate_before_patch_md5sums(path_to_repo, diff_files)
+    generate_before_patch_hashes(path_to_repo, diff_files)
 
-    generate_after_patch_md5sums(path_to_repo, diff_files)
+    generate_after_patch_hashes(path_to_repo, diff_files)
 
     determine_manager_paths(diff_files, location_mappings)
 
@@ -378,19 +399,19 @@ def generate_patch(patch_name, patch_description, path_to_repo, commit,
     patch_definition['patches'] = [
         {
             'patch_file': os.path.split(diff_file)[1],
-            'md5sum': details['diff_md5sum'],
+            'sha256sum': details['diff_sha256sum'],
             'destinations': details['destinations'],
         } for diff_file, details in diff_files.items()
     ]
 
-    patch_definition['md5sums_before'] = {}
-    before = patch_definition['md5sums_before']
-    patch_definition['md5sums_after'] = {}
-    after = patch_definition['md5sums_after']
+    patch_definition['sha256sums_before'] = {}
+    before = patch_definition['sha256sums_before']
+    patch_definition['sha256sums_after'] = {}
+    after = patch_definition['sha256sums_after']
     for details in diff_files.values():
         for destination in details['destinations']:
-            before[destination] = [details['before_md5sum']]
-            after[destination] = [details['after_md5sum']]
+            before[destination] = [details['before_sha256sum']]
+            after[destination] = [details['after_sha256sum']]
 
     patch_path = os.path.join(
         'patch_files',
