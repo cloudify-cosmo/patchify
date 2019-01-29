@@ -35,8 +35,8 @@ def get_patch_details(patch_definition_path):
         )
         sys.exit(1)
 
-    definition_md5 = subprocess.check_output(
-        ['md5sum', patch_definition_path]
+    definition_hash = subprocess.check_output(
+        ['./pysha256sum', patch_definition_path]
     ).split()[0]
     patch_definition_file = os.path.split(patch_definition_path)[1]
     patch_name = os.path.splitext(patch_definition_file)[0]
@@ -44,10 +44,10 @@ def get_patch_details(patch_definition_path):
     with open(patch_definition_path) as patch_def_handle:
         patch_definition = json.load(patch_def_handle)
 
-    if 'description' not in patch_definition:
+    if not patch_definition['patch_version'].startswith('2.'):
         sys.stderr.write(
-            'Patches to be added to the central registry must have a '
-            'description.\n'
+            'Patches to be added to the central registry must be at least '
+            'version 2.0.0.\n'
             'FAILED TO ADD PATCH TO CENTRAL REGISTRY.\n'
         )
         sys.exit(1)
@@ -56,14 +56,14 @@ def get_patch_details(patch_definition_path):
     patch_files = [
         patch['patch_file'] for patch in patch_definition['patches']
     ]
-    patch_id = generate_patch_id(patch_name, definition_md5)
+    patch_id = generate_patch_id(patch_name, definition_hash)
 
     applicable_versions = patch_definition['manager_versions']
 
     patch_details = {
         "patch_name": patch_name,
         "patch_id": patch_id,
-        "patch_md5sum": definition_md5,
+        "patch_hash": definition_hash,
         "patch_description": patch_description,
         "patch_definition_path": patch_definition_file,
         "patch_files": patch_files,
@@ -73,10 +73,10 @@ def get_patch_details(patch_definition_path):
     return applicable_versions, patch_details
 
 
-def generate_patch_id(patch_name, definition_md5sum):
+def generate_patch_id(patch_name, definition_hash):
     """Generate the ID of a patch. This method should match that used in the
     main patchify script."""
-    return patch_name + '-' + definition_md5sum
+    return patch_name + '-' + definition_hash
 
 
 def get_central_registry(version):
