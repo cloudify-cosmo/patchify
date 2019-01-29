@@ -621,6 +621,13 @@ def upload_hash_commands(manager_connection_string, ssh_port, keyfile):
         say('Hash check script on server is up to date.')
         return
 
+    if server_hash != 'DOESNOTEXIST':
+        say('Removing outdated hash check script.')
+        ssh(
+            manager_connection_string, ssh_port, keyfile,
+            'sudo rm -rf ' + script_path,
+        )
+
     say("Uploading hash check script.")
     with tempdir() as tmp_path:
         with temporarily_own_directory(
