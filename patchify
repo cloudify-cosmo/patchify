@@ -38,6 +38,12 @@ PATCH_VERSIONS = {
             },
         },
     },
+    2: {
+        'required': set(['manager_versions', 'community', 'premium',
+                         'patch_version', 'description',
+                         'affected_services', 'patches',
+                         'sha256sums_before', 'sha256sums_after']),
+    },
 }
 
 
@@ -875,14 +881,19 @@ def upload_and_verify_patch_files(manager_connection_string, ssh_port,
                                   keyfile):
     for patch in patches:
         patch_name = patch['patch_file']
-        expected_hash = patch['md5sum']
+        if 'sha256sum' in patch:
+            hash_type = 'sha256'
+            expected_hash = patch['sha256sum']
+        else:
+            hash_type = 'md5'
+            expected_hash = patch['md5sum']
 
         upload(
             file_name=patch_name,
             source_path=patch_dir,
             dest_path=os.path.join(staging_dir, patch_name),
             expected_hash=expected_hash,
-            hash_type='md5',
+            hash_type=hash_type,
             manager_connection_string=manager_connection_string,
             ssh_port=ssh_port,
             keyfile=keyfile,
@@ -1526,8 +1537,8 @@ def apply_patch(patch_definition, patch_name, definition_file, skip_services,
                                        ssh_port, keyfile)
 
     say("Checking whether patch has already been applied.")
-    definition_md5sum = get_local_hash(definition_file, hash_type='md5')
-    patch_id = generate_patch_id(patch_name, definition_md5sum)
+    definition_hash = get_local_hash(definition_file, hash_type='sha256')
+    patch_id = generate_patch_id(patch_name, definition_hash)
     current_patches = registry.get('current_patches')
     this_patch = None
     for patch in current_patches:
@@ -2030,10 +2041,10 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
     )
 
 
-def generate_patch_id(patch_name, definition_md5sum):
+def generate_patch_id(patch_name, definition_hash):
     """Generate the ID of a patch. This method should match that used in the
     central registry update tool."""
-    return patch_name + '-' + definition_md5sum
+    return patch_name + '-' + definition_hash
 
 
 def add_patch_to_registry(registry, patch_id, timestamp,
@@ -2041,7 +2052,12 @@ def add_patch_to_registry(registry, patch_id, timestamp,
                           manager_connection_string, ssh_port, keyfile):
     current_patches = registry.get('current_patches', [])
 
-    affected_files = patch_definition['md5sums_after'].keys()
+    if 'sha256sums_after' in patch_definition:
+        affected_files = patch_definition['sha256sums_after'].keys()
+        modified_files = patch_definition['sha256sums_after']
+    else:
+        affected_files = patch_definition['md5sums_after'].keys()
+        modified_files = patch_definition['md5sums_after']
 
     block_uninstall = []
     for existing_patch in current_patches:
@@ -2054,7 +2070,7 @@ def add_patch_to_registry(registry, patch_id, timestamp,
         'patch_name': patch_name,
         'timestamp': timestamp,
         'patch_directory': patch_path,
-        'modified_files': patch_definition['md5sums_after'],
+        'modified_files': modified_files,
         'blocks_uninstall_of': block_uninstall,
         'description': patch_definition.get('description'),
     }
