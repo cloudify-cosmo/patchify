@@ -6,33 +6,33 @@
         "test_patch_1"
       ], 
       "patch_definition_path": "test_patch_1.json", 
-      "patch_md5sum": "test_patch_1-3769321dd45ae9180c17fa731fded4ea", 
       "supports_community": true, 
-      "patch_id": "test_patch_1-3769321dd45ae9180c17fa731fded4ea",
+      "patch_id": "test_patch_1-8d70908a9294434278d74ac0dd4bb633a83ae7afa0007a18610101d62a33a29e", 
       "patch_name": "test_patch_1", 
+      "patch_hash": "8d70908a9294434278d74ac0dd4bb633a83ae7afa0007a18610101d62a33a29e", 
       "patch_description": "Patch for testing patchify."
     }, 
     {
       "patch_files": [
         "test_patch_2"
       ], 
-      "patch_description": "Test patch for testing patchify.", 
       "patch_definition_path": "test_patch_2.json", 
       "supports_community": true, 
       "patch_name": "test_patch_2", 
-      "patch_id": "test_patch_2-e12335a6544fa70a2928f227a7b1aeea", 
-      "patch_md5sum": "e12335a6544fa70a2928f227a7b1aeea"
+      "patch_id": "test_patch_2-66e6098df7e7046f7581ff8e0bc883a22edc5e6b0ed411efc068a087b7fe56dc", 
+      "patch_hash": "66e6098df7e7046f7581ff8e0bc883a22edc5e6b0ed411efc068a087b7fe56dc", 
+      "patch_description": "Test patch for testing patchify."
     }, 
     {
       "patch_files": [
         "test_patch_3_replace_1", 
         "test_patch_3_replace_2"
       ], 
-      "patch_md5sum": "ac87fbf839de4a97e8d7f94a7b7e21fa", 
-      "supports_community": true, 
-      "patch_id": "test_patch_3-ac87fbf839de4a97e8d7f94a7b7e21fa", 
-      "patch_name": "test_patch_3", 
       "patch_definition_path": "test_patch_3.json", 
+      "supports_community": true, 
+      "patch_id": "test_patch_3-f8817d8c2753f473a899e2b6345b71ece99b23b9c7b0ac050a224333fc2c70ce", 
+      "patch_name": "test_patch_3", 
+      "patch_hash": "f8817d8c2753f473a899e2b6345b71ece99b23b9c7b0ac050a224333fc2c70ce", 
       "patch_description": "Test patch modifying existing patches for testing patchify."
     }
   ]

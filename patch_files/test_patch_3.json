@@ -1,5 +1,5 @@
 {
-  "patch_version": "1.1.0",
+  "patch_version": "2.0.0",
   "description": "Test patch modifying existing patches for testing patchify.",
   "manager_versions": ["4.5"],
   "community": true,
@@ -7,24 +7,24 @@
   "patches": [
     {
       "patch_file": "test_patch_3_replace_1",
-      "md5sum": "3080a4dc12e588b0013f09babfc5b408",
+      "sha256sum": "63f3c32187ab0bc3a0e1cfba4165c772284cb9954b3e261793c87ccff5071563",
       "destinations": ["/opt/cloudify/test_patch_1"]
     },
     {
       "patch_file": "test_patch_3_replace_2",
-      "md5sum": "1a50a78d8f65d3ac577cc428971d1a1c",
+      "sha256sum": "78a0596617dcaf50574597b69478856e3626161e49dc67f96d10621aabe7a330",
       "destinations": ["/opt/cloudify/test_patch_2"]
     }
   ],
   "affected_services": [
     "cloudify-rabbitmq"
   ],
-  "md5sums_before": {
-    "/opt/cloudify/test_patch_1": ["ac1831e6aa0f04486b58617723511502"],
-    "/opt/cloudify/test_patch_2": ["ab182328e2a866130feed047371f66f8"]
+  "sha256sums_before": {
+    "/opt/cloudify/test_patch_1": ["9f6741fafb8cbb75e20c3f1eec11f0cb5b3a13e89552232068476811fa449bda"],
+    "/opt/cloudify/test_patch_2": ["7c19f59a02026d9fb4442edc543d6b292eff75a71add62d0f1cc2d3fb2d922b7"]
   },
-  "md5sums_after": {
-    "/opt/cloudify/test_patch_1": ["60d0aa99e59cd5934711ed10f955b680"],
-    "/opt/cloudify/test_patch_2": ["83c53cbcc57ed5f9c1ce23395aabcc64"]
+  "sha256sums_after": {
+    "/opt/cloudify/test_patch_1": ["e63659e04e8ea29904cdb8562ac77f86d2691c3192b32c066358198fb386e920"],
+    "/opt/cloudify/test_patch_2": ["c993a76e1e8a3ef93ebd14018ba34e47e0952fb4e40481218e94fc22f4abe553"]
   }
 }

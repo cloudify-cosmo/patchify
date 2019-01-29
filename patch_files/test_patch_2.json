@@ -1,5 +1,5 @@
 {
-  "patch_version": "1.1.0",
+  "patch_version": "2.0.0",
   "description": "Test patch for testing patchify.",
   "manager_versions": ["4.5"],
   "community": true,
@@ -7,17 +7,17 @@
   "patches": [
     {
       "patch_file": "test_patch_2",
-      "md5sum": "cafb9a2d743a5f941f8af25ce5b26d01",
+      "sha256sum": "17582a2e92081bcbbaa3ea20d7e2cc3be13a2dcf03b02fb074ef61ea39a38287",
       "destinations": ["/opt/cloudify/test_patch_2"]
     }
   ],
   "affected_services": [
     "cloudify-mgmtworker"
   ],
-  "md5sums_before": {
+  "sha256sums_before": {
     "/opt/cloudify/test_patch_2": ["DOESNOTEXIST"]
   },
-  "md5sums_after": {
-    "/opt/cloudify/test_patch_2": ["ab182328e2a866130feed047371f66f8"]
+  "sha256sums_after": {
+    "/opt/cloudify/test_patch_2": ["7c19f59a02026d9fb4442edc543d6b292eff75a71add62d0f1cc2d3fb2d922b7"]
   }
 }
