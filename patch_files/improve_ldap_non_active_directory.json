@@ -3,22 +3,22 @@
         "cloudify-restservice"
     ], 
     "premium": true, 
-    "description": "improve ldap search for non active directory.", 
-    "md5sums_before": {
+    "description": "Improve ldap search for non active directory.", 
+    "sha256sums_before": {
         "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/authentication/ldappy/users.py": [
-            "50216c7e757c0e45d54a9e7559f506f8"
+            "a4b436b3b8e8ff64136fe6f7692c11971a11527a4980118270b9dc5bbab3a22f"
         ]
     }, 
-    "md5sums_after": {
+    "sha256sums_after": {
         "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/authentication/ldappy/users.py": [
-            "a13eb2212f74414ab3fbe5966b8d2e7c"
+            "1edc92b3b8b69562db9f75cdb64f6519157e355ecf317a9ac3b23ac3153676d3"
         ]
     }, 
     "community": false, 
-    "patch_version": "1.1.0", 
+    "patch_version": "2.0.0", 
     "patches": [
         {
-            "md5sum": "", 
+            "sha256sum": "4fe7934acacc605bd82ec50bce66fca5e36f349da72e43dbd0e5af27db6a5c9e", 
             "patch_file": "improve_ldap_non_active_directory_cloudify_premium_authentication_ldappy_users.py", 
             "destinations": [
                 "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/authentication/ldappy/users.py"

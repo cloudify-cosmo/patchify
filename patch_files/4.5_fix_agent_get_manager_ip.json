@@ -1,36 +1,37 @@
 {
-  "patch_version": "1.0.0",
-  "manager_versions": ["4.5.0","4.5"],
-  "community": true,
+  "patch_version": "2.0.0",
+  "manager_versions": ["4.5"],
+  "description": "Make agents retrieve correct manager IP when using multinetworking during cluster failovers.",
+  "community": false,
   "premium": true,
   "patches": [
     {
       "patch_file": "4.5_manager_ip__agent_config.py.diff",
-      "md5sum": "3632f87c7f391abec742a544e95682be",
+      "sha256sum": "0b70c911b8e5540e42a2e3da992c4cbde2b03a7719b63f5ac307e364ce14c5a6",
       "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py"]
     },
     {
       "patch_file": "4.5_manager_ip____init__.py.diff",
-      "md5sum": "f6079942f1a755ac231c8c44f9bccf48",
+      "sha256sum": "aa45cf6e8fe11f31bb90001808d327f5987f07b0f9a6d35351f729a6779af5c3",
       "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/__init__.py"]
     },
     {
       "patch_file": "4.5_manager_ip__script.py.diff",
-      "md5sum": "92fe0f27c69a082d4de7d4585b24e5a2",
+      "sha256sum": "4ecce8d4c2816ef00e571534ce879cba7dee94cfac56a1d58ea35b18f7fc603e",
       "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/script.py"]
     }
   ],
   "affected_services": [
     "cloudify-mgmtworker"
   ],
-  "md5sums_before": {
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py": ["ed4333195e7c74713fc506f3d17ed25b"],
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/__init__.py": ["7682c155bcfc6001cd3bfac255ff7d59"],
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/script.py": ["29eaf9a21566bb3ba87949be3bec6241"]
+  "sha256sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py": ["25928a1eb6af40119ac92d075ee3f0c6c28d8418e89e06233d1b23f29f7165b4"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/__init__.py": ["1b03219af640aa9f43eeb509ebc5154f86120ee2e3d4e42abce2f365764dc367"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/script.py": ["9f45e210bf62feff1209b44fb21b0923817f2cbda60961acadac59971546f347"]
   },
-  "md5sums_after": {
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py": ["5c72da44a72bbd1d7e5af833f9bd9d68"],
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/__init__.py": ["43a3a973e13cf07f41c017c12f50351a"],
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/script.py": ["2eb94deeeadaa6481ffaa362bc17f67b"]
+  "sha256sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py": ["86f0f3b7bf15bd3c4eb0dcf5384ad10889550c908f36df870319901d7e9a37e8"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/__init__.py": ["acb82931686ac1bc393efd74325e51b9200d70a4a1b4a3975a882d8a8d86c86d"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/script.py": ["831def70ca74f9c65aafdb6788ca5fbf40511557d45e2c71d9c88f34f87df7bc"]
   }
 }

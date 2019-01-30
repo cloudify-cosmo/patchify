@@ -1,28 +1,29 @@
 {
-  "patch_version": "1.0.0",
+  "patch_version": "2.0.0",
   "manager_versions": ["4.3.2", "4.5"],
+  "description": "Allow agent to be created successfully when a retry occurs during agent creation.",
   "community": true,
   "premium": true,
   "patches": [
     {
       "patch_file": "survive_create_on_retry_agent_install",
-      "md5sum": "20f01eb2310316a379533a689c4f3d3d",
+      "sha256sum": "7b5698c034a1812d1c8214cf199c5e95ec7805341d4dc16368afdb15525af520",
       "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template"]
     }
   ],
   "affected_services": [
     "cloudify-mgmtworker"
   ],
-  "md5sums_before": {
+  "sha256sums_before": {
     "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template": [
-      "a4e11a0f0c2f4be7af5e73a0ed21648e",
-      "4101967c482accea6ab438fa26d8de33"
+      "4d1501bf16beed1eeeb4a7daef8e732206914ab182bba26af1a54abf50ea8d01",
+      "0cd6b9b32f14f7dc89d4afb64e4093fe12ab13f29bbde476b74ab270f16451e1"
     ]
   },
-  "md5sums_after": {
+  "sha256sums_after": {
     "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template": [
-      "bb0348a420e84a7c0afdf410171398d2",
-      "48326f51f83dadf2c73342a023aa736a"
+      "0504566c7a19dbe5567b9ecf7d6501995fcbfc734f6389101c752ac2eba5cf67",
+      "4f8aa877fa68670b8becdfa96eafca86766b2e6f5d616024c8e1a26a85be6582"
     ]
   }
 }

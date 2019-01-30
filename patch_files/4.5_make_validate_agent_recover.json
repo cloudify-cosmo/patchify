@@ -1,22 +1,23 @@
 {
-  "patch_version": "1.0.0",
-  "manager_versions": ["4.5.0","4.5"],
+  "patch_version": "2.0.0",
+  "manager_versions": ["4.5"],
+  "description": "Allow validate_agent to retry on failures.",
   "community": true,
   "premium": true,
   "patches": [
     {
       "patch_file": "4.5_make_validate_agent_recover__operations.py.patch",
-      "md5sum": "1ef98b642afbd2a36d146e6e438b9e61",
+      "sha256sum": "aee7a940697ccd29b730cd063c0fda3ea14282bfd8ca315325ce1e25388f1a5e",
       "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py"]
     }
   ],
   "affected_services": [
     "cloudify-mgmtworker"
   ],
-  "md5sums_before": {
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py": ["2024a642ab4e7787964cd3c430c998c5"]
+  "sha256sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py": ["93f3b909543c830820769817d91da38454ce351dec23747c17d969434f209075"]
   },
-  "md5sums_after": {
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py": ["081e0d2000427cd64e2836d7ec9f4026"]
+  "sha256sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py": ["4c7609fc4f790046bfa1a56329252dfff6d082ebc139475741589eaa81564bed"]
   }
 }

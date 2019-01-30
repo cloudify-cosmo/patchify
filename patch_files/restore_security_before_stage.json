@@ -1,20 +1,21 @@
 {
-  "patch_version": "1.0.0",
+  "patch_version": "2.0.0",
   "manager_versions": ["4.5"],
+  "description": "Restore security configuration before Stage tries to use it.",
   "community": false,
   "premium": true,
   "patches": [
     {
       "patch_file": "restore_security_before_stage",
-      "md5sum": "80da7779b9b06a7bdddc45fa78e1623c",
+      "sha256sum": "c05d2912061af51da3f7fe38b1fbf3721255ba7a1967df22c9af02a95dc16f32",
       "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py"]
     }
   ],
   "affected_services": ["cloudify-mgmtworker"],
-  "md5sums_before": {
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": ["b82d3b317ddd8a41767fa921f0c7bc03"]
+  "sha256sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": ["3607420b97d9eb5ae9060151709600ca099fe8987d4d92641abba4d719eea704"]
   },
-  "md5sums_after": {
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": ["113de00cfe98c8502bc921a3c3e8f32a"]
+  "sha256sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": ["919791e1fc016b78dc1165234a25622d1976039ed6d45ff6e5451e418c77fba0"]
   }
 }

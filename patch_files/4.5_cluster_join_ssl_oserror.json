@@ -1,20 +1,21 @@
 {
-  "patch_version": "1.0.0",
-  "manager_versions": ["4.5.0","4.5"],
-  "community": true,
+  "patch_version": "2.0.0",
+  "manager_versions": ["4.5"],
+  "description": "Allow joining cluster when current leader has a CA key but joining server does not.",
+  "community": false,
   "premium": true,
   "patches": [
     {
       "patch_file": "cluster_join_ssl_oserror",
-      "md5sum": "812930de2c7d1f850a6193a17bf2d8c3",
+      "sha256sum": "261c4aeed8fb3549c5477477df24a70bf056d14946bfbba30af7b0760cbfc836",
       "destinations": ["/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/ssl.py"]
     }
   ],
   "affected_services": [],
-  "md5sums_before": {
-    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/ssl.py": ["1202dae96cffff97b46541751fc70ade"]
+  "sha256sums_before": {
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/ssl.py": ["afc24c4e350eb57a8f07b52be05d7db8ee1488d9ae705c6b85b13298663b57c8"]
   },
-  "md5sums_after": {
-    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/ssl.py": ["a2e81adfc303365f0dfc38fc54ce5d6e"]
+  "sha256sums_after": {
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/ssl.py": ["29e0fabd7425891bb641c9fdfca9045d6aec4a7cbdce800d36d99547be5390ca"]
   }
 }

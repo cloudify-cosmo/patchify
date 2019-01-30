@@ -1,22 +1,23 @@
 {
-  "patch_version": "1.0.0",
-  "manager_versions": ["4.5.0","4.5"],
+  "patch_version": "2.0.0",
+  "manager_versions": ["4.5"],
+  "description": "Avoid mib compilation errors in event-hooks.",
   "community": true,
   "premium": true,
   "patches": [
     {
       "patch_file": "4.5_remove_mib_compile__snmp_trap.py.patch",
-      "md5sum": "d9ee2328a375b77c66ccabc68369bcf3",
+      "sha256sum": "988de4d57d26d6d55e0d623fe2968eea794bfdf8225582bc7557fbc56d479984",
       "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/snmp/snmp_trap.py"]
     }
   ],
   "affected_services": [
     "cloudify-mgmtworker"
   ],
-  "md5sums_before": {
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/snmp/snmp_trap.py": ["037184030aa7a9c1190e2c19a41c8dee"]
+  "sha256sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/snmp/snmp_trap.py": ["773f9b28cfa47674706816594c378d65ecf3a54fbfeb8642ccf18630aebdc51b"]
   },
-  "md5sums_after": {
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/snmp/snmp_trap.py": ["986b659cfaa630630cdaf66fdb793870"]
+  "sha256sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/snmp/snmp_trap.py": ["996463d613ebdb8215a3e0d3f1c5664ff17653aee14ffba7f7bf61cd76af103b"]
   }
 }

@@ -1,12 +1,13 @@
 {
-  "patch_version": "1.0.0",
+  "patch_version": "2.0.0",
   "manager_versions": ["4.5"],
+  "description": "Support specifying node instances to include or exclude when scaling down.",
   "community": true,
   "premium": true,
   "patches": [
     {
       "patch_file": "targetedscale_workflows",
-      "md5sum": "57f46788da514c3586024bbb98d4fcb7",
+      "sha256sum": "4b305de7c44d5081e3303ec1d781dc54722029af8afd2805c873326692f1f0b3",
       "destinations": [
         "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py",
         "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py"
@@ -14,7 +15,7 @@
     },
     {
       "patch_file": "targetedscale_dsl_parser",
-      "md5sum": "80c073f3fb25c43ee019a7e9099ff96e",
+      "sha256sum": "ff0de390b5c434454ab5666aac3eec9c1dcdb38b974b9318a8a3e16522e83a8b",
       "destinations": [
         "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py",
         "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py"
@@ -25,16 +26,16 @@
     "cloudify-mgmtworker",
     "cloudify-restservice"
   ],
-  "md5sums_before": {
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": ["995ab763e6b0416713c0559738c9cd54"],
-    "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": ["995ab763e6b0416713c0559738c9cd54"],
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py": ["b984c70fbc5837428cc6d174aede9471"],
-    "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py": ["b984c70fbc5837428cc6d174aede9471"]
+  "sha256sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": ["c2ea82aba9cf5c4b0e2d33a362444b0b70993903a941443ee7e3e5f8db10f7be"],
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": ["c2ea82aba9cf5c4b0e2d33a362444b0b70993903a941443ee7e3e5f8db10f7be"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py": ["1a84dbf13c2e7f9bc64381e36f659098fd34cfc591b3e1d27bfef194b7da6216"],
+    "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py": ["1a84dbf13c2e7f9bc64381e36f659098fd34cfc591b3e1d27bfef194b7da6216"]
   },
-  "md5sums_after": {
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": ["a6ed44297c4a58ee08cf52d3a44aa0c8"],
-    "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": ["a6ed44297c4a58ee08cf52d3a44aa0c8"],
-    "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py": ["a04d278676a29cba401b0a3dff4c8c18"],
-    "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py": ["a04d278676a29cba401b0a3dff4c8c18"]
+  "sha256sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": ["16062cd29ff2521ed310c988f2b43ffec3b403ad08ec3b26c4b1152f3cfccd4c"],
+    "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": ["16062cd29ff2521ed310c988f2b43ffec3b403ad08ec3b26c4b1152f3cfccd4c"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py": ["6816f7f142795849fa37286e6e28466577c57b91da6c9a4c204d6047a09a468c"],
+    "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/rel_graph.py": ["6816f7f142795849fa37286e6e28466577c57b91da6c9a4c204d6047a09a468c"]
   }
 }
