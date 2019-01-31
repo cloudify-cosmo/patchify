@@ -1904,6 +1904,7 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
         'removed_patch_backups_path': backup_path,
     }
 
+    hash_type = 'md5'
     if 'md5sums_before' in old_definition:
         new_definition['md5sums_after'] = old_definition['md5sums_before']
     if 'md5sums_after' in old_definition:
@@ -1916,43 +1917,45 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
         new_definition['sha256sums_before'] = (
             old_definition['sha256sums_after']
         )
+        hash_type = 'sha256'
 
     say("Checking for correct files to restore.")
     files_to_delete = []
     files_to_restore = []
-    for target_file, valid_md5sums in new_definition['md5sums_after'].items():
+    hash_check_key = '{hash_type}sums_after'.format(hash_type=hash_type)
+    for target_file, valid_hashes in new_definition[hash_check_key].items():
         target_backup_path = os.path.join(
             backup_path,
             target_file.lstrip('/'),
         )
 
-        backup_md5sum = get_file_hash(
+        backup_hash = get_file_hash(
             file_path=target_backup_path,
             manager_connection_string=manager_connection_string,
             ssh_port=ssh_port,
             keyfile=keyfile,
-            hash_type='md5',
+            hash_type=hash_type,
         )
-        if backup_md5sum not in valid_md5sums:
+        if backup_hash not in valid_hashes:
             raise InvalidBackup(
                 'File to be restored does not match any acceptable MD5sums.\n'
                 'File to be restored was: {target_file}\n'
-                'MD5sum was "{backup_md5sum}", but valid MD5sums were: '
+                'Hash was "{backup_hash}", but valid hashes were: '
                 '{valid}'.format(
                     target_file=target_backup_path,
-                    backup_md5sum=backup_md5sum,
-                    valid=', '.join(valid_md5sums),
+                    backup_hash=backup_hash,
+                    valid=', '.join(valid_hashes),
                 ),
             )
 
-        if backup_md5sum == 'DOESNOTEXIST':
+        if backup_hash == 'DOESNOTEXIST':
             files_to_delete.append(target_file)
         else:
             files_to_restore.append((target_backup_path, target_file))
 
     say("Validating current files.")
     check_hashes_before(new_definition, manager_connection_string,
-                        ssh_port, keyfile, hash_type='md5')
+                        ssh_port, keyfile, hash_type=hash_type)
 
     possibly_stop_services(new_definition, skip_services,
                            manager_connection_string, ssh_port, keyfile)
@@ -2023,7 +2026,7 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
     check_hashes_after(new_definition,
                        manager_connection_string, ssh_port, keyfile,
                        backup_root, delete_root, skip_services,
-                       hash_type='md5')
+                       hash_type=hash_type)
 
     possibly_start_services(new_definition, skip_services,
                             manager_connection_string, ssh_port, keyfile)
