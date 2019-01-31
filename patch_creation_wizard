@@ -331,13 +331,23 @@ def determine_manager_paths(diff_files, location_mappings):
 
     for details in diff_files.values():
         path_in_repo = details['path_in_repo']
+        print('Checking {path} ...'.format(path=path_in_repo))
         if path_in_repo in location_mappings:
+            print('Location provided by command line argument.')
             details['destinations'] = location_mappings[path_in_repo]
         else:
+            expected_hash = details['before_sha256sum']
+            filename = os.path.split(path_in_repo)[1]
+            print(
+                'Looking for file {name} with hash: {file_hash}'.format(
+                    file_hash=expected_hash,
+                    name=filename,
+                )
+            )
             command = base_command + [
                 'sudo find /opt /etc/cloudify '
                 '-name {filename} -exec ./pysha256sum {{}} \\;'.format(
-                    filename=os.path.split(path_in_repo)[1],
+                    filename=filename,
                 )
             ]
 
@@ -346,10 +356,17 @@ def determine_manager_paths(diff_files, location_mappings):
             for line in result.strip().splitlines():
                 if line == '':
                     continue
+                print('Candidate: {detail}'.format(detail=line))
                 line = line.strip()
                 line_hash, path = line.split(' ', 1)
-                if line_hash.strip() == details['before_sha256sum']:
+                if line_hash.strip() == expected_hash:
+                    print('Matched, addding to destinations.')
                     locations.append(path.strip())
+                else:
+                    print('Hash mismatch, not adding.')
+
+            # Whitespace for readability
+            print('')
 
             details['destinations'] = locations
 
