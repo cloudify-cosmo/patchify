@@ -133,6 +133,50 @@ def output_json(data):
     print(json.dumps(data, indent=2, sort_keys=True))
 
 
+def output_table(data, fields):
+    field_lengths = []
+    for field in fields:
+        for entry in data:
+            if isinstance(entry[field], list):
+                entry[field] = ', '.join(entry[field])
+        field_length = max(
+            2 + len(str(entry[field])) for entry in data
+        )
+        field_length = max(
+            field_length,
+            2 + len(field)
+        )
+        field_lengths.append(field_length)
+
+    output_table_divider(field_lengths)
+    # Column headings
+    output_table_row(field_lengths, fields)
+    output_table_divider(field_lengths)
+
+    for entry in data:
+        row = [
+            entry[field] for field in fields
+        ]
+        output_table_row(field_lengths, row)
+    output_table_divider(field_lengths)
+
+
+def output_table_divider(lengths):
+    output = '+'
+    for length in lengths:
+        output += '-' * length
+        output += '+'
+    print(output)
+
+
+def output_table_row(lengths, entries):
+    output = '|'
+    for i in range(len(lengths)):
+        output += str(entries[i]).center(lengths[i])
+        output += '|'
+    print(output)
+
+
 def get_manager_version():
     try:
         version_output = subprocess.check_output(['cfy', '--version'])
@@ -2147,10 +2191,10 @@ def get_uninstall_blockers(patches):
     return blockers
 
 
-def retrieve_manager_patch_details(json_output, action):
+def retrieve_manager_patch_details(verbose, action):
     ssh_details = get_profile_ssh_details(action)
     if len(ssh_details) > 1:
-        if not json_output:
+        if verbose:
             say("Determining cluster leader.")
         leader, _, _ = get_cluster_members()
     else:
@@ -2164,7 +2208,7 @@ def retrieve_manager_patch_details(json_output, action):
         ssh_port = mgr_ssh_details['ssh_port']
         cluster_node_name = mgr_ssh_details['cluster_node_name']
 
-        if not json_output:
+        if verbose:
             if cluster_node_name:
                 say(
                     "Getting installed patch details from {node}...".format(
@@ -2176,13 +2220,13 @@ def retrieve_manager_patch_details(json_output, action):
         try:
             abort_on_ssh_failure(manager_connection_string, ssh_port, keyfile,
                                  cluster_node_name=cluster_node_name,
-                                 quiet=json_output)
+                                 quiet=not verbose)
         except SSHCheckFailure as err:
             exit_with_sadness(str(err), action)
         try:
             registry = download_patch_registry(manager_connection_string,
                                                ssh_port, keyfile,
-                                               quiet=json_output)
+                                               quiet=not verbose)
         except PatchRegistryParseFailure as err:
             exit_with_sadness(str(err), action)
         manager_patches[cluster_node_name] = registry.get('current_patches',
@@ -2191,10 +2235,10 @@ def retrieve_manager_patch_details(json_output, action):
     return manager_patches, leader
 
 
-def list_patches(json_output):
+def list_patches(json_output, verbose):
     action = 'LISTING PATCHES'
 
-    manager_patches, leader = retrieve_manager_patch_details(json_output,
+    manager_patches, leader = retrieve_manager_patch_details(verbose,
                                                              action)
 
     if json_output:
@@ -2202,6 +2246,75 @@ def list_patches(json_output):
             output_json(manager_patches)
         else:
             output_json(manager_patches[None])
+    elif not verbose:
+        if leader:
+            display = []
+            patch_id_mapping = {}
+            replica_count = len(manager_patches) - 1
+            patch_num = 0
+
+            leader_patches = manager_patches.pop(leader)
+
+            for patch in leader_patches:
+                patch_num += 1
+                display.append({
+                    'patch': patch_num,
+                    'on_leader': True,
+                    'on_replicas': 0,
+                    'patch_id': patch['patch_id'],
+                    'blocks': patch['blocks_uninstall_of'],
+                })
+                patch_id_mapping[patch['patch_id']] = patch_num
+
+            for replica in manager_patches.values():
+                for patch in replica:
+                    if patch['patch_id'] in patch_id_mapping:
+                        pos = patch_id_mapping[patch['patch_id']] - 1
+                        display[pos]['on_replicas'] += 1
+                    else:
+                        patch_num += 1
+                        display.append({
+                            'patch': patch_num,
+                            'on_leader': False,
+                            'on_replicas': 1,
+                            'patch_id': patch['patch_id'],
+                            'blocks': patch['blocks_uninstall_of'],
+                        })
+                        patch_id_mapping[patch['patch_id']] = patch_num
+
+            for patch in display:
+                patch['on_replicas'] = '{on}/{total}'.format(
+                    on=patch['on_replicas'],
+                    total=replica_count,
+                )
+                patch['patch'] = str(patch['patch'])
+
+            fields = ['patch', 'on_leader', 'on_replicas', 'patch_id',
+                      'blocks']
+        else:
+            display = []
+            patch_id_mapping = {}
+            for num, patch in enumerate(manager_patches[None]):
+                display.append({
+                    'patch': str(num + 1),
+                    'installed': True,
+                    'patch_id': patch['patch_id'],
+                    'blocks': patch['blocks_uninstall_of'],
+                })
+                patch_id_mapping[patch['patch_id']] = str(num + 1)
+
+            fields = ['patch', 'installed', 'patch_id', 'blocks']
+
+        # Provide short patch blocking output
+        for blocker in display:
+            if blocker['blocks']:
+                blocks = []
+                for patch in display:
+                    if patch['patch_id'] in blocker['blocks']:
+                        blocks.append(patch['patch'])
+                blocker['blocks'] = ', '.join(blocks)
+
+        output_table(display, fields)
     else:
         for patches in manager_patches.values():
             uninstall_blocked = get_uninstall_blockers(patches)
@@ -2387,8 +2500,8 @@ def determine_central_registry_location(central_repository_location,
 
 def retrieve_central_patch_listing(registry_location, action,
                                    manager_version,
-                                   json_output=False):
-    if not json_output:
+                                   verbose):
+    if verbose:
         say('Retrieving central patch registry.')
     try:
         raw_listing = urllib2.urlopen(
@@ -2423,7 +2536,7 @@ def retrieve_central_patch_listing(registry_location, action,
         )
 
     if manager_version['community']:
-        if not json_output:
+        if verbose:
             say('Filtering out premium-only patches.')
         central_listing['patches'] = [
             patch for patch in central_listing['patches']
@@ -2449,12 +2562,14 @@ def apply_central_manager_patches(central_repository_location,
         central_registry_location,
         action,
         manager_version,
+        verbose=True,
     )
 
     say('Determining which patches need installing.')
     _, leader = set_recommended_patch_status(
         central_listing,
         action,
+        verbose=True,
     )
     # Filter out the patches that are not missing from any managers in this
     # profile
@@ -2566,6 +2681,7 @@ def download_central_manager_patches(
             central_registry_location,
             action,
             manager_version,
+            verbose=True,
         )
 
     say('Determining all required file locations.')
@@ -2598,11 +2714,11 @@ def download_central_manager_patches(
 
 
 def set_recommended_patch_status(central_listing, action,
-                                 json_output=False):
-    if not json_output:
+                                 verbose):
+    if verbose:
         say('Getting current patch state from manager.')
     manager_patches, leader = retrieve_manager_patch_details(
-        json_output,
+        verbose,
         action,
     )
     central_patches = set(
@@ -2634,10 +2750,10 @@ def set_recommended_patch_status(central_listing, action,
 
 def list_central_manager_patches(central_repository_location,
                                  skip_checking_manager,
-                                 json_output):
+                                 json_output, verbose):
     action = 'LISTING CENTRAL PATCHES'
 
-    if not json_output:
+    if verbose:
         say('Getting manager version to list correct patches.')
     manager_version = get_manager_version()
 
@@ -2649,7 +2765,7 @@ def list_central_manager_patches(central_repository_location,
         central_registry_location,
         action,
         manager_version,
-        json_output,
+        verbose,
     )
 
     if skip_checking_manager:
@@ -2659,11 +2775,41 @@ def list_central_manager_patches(central_repository_location,
         manager_patches, leader = set_recommended_patch_status(
             central_listing,
             action,
-            json_output,
+            verbose,
         )
 
     if json_output:
         output_json(central_listing)
+    elif not verbose:
+        display = []
+        for patch in central_listing['patches']:
+            display_patch = {
+                'patch_id': patch['patch_id'],
+            }
+
+            missing_patches = patch['missing_on_manager']
+            if leader:
+                installed_on_leader = leader not in missing_patches
+
+                missing_on_replicas = len(missing_patches)
+                if not installed_on_leader:
+                    missing_on_replicas -= 1
+                replica_count = len(manager_patches) - 1
+                installed_on_replicas = replica_count - missing_on_replicas
+
+                display_patch['on_leader'] = installed_on_leader
+                display_patch['on_replicas'] = '{on}/{total}'.format(
+                    on=installed_on_replicas,
+                    total=replica_count,
+                )
+
+                fields = ['on_leader', 'on_replicas', 'patch_id']
+            else:
+                display_patch['installed'] = not missing_patches
+                fields = ['installed', 'patch_id']
+
+            display.append(display_patch)
+        output_table(display, fields)
     else:
         say('')
         say(
@@ -2759,6 +2905,30 @@ def add_manager_updates_args(parser, repo_root=True):
         )
 
 
+def add_list_output_args(parser):
+    exclusive_options = parser.add_mutually_exclusive_group()
+    exclusive_options.add_argument(
+        '-j', '--json',
+        help=(
+            'Whether to output the patch list in json.'
+            'This option may not be used with the verbose output option.'
+        ),
+        action='store_true',
+        default=False,
+        required=False,
+    )
+    exclusive_options.add_argument(
+        '-v', '--verbose',
+        help=(
+            'Output extra details for these patches. '
+            'This option may not be used with the json output option.'
+        ),
+        action='store_true',
+        default=False,
+        required=False,
+    )
+
+
 def add_install_patch_command_arg(parser):
     parser.add_argument(
         '-P', '--install-patch-command',
@@ -2794,17 +2964,7 @@ def main():
 
     list_patch_args = subparsers.add_parser('list',
                                             help='List installed patches')
-    list_patch_args.add_argument(
-        '-j', '--json',
-        help=(
-            'Whether to output the patch list in json. '
-            'If true, a json dict mapping timestamps to patch names will be '
-            'the output.'
-        ),
-        action='store_true',
-        default=False,
-        required=False,
-    )
+    add_list_output_args(list_patch_args)
 
     apply_patch_args = subparsers.add_parser('apply',
                                              help='Apply a patch')
@@ -2856,15 +3016,7 @@ def main():
         default=False,
         action='store_true',
     )
-    list_mgr_updates_args.add_argument(
-        '-j', '--json',
-        help=(
-            'Whether to output the patch list in json.'
-        ),
-        action='store_true',
-        default=False,
-        required=False,
-    )
+    add_list_output_args(list_mgr_updates_args)
     add_manager_updates_args(list_mgr_updates_args, repo_root=False)
 
     download_mgr_updates_args = manager_updates_subparsers.add_parser(
@@ -2912,12 +3064,13 @@ def main():
     elif args.action == 'remove':
         patch_remover(args.patch_id, args.skip_services)
     elif args.action == 'list':
-        list_patches(args.json)
+        list_patches(args.json, args.verbose)
     elif args.action == 'manager-updates' and args.subaction == 'list':
         list_central_manager_patches(
             args.central_repository_location,
             args.skip_checking_manager,
             args.json,
+            args.verbose,
         )
     elif args.action == 'manager-updates' and args.subaction == 'download':
         download_central_manager_patches(
