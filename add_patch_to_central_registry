@@ -160,7 +160,7 @@ def update_central_registry(registry, version):
     )
 
     with open(version_registry_path, 'w') as reg_handle:
-        reg_handle.write(json.dumps(registry, indent=2))
+        reg_handle.write(json.dumps(registry, indent=2, sort_keys=True))
 
 
 def main():

@@ -2,30 +2,32 @@
   "patch_root_path": "https://raw.githubusercontent.com/cloudify-cosmo/patchify/master/patch_files/", 
   "patches": [
     {
+      "patch_definition_path": "4.5_cluster_join_ssl_oserror.json", 
+      "patch_description": "Allow joining cluster when current leader has a CA key but joining server does not.", 
       "patch_files": [
         "cluster_join_ssl_oserror"
       ], 
-      "patch_definition_path": "4.5_cluster_join_ssl_oserror.json", 
-      "supports_community": false, 
+      "patch_hash": "87fa36fe3befb9d1510694f9bebeb3e33185175f1aae49681a41358a4a942b9e", 
       "patch_id": "4.5_cluster_join_ssl_oserror-87fa36fe3befb9d1510694f9bebeb3e33185175f1aae49681a41358a4a942b9e", 
       "patch_name": "4.5_cluster_join_ssl_oserror", 
-      "patch_hash": "87fa36fe3befb9d1510694f9bebeb3e33185175f1aae49681a41358a4a942b9e", 
-      "patch_description": "Allow joining cluster when current leader has a CA key but joining server does not."
+      "supports_community": false
     }, 
     {
+      "patch_definition_path": "4.5_fix_agent_get_manager_ip.json", 
+      "patch_description": "Make agents retrieve correct manager IP when using multinetworking during cluster failovers.", 
       "patch_files": [
         "4.5_manager_ip__agent_config.py.diff", 
         "4.5_manager_ip____init__.py.diff", 
         "4.5_manager_ip__script.py.diff"
       ], 
-      "patch_definition_path": "4.5_fix_agent_get_manager_ip.json", 
-      "supports_community": false, 
-      "patch_name": "4.5_fix_agent_get_manager_ip", 
-      "patch_id": "4.5_fix_agent_get_manager_ip-4e6b77747bf148a4b82cb69e0e8e0feae285c8fc4b4db5d9ce2d4c924ef0af12", 
       "patch_hash": "4e6b77747bf148a4b82cb69e0e8e0feae285c8fc4b4db5d9ce2d4c924ef0af12", 
-      "patch_description": "Make agents retrieve correct manager IP when using multinetworking during cluster failovers."
+      "patch_id": "4.5_fix_agent_get_manager_ip-4e6b77747bf148a4b82cb69e0e8e0feae285c8fc4b4db5d9ce2d4c924ef0af12", 
+      "patch_name": "4.5_fix_agent_get_manager_ip", 
+      "supports_community": false
     }, 
     {
+      "patch_definition_path": "4.5_fix_get_all_results.json", 
+      "patch_description": "Support deployments with more than 1000 nodes.", 
       "patch_files": [
         "get_all_results__base.py.diff", 
         "get_all_results__4.5_resource_manager.py.diff", 
@@ -37,81 +39,80 @@
         "get_all_results__4.5_ha_agents.py.diff", 
         "get_all_results__4.5_cli_agents.py.diff"
       ], 
-      "patch_definition_path": "4.5_fix_get_all_results.json", 
-      "supports_community": true, 
+      "patch_hash": "17bc96d8375bd330b8d5734abe444838fb44f99c1283767ec19f1d77570076a8", 
       "patch_id": "4.5_fix_get_all_results-17bc96d8375bd330b8d5734abe444838fb44f99c1283767ec19f1d77570076a8", 
       "patch_name": "4.5_fix_get_all_results", 
-      "patch_hash": "17bc96d8375bd330b8d5734abe444838fb44f99c1283767ec19f1d77570076a8", 
-      "patch_description": "Support deployments with more than 1000 nodes."
+      "supports_community": true
     }, 
     {
+      "patch_definition_path": "4.5_make_validate_agent_recover.json", 
+      "patch_description": "Allow validate_agent to retry on failures.", 
       "patch_files": [
         "4.5_make_validate_agent_recover__operations.py.patch"
       ], 
-      "patch_definition_path": "4.5_make_validate_agent_recover.json", 
-      "supports_community": true, 
-      "patch_name": "4.5_make_validate_agent_recover", 
-      "patch_id": "4.5_make_validate_agent_recover-d64ba9bd8f748c29f58a42517ffca30799e95813f0e3b19a99cc3a015486c35c", 
       "patch_hash": "d64ba9bd8f748c29f58a42517ffca30799e95813f0e3b19a99cc3a015486c35c", 
-      "patch_description": "Allow validate_agent to retry on failures."
+      "patch_id": "4.5_make_validate_agent_recover-d64ba9bd8f748c29f58a42517ffca30799e95813f0e3b19a99cc3a015486c35c", 
+      "patch_name": "4.5_make_validate_agent_recover", 
+      "supports_community": true
     }, 
     {
+      "patch_definition_path": "4.5_remove_mib_compile.json", 
+      "patch_description": "Avoid mib compilation errors in event-hooks.", 
       "patch_files": [
         "4.5_remove_mib_compile__snmp_trap.py.patch"
       ], 
-      "patch_definition_path": "4.5_remove_mib_compile.json", 
-      "supports_community": true, 
+      "patch_hash": "2e4007f844b750c75ce5052c8998fdc60a936af0c51d5949d32f003a0ad6b939", 
       "patch_id": "4.5_remove_mib_compile-2e4007f844b750c75ce5052c8998fdc60a936af0c51d5949d32f003a0ad6b939", 
       "patch_name": "4.5_remove_mib_compile", 
-      "patch_hash": "2e4007f844b750c75ce5052c8998fdc60a936af0c51d5949d32f003a0ad6b939", 
-      "patch_description": "Avoid mib compilation errors in event-hooks."
+      "supports_community": true
     }, 
     {
+      "patch_definition_path": "improve_ldap_non_active_directory.json", 
+      "patch_description": "Improve ldap search for non active directory.", 
       "patch_files": [
         "improve_ldap_non_active_directory_cloudify_premium_authentication_ldappy_users.py"
       ], 
-      "patch_definition_path": "improve_ldap_non_active_directory.json", 
-      "supports_community": false, 
-      "patch_name": "improve_ldap_non_active_directory", 
-      "patch_id": "improve_ldap_non_active_directory-2408ee860293678d74dcda9147c699d4e0ae93e588ec33f8257c98704bdd4358", 
       "patch_hash": "2408ee860293678d74dcda9147c699d4e0ae93e588ec33f8257c98704bdd4358", 
-      "patch_description": "Improve ldap search for non active directory."
+      "patch_id": "improve_ldap_non_active_directory-2408ee860293678d74dcda9147c699d4e0ae93e588ec33f8257c98704bdd4358", 
+      "patch_name": "improve_ldap_non_active_directory", 
+      "supports_community": false
     }, 
     {
+      "patch_definition_path": "restore_security_before_stage.json", 
+      "patch_description": "Restore security configuration before Stage tries to use it.", 
       "patch_files": [
         "restore_security_before_stage"
       ], 
-      "patch_definition_path": "restore_security_before_stage.json", 
-      "supports_community": false, 
+      "patch_hash": "69920760b151dc98aea9c34098e2a04a9949c060002ce9a890224e274e93752b", 
       "patch_id": "restore_security_before_stage-69920760b151dc98aea9c34098e2a04a9949c060002ce9a890224e274e93752b", 
       "patch_name": "restore_security_before_stage", 
-      "patch_hash": "69920760b151dc98aea9c34098e2a04a9949c060002ce9a890224e274e93752b", 
-      "patch_description": "Restore security configuration before Stage tries to use it."
+      "supports_community": false
     }, 
     {
+      "patch_definition_path": "survive_create_on_retry_agent_install.json", 
+      "patch_description": "Allow agent to be created successfully when a retry occurs during agent creation.", 
       "patch_files": [
         "survive_create_on_retry_agent_install"
       ], 
-      "patch_definition_path": "survive_create_on_retry_agent_install.json", 
-      "supports_community": true, 
-      "patch_name": "survive_create_on_retry_agent_install", 
-      "patch_id": "survive_create_on_retry_agent_install-8c41cd65d54b73dc7c085e37435f4aed210d79593ad46a411a9e107bbf7285e7", 
       "patch_hash": "8c41cd65d54b73dc7c085e37435f4aed210d79593ad46a411a9e107bbf7285e7", 
-      "patch_description": "Allow agent to be created successfully when a retry occurs during agent creation."
+      "patch_id": "survive_create_on_retry_agent_install-8c41cd65d54b73dc7c085e37435f4aed210d79593ad46a411a9e107bbf7285e7", 
+      "patch_name": "survive_create_on_retry_agent_install", 
+      "supports_community": true
     }, 
     {
+      "patch_definition_path": "targetedscale.json", 
+      "patch_description": "Support specifying node instances to include or exclude when scaling down.", 
       "patch_files": [
         "targetedscale_workflows", 
         "targetedscale_dsl_parser"
       ], 
-      "patch_definition_path": "targetedscale.json", 
-      "supports_community": true, 
-      "patch_id": "targetedscale-5375b3bb7d12e72cac2a5274a32e5daa422b2674889f5af590d090963ef64e90", 
-      "patch_name": "targetedscale", 
       "patch_hash": "5375b3bb7d12e72cac2a5274a32e5daa422b2674889f5af590d090963ef64e90", 
-      "patch_description": "Support specifying node instances to include or exclude when scaling down."
+      "patch_id": "targetedscale-5375b3bb7d12e72cac2a5274a32e5daa422b2674889f5af590d090963ef64e90", 
+      "patch_name": "targetedscale"
     }, 
     {
+      "patch_definition_path": "agent_installer_tmpdir.json", 
+      "patch_description": "Make the agent install scripts honor the CFY_EXEC_TEMP agent_config envvar.", 
       "patch_files": [
         "tmpdir_cloudify_agent__installer__config__agent_config.py", 
         "tmpdir_cloudify_agent__installer__config__installer_config.py", 
@@ -121,12 +122,10 @@
         "tmpdir_cloudify_agent__resources__script__linux-download.template.sh", 
         "tmpdir_cloudify_agent__resources__script__linux.sh.template"
       ], 
-      "patch_definition_path": "agent_installer_tmpdir.json", 
-      "supports_community": true, 
+      "patch_hash": "b32038b1bf6fb98d99ab962d217fa3d7bbbf0a69fdeb12b9d9b9d03951fd358d", 
       "patch_id": "agent_installer_tmpdir-b32038b1bf6fb98d99ab962d217fa3d7bbbf0a69fdeb12b9d9b9d03951fd358d", 
       "patch_name": "agent_installer_tmpdir", 
-      "patch_hash": "b32038b1bf6fb98d99ab962d217fa3d7bbbf0a69fdeb12b9d9b9d03951fd358d", 
-      "patch_description": "Make the agent install scripts honor the CFY_EXEC_TEMP agent_config envvar."
+      "supports_community": true
     }
   ]
 }
