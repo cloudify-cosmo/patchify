@@ -235,18 +235,18 @@ def get_cfy_output(subcommand_and_args):
         # Getting management services status... [ip=192.0.2.4]
         #
         # Services:
-        # +--------------------------------+--------+
-        # |            service             | status |
-        # +--------------------------------+--------+
-        # | Riemann                        |   up   |
-        # | Celery Management              |   up   |
-        # | Manager Rest-Service           |   up   |
-        # | AMQP InfluxDB                  |   up   |
-        # | RabbitMQ                       |   up   |
-        # | Elasticsearch                  |   up   |
-        # | Webserver                      |   up   |
-        # | Logstash                       |   up   |
-        # +--------------------------------+--------+
+        # +--------------------------------+---------+
+        # |            service             |  status |
+        # +--------------------------------+---------+
+        # | Cloudify Composer              | running |
+        # | AMQP-Postgres                  | running |
+        # | RabbitMQ                       | running |
+        # | Webserver                      | running |
+        # | Management Worker              | running |
+        # | PostgreSQL                     | running |
+        # | Cloudify Console               | running |
+        # | Manager Rest-Service           | running |
+        # +--------------------------------+---------+
         if line.startswith('+--'):
             dividers_found += 1
         elif dividers_found == 1:
