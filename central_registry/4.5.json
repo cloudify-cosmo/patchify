@@ -122,8 +122,8 @@
         "tmpdir_cloudify_agent__resources__script__linux-download.template.sh", 
         "tmpdir_cloudify_agent__resources__script__linux.sh.template"
       ], 
-      "patch_hash": "b32038b1bf6fb98d99ab962d217fa3d7bbbf0a69fdeb12b9d9b9d03951fd358d", 
-      "patch_id": "agent_installer_tmpdir-b32038b1bf6fb98d99ab962d217fa3d7bbbf0a69fdeb12b9d9b9d03951fd358d", 
+      "patch_hash": "4f19539fc9ebf7d1e96432b2cbe01a9794d0f918c053dd40263f304ca42cbb3b", 
+      "patch_id": "agent_installer_tmpdir-4f19539fc9ebf7d1e96432b2cbe01a9794d0f918c053dd40263f304ca42cbb3b", 
       "patch_name": "agent_installer_tmpdir", 
       "supports_community": true
     }
