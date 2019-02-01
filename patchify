@@ -45,7 +45,7 @@ PATCH_VERSIONS = {
                          'sha256sums_before', 'sha256sums_after']),
     },
 }
-PATCHIFY_VERSION = (1, 0, 0)
+PATCHIFY_VERSION = (1, 0, 1)
 
 
 class VersionError(Exception):
@@ -3096,10 +3096,6 @@ def main():
     add_manager_updates_args(apply_mgr_updates_args)
 
     args = parser.parse_args()
-
-    if args.version:
-        say(get_patchify_version_output())
-        sys.exit(0)
 
     if args.action == 'apply':
         patch_applier(args.patch_file, args.skip_services,
