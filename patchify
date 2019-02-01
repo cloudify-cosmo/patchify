@@ -45,6 +45,7 @@ PATCH_VERSIONS = {
                          'sha256sums_before', 'sha256sums_after']),
     },
 }
+PATCHIFY_VERSION = (1, 0, 0)
 
 
 class VersionError(Exception):
@@ -127,6 +128,30 @@ def say(message):
 
 def sadly_say(message):
     sys.stderr.write('%s\n' % message)
+
+
+def get_patchify_version_output():
+    supported_def_vers = get_supported_definition_versions()
+
+    return (
+        'Patchify version {ver}. '
+        'Supported patch definitions: {def_vers}.'
+    ).format(
+        ver='.'.join(str(i) for i in PATCHIFY_VERSION),
+        def_vers=', '.join(supported_def_vers)
+    )
+
+
+def get_supported_definition_versions():
+    supported_versions = []
+    for major, schema in PATCH_VERSIONS.items():
+        minor_versions = [0]
+        minor_versions.extend(schema.get('minor_versions', {}).keys())
+        for minor in minor_versions:
+            supported_versions.append(
+                '.'.join(str(v) for v in [major, minor, 0]),
+            )
+    return sorted(supported_versions)
 
 
 def output_json(data):
@@ -305,14 +330,7 @@ def load_patch_definition(filename):
         else:
             minor_schema = {}
     except KeyError:
-        supported_versions = []
-        for major, schema in PATCH_VERSIONS.items():
-            minor_versions = [0]
-            minor_versions.extend(schema.get('minor_versions', {}).keys())
-            for minor in minor_versions:
-                supported_versions.append(
-                    '.'.join(str(v) for v in [major, minor, 0]),
-                )
+        supported_versions = get_supported_definition_versions()
 
         add_definition_error(
             message=(
@@ -2956,7 +2974,17 @@ def nullable_int(value):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Apply a patch to a cloudify manager.',
+        description=(
+            'Apply a patch to a cloudify manager.\n' +
+            get_patchify_version_output()
+        ),
+    )
+
+    parser.add_argument(
+        '-v', '--version',
+        help="Display version information.",
+        action='version',
+        version=get_patchify_version_output(),
     )
 
     subparsers = parser.add_subparsers(help='Patch action',
@@ -3057,6 +3085,10 @@ def main():
     add_manager_updates_args(apply_mgr_updates_args)
 
     args = parser.parse_args()
+
+    if args.version:
+        say(get_patchify_version_output())
+        sys.exit(0)
 
     if args.action == 'apply':
         patch_applier(args.patch_file, args.skip_services,
