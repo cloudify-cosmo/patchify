@@ -2876,6 +2876,15 @@ def list_central_manager_patches(central_repository_location,
             say('All recommended patches are installed.')
 
 
+def central_repo_location(value):
+    """Make sure central repo locations end in a slash, because we know we
+    will fail later if they don't. Other than that, urllib2 will request the
+    location later, so we'll let it handle other failures."""
+    if not value.endswith('/'):
+        value += '/'
+    return value
+
+
 def add_apply_and_remove_args(parser):
     parser.add_argument(
         '-s', '--skip-services',
@@ -2910,6 +2919,7 @@ def add_manager_updates_args(parser, repo_root=True):
             'https://raw.githubusercontent.com/'
             'cloudify-cosmo/patchify/master/central_registry/'
         ),
+        type=central_repo_location,
     )
 
     if repo_root:
@@ -2920,6 +2930,7 @@ def add_manager_updates_args(parser, repo_root=True):
                 'If not set, the location will be retrieved with the patch '
                 'listings.'
             ),
+            type=central_repo_location,
         )
 
 
