@@ -1,0 +1,15 @@
+diff --git a/cloudify_agent/resources/script/linux.sh.template b/cloudify_agent/resources/script/linux.sh.template
+index 79490b3..87521ce 100644
+--- a/cloudify_agent/resources/script/linux.sh.template
++++ b/cloudify_agent/resources/script/linux.sh.template
+@@ -173,5 +173,8 @@ main()
+     {% endif %}
+ }
+ export -f main
+-
++{% if tmpdir %}
++export TMPDIR={{ tmpdir }}
++export CFY_EXEC_TEMP={{ tmpdir }}
++{% endif %}
+ main
+ 

@@ -110,6 +110,23 @@
       "patch_name": "targetedscale", 
       "patch_hash": "5375b3bb7d12e72cac2a5274a32e5daa422b2674889f5af590d090963ef64e90", 
       "patch_description": "Support specifying node instances to include or exclude when scaling down."
+    }, 
+    {
+      "patch_files": [
+        "tmpdir_cloudify_agent__installer__config__agent_config.py", 
+        "tmpdir_cloudify_agent__installer__config__installer_config.py", 
+        "tmpdir_cloudify_agent__installer__runners__fabric_runner.py", 
+        "tmpdir_cloudify_agent__installer__runners__winrm_runner.py", 
+        "tmpdir_cloudify_agent__installer__script.py", 
+        "tmpdir_cloudify_agent__resources__script__linux-download.template.sh", 
+        "tmpdir_cloudify_agent__resources__script__linux.sh.template"
+      ], 
+      "patch_definition_path": "agent_installer_tmpdir.json", 
+      "supports_community": true, 
+      "patch_id": "agent_installer_tmpdir-b32038b1bf6fb98d99ab962d217fa3d7bbbf0a69fdeb12b9d9b9d03951fd358d", 
+      "patch_name": "agent_installer_tmpdir", 
+      "patch_hash": "b32038b1bf6fb98d99ab962d217fa3d7bbbf0a69fdeb12b9d9b9d03951fd358d", 
+      "patch_description": "Make the agent install scripts honor the CFY_EXEC_TEMP agent_config envvar."
     }
   ]
 }

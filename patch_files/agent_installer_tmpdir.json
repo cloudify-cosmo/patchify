@@ -1,0 +1,66 @@
+{
+  "patch_version": "2.0.0",
+  "manager_versions": ["4.5"],
+  "description": "Make the agent install scripts honor the CFY_EXEC_TEMP agent_config envvar.",
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "tmpdir_cloudify_agent__installer__config__agent_config.py",
+      "sha256sum": "12293c4757c53f0f40d45e5cbb15a6dbd7f496f923676991df1da693901d03c3",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py"]
+    },
+    {
+      "patch_file": "tmpdir_cloudify_agent__installer__config__installer_config.py",
+      "sha256sum": "72a2881e62f5ce5c41dd82a636a0850bd1fefc8e8d90c3f712f7de5fe84d5ed8",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/installer_config.py"]
+    },
+    {
+      "patch_file": "tmpdir_cloudify_agent__installer__runners__fabric_runner.py",
+      "sha256sum": "9b05a146fb2820deea1c6f884b999461686460c5a4bfb95177b0fb687c9b1e0f",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/runners/fabric_runner.py"]
+    },
+    {
+      "patch_file": "tmpdir_cloudify_agent__installer__runners__winrm_runner.py",
+      "sha256sum": "77049044ac5957a0da5eeed0809b84a586403e01cfe099d3bd422129ac8f5b14",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/runners/winrm_runner.py"]
+    },
+    {
+      "patch_file": "tmpdir_cloudify_agent__installer__script.py",
+      "sha256sum": "a4d17b93d59a4a7e0a90868ed5e73abc9fd7662a16738b67803b31351cf2e432",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/script.py"]
+    },
+    {
+      "patch_file": "tmpdir_cloudify_agent__resources__script__linux-download.template.sh",
+      "sha256sum": "7b06eb631dcb63903226ed662d72941a20465118bcf9792b1968db8e3a645d3a",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux-download.sh.template"]
+    },
+    {
+      "patch_file": "tmpdir_cloudify_agent__resources__script__linux.sh.template",
+      "sha256sum": "5bef4267cc5b239a56c5ff3882612cc7e1c8219b719ee823ede62e07f2f080b5",
+      "destinations": ["/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-mgmtworker"
+  ],
+  "sha256sums_before": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py": ["25928a1eb6af40119ac92d075ee3f0c6c28d8418e89e06233d1b23f29f7165b4"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/installer_config.py": ["b8e8d0e52a58c185fa38d858acf9e971a32904c99eaf0d93a8dde0b6639be184"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/runners/fabric_runner.py": ["ee185927a9fd7ea8a4f352c5792c938b7a984c8b7352d781d827e75e0657ffbe"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/runners/winrm_runner.py": ["28c6acb47ea243f3cb4d71ca8bafe2cfd5f97ec9cbff2e084d30468230e2bd37"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/script.py": ["9f45e210bf62feff1209b44fb21b0923817f2cbda60961acadac59971546f347"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux-download.sh.template": ["88a130a9082d4589382ca50e2cb8843017b6744f4e4d495194b3fcb194b5c62c"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template": ["0cd6b9b32f14f7dc89d4afb64e4093fe12ab13f29bbde476b74ab270f16451e1"]
+  },
+  "sha256sums_after": {
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py": ["c58ffe341b2641f8800f9f7adc01721aa9253514dd15b00846a7f6cf78e55b5c"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/installer_config.py": ["8282dc735eea945dcd893b80a075d31b3c9161dfc46d2fff50dd0499fe00557d"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/runners/fabric_runner.py": ["df11e9079206e445ad42120e848711ff0849f58916725cf31222fb667120b50d"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/runners/winrm_runner.py": ["1968e707bd564d388793f9e05b63d00cade145a2a3d1d0cbc8b4b815e6d98f70"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/script.py": ["4bf7a9c6cbb85abffa3183c9f24b7927ed89a4cbd1337ba13ca24719312e6a04"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux-download.sh.template": ["f9a2ce1e5d7f76988ebe7fd144df3897e67011bd3321dae0257e1578277a8d24"],
+    "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template": ["44f566a2e7dce64822e6ba18dc6429f90f6108c33a2ae0a095bce6163fd01887"]
+  }
+}
+ 
