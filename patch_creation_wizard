@@ -25,6 +25,28 @@ LOCATION_TO_SERVICE = {
         'cloudify-amqp-postgres'
     ),
 }
+# Including commands that aren't generally part of core centos/ubuntu installs
+REQUIRED_COMMANDS = [
+    'patch',
+    'git',
+]
+
+
+def check_required_commands():
+    """Confirm all required commands can be found."""
+    for command in REQUIRED_COMMANDS:
+        try:
+            subprocess.check_call(['which', command])
+        except subprocess.CalledProcessError:
+            sys.stderr.write(
+                'Could not find all required commands.\n'
+                'Required commands are: {commands}\n'
+                'Command should be able to be found by running: which '
+                '<command>\n'.format(
+                    commands=', '.join(REQUIRED_COMMANDS)
+                )
+            )
+            sys.exit(1)
 
 
 def get_manager_version():
@@ -562,6 +584,8 @@ def main():
     )
 
     args = parser.parse_args()
+
+    check_required_commands()
 
     location_mappings = process_location_mappings(
         args.manager_location_mappings,
