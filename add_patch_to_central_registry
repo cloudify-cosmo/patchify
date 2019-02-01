@@ -23,6 +23,14 @@ def get_central_registry_path():
     )
 
 
+def get_patch_files_path():
+    """Get the root patch files path for testing with urllib2."""
+    return 'file://' + os.path.join(
+        os.path.split(os.path.abspath(sys.argv[0]))[0],
+        'patch_files',
+    )
+
+
 def get_patch_details(patch_definition_path):
     """Get details of the patch that is to be added to the registry."""
     if not os.path.exists(patch_definition_path):
@@ -107,25 +115,15 @@ def check_patch_details(patch_details, registry):
         sys.stderr.write(
             'Patch {patch_id} is already in the central registry.\n'
             'ABORTING ADDING PATCH!\n'.format(
-                patch_id=patch['patch_id'],
+                patch_id=patch_details['patch_id'],
             )
         )
         sys.exit(1)
 
     # Check that all files the patch requires are reachable
-    root = registry['patch_root_path']
-
-    # We'll only expect to handle:
-    #  - http(s)://
-    #  - file:// paths (for dev work)
-    root_components = root.split('://', 1)
-    proto = root_components[0]
-    if len(root_components) != 2 or proto not in ('http', 'https', 'file'):
-        sys.stderr.write(
-            'Expecting patch root path to be file:// or http(s)://\n'
-            'ABORTING ADDING PATCH!\n'
-        )
-        sys.exit(1)
+    # We'll check against the current repo on the grounds that the new patch
+    # is expected to be merged from there.
+    root = get_patch_files_path()
 
     files_to_check = [
         root + '/patches/' + patch_file
@@ -137,12 +135,11 @@ def check_patch_details(patch_details, registry):
 
     for file_to_check in files_to_check:
         result = urllib2.urlopen(file_to_check)
-        if proto in ('http', 'https'):
-            success = result.code == 200
-        else:
-            success = result.code is None
 
-        if not success:
+        # Because we're checking a file:// link, None is successful as a
+        # result code. This will need changing if support for http(s) calls
+        # is added later.
+        if result.code is not None:
             sys.stderr.write(
                 'Failed to access {target_file}.\n'
                 'Response code was: {code}\n'
@@ -200,6 +197,10 @@ def main():
     print(
         'It is also recommended that you test applying all patches in '
         'modified registries to clean managers of those versions.'
+    )
+    print(
+        'To do this, see the -c and -r args to '
+        './patchify manager-updates apply.'
     )
 
 
