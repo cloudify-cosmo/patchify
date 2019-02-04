@@ -9,7 +9,8 @@ import string
 import subprocess
 import sys
 
-PATCH_DIFF_PATH = os.path.join('patch_files', 'patches')
+PATCHIFY_PATH = os.path.dirname(os.path.abspath(sys.argv[0]))
+PATCH_DIFF_PATH = os.path.join(PATCHIFY_PATH, 'patch_files', 'patches')
 VALID_IN_PATCH_NAME = (
     string.uppercase + string.lowercase + string.digits + '_'
 )
@@ -80,25 +81,11 @@ def get_manager_version():
     }
 
 
-def check_current_location():
-    """Make sure we're in the same directory as patchify, to simplify the rest
-    of the script."""
-    local_files = os.listdir(os.getcwd())
-    if not all(required in local_files for required in
-               ['patchify', 'patch_files']):
-        sys.stderr.write(
-            'This must be run from the root of the patchify repo.\n'
-            'patchify and patch_files were expected to be found in the '
-            'current working dir.\n'
-        )
-        sys.exit(1)
-
-
 def check_name_available(patch_name):
     """Confirm specified patch name is available."""
     existing_patch_names = [
         os.path.splitext(patch_file)[0] for patch_file in
-        os.listdir(os.path.join(os.getcwd(), 'patch_files'))
+        os.listdir(os.path.join(PATCHIFY_PATH, 'patch_files'))
         if patch_file.endswith('.json')
     ]
     if patch_name in existing_patch_names:
@@ -139,7 +126,7 @@ def generate_patch_diff_files(patch_name, path_to_repo, commit):
             'before_sha256sum': None,
             'after_sha256sum': None,
             'diff_sha256sum': subprocess.check_output(
-                ['./pysha256sum',
+                [os.path.join(PATCHIFY_PATH, 'pysha256sum'),
                  os.path.join(PATCH_DIFF_PATH, diff_file_name)],
             ).split(' ')[0],
             'destinations': [],
@@ -185,7 +172,7 @@ def generate_before_patch_hashes(path_to_repo, diff_files):
             subprocess.check_call(
                 [
                     'patch', '-R', details['path_in_repo'],
-                    os.path.join(os.getcwd(), PATCH_DIFF_PATH, diff_file),
+                    os.path.join(PATCH_DIFF_PATH, diff_file),
                 ],
                 cwd=path_to_repo,
             )
@@ -221,7 +208,7 @@ def generate_before_patch_hashes(path_to_repo, diff_files):
             subprocess.check_call(
                 [
                     'patch', details['path_in_repo'],
-                    os.path.join(os.getcwd(), PATCH_DIFF_PATH, diff_file),
+                    os.path.join(PATCH_DIFF_PATH, diff_file),
                 ],
                 cwd=path_to_repo,
             )
@@ -347,7 +334,8 @@ def determine_manager_paths(diff_files, location_mappings):
 
     # Upload shasum script and ensure it is executable
     scp_command.extend(
-        ['pysha256sum', ssh_details['connection_string'] + ':']
+        [os.path.join(PATCHIFY_PATH, 'pysha256sum'),
+         ssh_details['connection_string'] + ':']
     )
     subprocess.check_call(scp_command)
 
@@ -419,8 +407,6 @@ def generate_patch(patch_name, patch_description, path_to_repo, commit,
     patch_definition['premium'] = True
     patch_definition['description'] = patch_description
 
-    check_current_location()
-
     check_name_available(patch_name)
 
     diff_files = generate_patch_diff_files(patch_name, path_to_repo, commit)
@@ -453,6 +439,7 @@ def generate_patch(patch_name, patch_description, path_to_repo, commit,
             after[destination] = [details['after_sha256sum']]
 
     patch_path = os.path.join(
+        PATCHIFY_PATH,
         'patch_files',
         patch_name + '.json'
     )
@@ -468,7 +455,8 @@ def generate_patch(patch_name, patch_description, path_to_repo, commit,
 def attempt_to_apply_patch(patch_definition, patch_files):
     """Test application of the patch."""
     command = [
-        './patchify', 'apply', '-p', patch_definition,
+        os.path.join(PATCHIFY_PATH, 'patchify'),
+        'apply', '-p', patch_definition,
         '--install-patch-command',
     ]
     try:
