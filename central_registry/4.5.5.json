@@ -1,0 +1,16 @@
+{
+  "patch_root_path": "https://raw.githubusercontent.com/cloudify-cosmo/patchify/master/patch_files/", 
+  "patches": [
+    {
+      "patch_definition_path": "455_stop_workflow_args.json", 
+      "patch_description": "Fix start, stop and restart workflows.", 
+      "patch_files": [
+        "455_stop_workflow_args_cloudify_plugins_workflows.py"
+      ], 
+      "patch_hash": "861378c59add69d07181dee84e3ec8a67f6e5bdeaf560fb3c65b7b83eb7181cc", 
+      "patch_id": "455_stop_workflow_args-861378c59add69d07181dee84e3ec8a67f6e5bdeaf560fb3c65b7b83eb7181cc", 
+      "patch_name": "455_stop_workflow_args", 
+      "supports_community": false
+    }
+  ]
+}

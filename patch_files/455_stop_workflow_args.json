@@ -1,0 +1,46 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "premium": true, 
+    "description": "Fix start, stop and restart workflows.", 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "961d02a6b37a5aff736bcba3315941f75d8aac150d72ce693e935cf0a9183b0a"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "961d02a6b37a5aff736bcba3315941f75d8aac150d72ce693e935cf0a9183b0a"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "961d02a6b37a5aff736bcba3315941f75d8aac150d72ce693e935cf0a9183b0a"
+        ]
+    }, 
+    "community": false, 
+    "patch_version": "2.0.0", 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "b510a6b8218e5195235326bbe4246c32e99999cbf82555075cec57e0f3e85a59"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "b510a6b8218e5195235326bbe4246c32e99999cbf82555075cec57e0f3e85a59"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "b510a6b8218e5195235326bbe4246c32e99999cbf82555075cec57e0f3e85a59"
+        ]
+    }, 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/plugins/workflows.py"
+            ], 
+            "patch_file": "455_stop_workflow_args_cloudify_plugins_workflows.py", 
+            "sha256sum": "3b0dd530bc9110bc5f6bf84228b1a7144f1364c16d8f0cded3cc9cf03ab44798"
+        }
+    ], 
+    "manager_versions": [
+        "4.5.5"
+    ]
+}
