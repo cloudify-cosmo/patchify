@@ -1,2 +1,3 @@
-1.0.0 - Support applying, listing, and removing patches. Support applying recommended patches from central repo, listing recommended patches, and comparing state of recommended patches to current manager/cluster.
+1.0.2 - Fix list command to work when there are no installed patches.
 1.0.1 - Fix subcommands failing on missing version error. Add trailing slashes automatically to central repo paths.
+1.0.0 - Support applying, listing, and removing patches. Support applying recommended patches from central repo, listing recommended patches, and comparing state of recommended patches to current manager/cluster.

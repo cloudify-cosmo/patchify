@@ -45,7 +45,7 @@ PATCH_VERSIONS = {
                          'sha256sums_before', 'sha256sums_after']),
     },
 }
-PATCHIFY_VERSION = (1, 0, 1)
+PATCHIFY_VERSION = (1, 0, 2)
 
 
 class VersionError(Exception):
@@ -164,9 +164,12 @@ def output_table(data, fields):
         for entry in data:
             if isinstance(entry[field], list):
                 entry[field] = ', '.join(entry[field])
-        field_length = max(
-            2 + len(str(entry[field])) for entry in data
-        )
+        if data:
+            field_length = max(
+                2 + len(str(entry[field])) for entry in data
+            )
+        else:
+            field_length = 2
         field_length = max(
             field_length,
             2 + len(field)
