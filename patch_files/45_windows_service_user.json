@@ -1,0 +1,83 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "Adds ability to specify user/password for Windows agent service.", 
+    "manager_versions": [
+        "4.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/__init__.py"
+            ], 
+            "patch_file": "45_windows_service_user_cloudify_agent_installer___init__.py", 
+            "sha256sum": "a7969900d3006cb00f97be132622550bb4909e6f9fecd74d54328d30d8d7dae0"
+        }, 
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/api/pm/nssm.py"
+            ], 
+            "patch_file": "45_windows_service_user_cloudify_agent_api_pm_nssm.py", 
+            "sha256sum": "963d8bc06dd5ab88e65e35004c956ece64bb2ffdf767fc82f2c1b2b861912728"
+        }, 
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/api/pm/base.py"
+            ], 
+            "patch_file": "45_windows_service_user_cloudify_agent_api_pm_base.py", 
+            "sha256sum": "e6b15bbb60db4707d3f78f47d2cc21cb082115afae3315ca5e6619ff611d4cc4"
+        }, 
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/pm/nssm/nssm.conf.template"
+            ], 
+            "patch_file": "45_windows_service_user_cloudify_agent_resources_pm_nssm_nssm.conf.template", 
+            "sha256sum": "27cf79c0f54c6364d5f716060062fb02659243d04ee87c707b78600cfcd3b02c"
+        }, 
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/api/utils.py"
+            ], 
+            "patch_file": "45_windows_service_user_cloudify_agent_api_utils.py", 
+            "sha256sum": "f4f79ad1c02f3ee3ab3607686c79847b1f4e3cbcf563074a524405deddb4da4f"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/api/pm/base.py": [
+            "8672c6d6cde2a028155da4d8d8df64dcd94be3de3c2a9a3d984f07b6c1572e92"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/api/pm/nssm.py": [
+            "dd337e6200c2ccbcf2df72a6c82bfbabf752d74f97f07b3697d96feb9b455655"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/api/utils.py": [
+            "2e2e4ccc6e2ef311a818f211594d8c60a0bfc5f7e8ec7260ccee515d6f672d45"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/pm/nssm/nssm.conf.template": [
+            "d9431cb48016dd5124cd8ff4eab72617c1f618ae68cf504be535279d8acec8ce"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/__init__.py": [
+            "14a5706c9e063de68482f9d3b592cc04c6a4ac457c3b10ad32a8126aef0efc6b"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/api/pm/base.py": [
+            "60ac98a8c7c92271bbb1f264248a00fde5bacf01410e079f113a27e75565fc25"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/api/pm/nssm.py": [
+            "21992950d467875f4392f1eadab0115403713b9c272ce797b502e108de0c6463"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/api/utils.py": [
+            "151468efa9fde8c8464e9a1ce76ebde5db4c780c5d483beba2a01ea2d7f9cf8e"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/pm/nssm/nssm.conf.template": [
+            "5c389a5aa33a64e7345bfb78a18304070f24c17c9cc0eaa8e454d03d2f248445"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/__init__.py": [
+            "acb82931686ac1bc393efd74325e51b9200d70a4a1b4a3975a882d8a8d86c86d"
+        ]
+    }
+}
