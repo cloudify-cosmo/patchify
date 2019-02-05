@@ -182,9 +182,10 @@ def generate_before_patch_hashes(path_to_repo, diff_files):
                 'Could not reverse patch. If you are attempting to generate '
                 'a patch from a commit that is not the final checked out '
                 'commit you may need to check out the specific commit and '
-                'confirm a clean "git status" output before '
+                'confirm a clean "git status" in {path} before '
                 'running the wizard again.\n'.format(
                     err=str(err),
+                    path=path_to_repo,
                 )
             )
             sys.exit(1)
@@ -481,7 +482,9 @@ def attempt_to_apply_patch(patch_definition, patch_files):
         'Patch generated and applies successfully.\n'
         'Please confirm behaviour with patch applied is correct before '
         'committing and PRing the new patch.\n'
-        'Run "git status" to see which files were created.'
+        'Run "git status" in {path} to see which files were created.'.format(
+            path=PATCHIFY_PATH,
+        )
     )
 
 
