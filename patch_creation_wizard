@@ -357,6 +357,7 @@ def determine_manager_paths(diff_files, location_mappings):
             )
             command = base_command + [
                 'sudo find /opt /etc/cloudify '
+                "! -path '/etc/cloudify/patches/*' "
                 '-name {filename} -exec ./pysha256sum {{}} \\;'.format(
                     filename=filename,
                 )
