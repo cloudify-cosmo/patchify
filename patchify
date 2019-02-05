@@ -2064,7 +2064,7 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
                 )
 
     if files_to_restore:
-        say("Restoring files modified by target patch.'")
+        say("Restoring files modified by target patch.")
         for file_backup, target_file in files_to_restore:
             ssh(
                 manager_connection_string,
