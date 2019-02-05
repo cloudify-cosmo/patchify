@@ -126,6 +126,17 @@
       "patch_id": "agent_installer_tmpdir-4f19539fc9ebf7d1e96432b2cbe01a9794d0f918c053dd40263f304ca42cbb3b", 
       "patch_name": "agent_installer_tmpdir", 
       "supports_community": true
+    }, 
+    {
+      "patch_definition_path": "45_agents_install_custom_parameters.json", 
+      "patch_description": "Allow custom parameters in cfy agents install.", 
+      "patch_files": [
+        "45_agents_install_custom_parameters_cloudify_cli_commands_agents.py"
+      ], 
+      "patch_hash": "b8a8dd3feedfdb41d50d06bb4845ad4d955c630e4f3d7f5bdaafae3b5078a3cc", 
+      "patch_id": "45_agents_install_custom_parameters-b8a8dd3feedfdb41d50d06bb4845ad4d955c630e4f3d7f5bdaafae3b5078a3cc", 
+      "patch_name": "45_agents_install_custom_parameters", 
+      "supports_community": false
     }
   ]
 }
