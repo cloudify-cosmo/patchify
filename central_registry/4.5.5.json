@@ -11,6 +11,17 @@
       "patch_id": "455_stop_workflow_args-861378c59add69d07181dee84e3ec8a67f6e5bdeaf560fb3c65b7b83eb7181cc", 
       "patch_name": "455_stop_workflow_args", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "455_agents_install_custom_parameters.json", 
+      "patch_description": "Allow custom parameters in cfy agents install.", 
+      "patch_files": [
+        "455_agents_install_custom_parameters_cloudify_cli_commands_agents.py"
+      ], 
+      "patch_hash": "82067f183e7b1e5250dd0038c13deff2042086dab6da8f392fd0ca3e17dd2418", 
+      "patch_id": "455_agents_install_custom_parameters-82067f183e7b1e5250dd0038c13deff2042086dab6da8f392fd0ca3e17dd2418", 
+      "patch_name": "455_agents_install_custom_parameters", 
+      "supports_community": false
     }
   ]
 }

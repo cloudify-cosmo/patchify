@@ -1,0 +1,29 @@
+{
+    "affected_services": [], 
+    "premium": true, 
+    "description": "Allow custom parameters in cfy agents install.", 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/commands/agents.py": [
+            "b171da7fb6dfac98a2aee866a9f04c73f45912022ec27ed19ff27b67149b2222"
+        ]
+    }, 
+    "community": false, 
+    "patch_version": "2.0.0", 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/commands/agents.py": [
+            "d52ced40006ce9fc99919a9486b7cd109bca55db388e2c5060925880a2caa195"
+        ]
+    }, 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/commands/agents.py"
+            ], 
+            "patch_file": "455_agents_install_custom_parameters_cloudify_cli_commands_agents.py", 
+            "sha256sum": "69d983b498736460fb8d8a6c7c61a7a203c5bcb0c2644efb1f8a4cf43511fd37"
+        }
+    ], 
+    "manager_versions": [
+        "4.5.5"
+    ]
+}
