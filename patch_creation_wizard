@@ -446,7 +446,7 @@ def generate_patch(patch_name, patch_description, path_to_repo, commit,
     )
     with open(patch_path, 'w') as def_handle:
         def_handle.write(
-            json.dumps(patch_definition, indent=4)
+            json.dumps(patch_definition, indent=4, sort_keys=True)
         )
 
     patch_files = diff_files.keys()
