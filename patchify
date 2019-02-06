@@ -637,10 +637,10 @@ def get_file_hash(file_path, manager_connection_string, ssh_port, keyfile,
     # not exist), while still allowing failure for unexpected situations
     # (e.g. segfault on one of the commands)
     md5command = (
-        'if [[ -f {path} ]]; '
+        'if sudo test -f {path} ; '
         # sudo this so that we can avoid permissions issues
         '  then sudo {command} {path}; '
-        'elif [[ -e {path} ]]; '
+        'elif sudo test -e {path}; '
         '  then echo -n "{notafile}"; '
         'else '
         '  echo -n "{notexisting}"; '
@@ -699,40 +699,37 @@ def upload_hash_commands(manager_connection_string, ssh_port, keyfile):
 
     say("Uploading hash check script.")
     with tempdir() as tmp_path:
-        with temporarily_own_directory(
-            manager_connection_string, ssh_port, keyfile, '/opt/cloudify',
-        ):
-            with open(
-                os.path.join(tmp_path, 'pysha256sum'),
-                'w',
-            ) as script_handle:
-                script_handle.write(SHA256SUM_SCRIPT)
+        with open(
+            os.path.join(tmp_path, 'pysha256sum'),
+            'w',
+        ) as script_handle:
+            script_handle.write(SHA256SUM_SCRIPT)
 
-            upload(
-                'pysha256sum',
-                tmp_path,
-                script_path,
-                manager_connection_string,
-                ssh_port,
-                keyfile,
-                # Using md5 because otherwise we'll be trying to validate that
-                # the script uploaded without corruption using the possibly
-                # corrupt script
-                hash_type='md5',
-            )
+        upload(
+            'pysha256sum',
+            tmp_path,
+            script_path,
+            manager_connection_string,
+            ssh_port,
+            keyfile,
+            # Using md5 because otherwise we'll be trying to validate that
+            # the script uploaded without corruption using the possibly
+            # corrupt script
+            hash_type='md5',
+        )
 
-            ssh(
-                manager_connection_string, ssh_port, keyfile,
-                'sudo chown root. {target}'.format(
-                    target=script_path,
-                )
+        ssh(
+            manager_connection_string, ssh_port, keyfile,
+            'sudo chown root. {target}'.format(
+                target=script_path,
             )
-            ssh(
-                manager_connection_string, ssh_port, keyfile,
-                'sudo chmod 555 {target}'.format(
-                    target=script_path,
-                )
+        )
+        ssh(
+            manager_connection_string, ssh_port, keyfile,
+            'sudo chmod 555 {target}'.format(
+                target=script_path,
             )
+        )
 
 
 def hashes_match(check_list, manager_connection_string, ssh_port, keyfile,
@@ -819,26 +816,6 @@ def ssh(manager_connection_string, ssh_port, keyfile, command,
 
 
 @contextmanager
-def temporarily_own_directory(manager_connection_string, ssh_port, keyfile,
-                              path):
-    ssh(
-        manager_connection_string,
-        ssh_port,
-        keyfile,
-        'sudo chown $(whoami). ' + path,
-    )
-    try:
-        yield
-    finally:
-        ssh(
-            manager_connection_string,
-            ssh_port,
-            keyfile,
-            'sudo chown root. ' + path,
-        )
-
-
-@contextmanager
 def tempdir():
     tmp_path = tempfile.mkdtemp(prefix='patchify-')
     try:
@@ -862,9 +839,10 @@ def upload(file_name, source_path, dest_path,
            manager_connection_string, ssh_port, keyfile,
            hash_type='sha256', expected_hash=None):
     source = os.path.join(source_path, file_name)
-    dest = '{mgr}:{dest_path}'.format(
+    tmp_path = '/tmp/' + file_name
+    dest = '{mgr}:{dest}'.format(
         mgr=manager_connection_string,
-        dest_path=dest_path,
+        dest=tmp_path,
     )
     say("Uploading {source} to {dest}".format(source=source, dest=dest))
 
@@ -874,7 +852,7 @@ def upload(file_name, source_path, dest_path,
         expected_hash = get_local_hash(source, hash_type=hash_type)
 
     uploaded_hash = get_file_hash(
-        file_path=dest_path,
+        file_path=tmp_path,
         manager_connection_string=manager_connection_string,
         ssh_port=ssh_port,
         keyfile=keyfile,
@@ -891,16 +869,48 @@ def upload(file_name, source_path, dest_path,
             )
         )
 
+    ssh(
+        manager_connection_string,
+        ssh_port,
+        keyfile,
+        'sudo mv {tmp_path} {dest_path}'.format(
+            tmp_path=tmp_path,
+            dest_path=dest_path,
+        ),
+    )
+
+    ssh(
+        manager_connection_string,
+        ssh_port,
+        keyfile,
+        'sudo chown root. {dest_path}'.format(
+            dest_path=dest_path,
+        ),
+    )
+
 
 def download(file_name, source_path, dest_path,
              manager_connection_string, ssh_port, keyfile, quiet=False):
-    source = '{mgr}:{dest_path}'.format(
+    tmp_path = '/tmp/' + file_name
+    src_path = source_path + '/' + file_name
+    source = '{mgr}:{source}'.format(
         mgr=manager_connection_string,
-        dest_path=os.path.join(source_path, file_name),
+        source=tmp_path,
     )
     dest = dest_path
     if not quiet:
-        say("Downloading {source} to {dest}".format(source=source, dest=dest))
+        say("Downloading {source} to {dest}".format(source=src_path,
+                                                    dest=dest))
+
+    ssh(
+        manager_connection_string,
+        ssh_port,
+        keyfile,
+        'sudo cp {src_path} {tmp_path}'.format(
+            src_path=src_path,
+            tmp_path=tmp_path,
+        ),
+    )
 
     _scp(keyfile, ssh_port, source, dest, quiet=quiet)
 
@@ -1181,17 +1191,15 @@ def generate_patch_data_dir(patch_name, patch_definition, timestamp,
         ' && echo ' + patch_info +
         ' | sudo tee ' + patch_path + '/patch_info >/dev/null',
     )
-    with temporarily_own_directory(manager_connection_string, ssh_port,
-                                   keyfile, patch_path):
-        source_path, file_name = os.path.split(definition_file)
-        upload(
-            file_name=file_name,
-            source_path=source_path,
-            dest_path=os.path.join(patch_path, 'patch_definition'),
-            manager_connection_string=manager_connection_string,
-            ssh_port=ssh_port,
-            keyfile=keyfile,
-        )
+    source_path, file_name = os.path.split(definition_file)
+    upload(
+        file_name=file_name,
+        source_path=source_path,
+        dest_path=os.path.join(patch_path, 'patch_definition'),
+        manager_connection_string=manager_connection_string,
+        ssh_port=ssh_port,
+        keyfile=keyfile,
+    )
 
     patch_dirs['backup_root'] = '{base}/backups'.format(
         base=patch_path,
@@ -1251,24 +1259,22 @@ def generate_patch_data_dir(patch_name, patch_definition, timestamp,
             keyfile,
             'sudo mkdir -p ' + patch_dirs['staging_dir'],
         )
-        with temporarily_own_directory(manager_connection_string, ssh_port,
-                                       keyfile, patch_dirs['staging_dir']):
-            patch_dir = os.path.join(os.path.dirname(definition_file),
-                                     'patches')
-            say("Uploading and verifying patch files.")
-            try:
-                upload_and_verify_patch_files(manager_connection_string,
-                                              ssh_port,
-                                              patch_dir,
-                                              patch_definition['patches'],
-                                              patch_dirs['staging_dir'],
-                                              keyfile)
-            except UploadError as err:
-                raise UploadError(
-                    'Failed to upload patch files: {err}'.format(
-                        err=str(err),
-                    ),
-                )
+        patch_dir = os.path.join(os.path.dirname(definition_file),
+                                 'patches')
+        say("Uploading and verifying patch files.")
+        try:
+            upload_and_verify_patch_files(manager_connection_string,
+                                          ssh_port,
+                                          patch_dir,
+                                          patch_definition['patches'],
+                                          patch_dirs['staging_dir'],
+                                          keyfile)
+        except UploadError as err:
+            raise UploadError(
+                'Failed to upload patch files: {err}'.format(
+                    err=str(err),
+                ),
+            )
 
     return patch_dirs
 
@@ -2175,17 +2181,14 @@ def update_registry(registry, manager_connection_string, ssh_port, keyfile):
                 'Error was: {err}'.format(err=err),
             )
 
-        with temporarily_own_directory(manager_connection_string, ssh_port,
-                                       keyfile,
-                                       BASE_MANAGER_PATCH_STORAGE_PATH):
-            upload(
-                file_name=PATCH_REGISTRY_FILE_NAME,
-                source_path=tmp_path,
-                dest_path=PATCH_REGISTRY_PATH,
-                manager_connection_string=manager_connection_string,
-                ssh_port=ssh_port,
-                keyfile=keyfile,
-            )
+        upload(
+            file_name=PATCH_REGISTRY_FILE_NAME,
+            source_path=tmp_path,
+            dest_path=PATCH_REGISTRY_PATH,
+            manager_connection_string=manager_connection_string,
+            ssh_port=ssh_port,
+            keyfile=keyfile,
+        )
 
 
 def remove_patch_from_registry(registry, patch_id, manager_connection_string,
@@ -2477,6 +2480,8 @@ def display_patch_listing(patches, output_method=say):
 
 def download_patch_registry(manager_connection_string, ssh_port, keyfile,
                             quiet=False):
+    if not quiet:
+        say('Checking patch registry.')
     patch_registry_md5 = get_file_hash(
         PATCH_REGISTRY_PATH,
         manager_connection_string,
@@ -2485,6 +2490,8 @@ def download_patch_registry(manager_connection_string, ssh_port, keyfile,
         'md5',
     )
     if patch_registry_md5 == 'DOESNOTEXIST':
+        if not quiet:
+            say('No registry found.')
         registry = {
             'current_patches': [],
         }
