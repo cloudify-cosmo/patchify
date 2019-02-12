@@ -22,6 +22,17 @@
       "patch_id": "455_agents_install_custom_parameters-82067f183e7b1e5250dd0038c13deff2042086dab6da8f392fd0ca3e17dd2418", 
       "patch_name": "455_agents_install_custom_parameters", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "create_deployment_no_capabilities.json", 
+      "patch_description": "create deployment with no capabilities in plan.", 
+      "patch_files": [
+        "create_deployment_no_capabilities_rest-service_manager_rest_resource_manager.py"
+      ], 
+      "patch_hash": "11b5c91bb015e03f9a2886969274fb853c79d9a9822ffbce1581ccc120e0ba1d", 
+      "patch_id": "create_deployment_no_capabilities-11b5c91bb015e03f9a2886969274fb853c79d9a9822ffbce1581ccc120e0ba1d", 
+      "patch_name": "create_deployment_no_capabilities", 
+      "supports_community": false
     }
   ]
 }
