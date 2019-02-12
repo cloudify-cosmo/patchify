@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "create deployment with no capabilities in plan.", 
+    "manager_versions": [
+        "4.5.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py"
+            ], 
+            "patch_file": "create_deployment_no_capabilities_rest-service_manager_rest_resource_manager.py", 
+            "sha256sum": "7aac8b6ec3cfc44aa0d813f8ea043c9e2e6ad1ed3a12f94586a3cda37386d631"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "d784b770c8d56aa028b5834f77ec627a6abe2f8f3ab159aeeaf34f6d260caef3"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "0d4fbd0c960d5b6acb329b06a9c3ed1bfb57ad5f5c88908153481fbc17daa875"
+        ]
+    }
+}
