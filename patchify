@@ -45,7 +45,7 @@ PATCH_VERSIONS = {
                          'sha256sums_before', 'sha256sums_after']),
     },
 }
-PATCHIFY_VERSION = (1, 0, 2)
+PATCHIFY_VERSION = (1, 0, 3)
 
 
 class VersionError(Exception):
