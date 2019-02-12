@@ -924,6 +924,15 @@ def download(file_name, source_path, dest_path,
 
     downloaded_md5sum = get_local_hash(dest, hash_type='md5')
 
+    ssh(
+        manager_connection_string,
+        ssh_port,
+        keyfile,
+        'sudo rm {tmp_path}'.format(
+            tmp_path=tmp_path,
+        ),
+    )
+
     if not original_md5sum == downloaded_md5sum:
         raise DownloadError(
             'Downloaded file {file_path} had md5sum {actual}, but should '
