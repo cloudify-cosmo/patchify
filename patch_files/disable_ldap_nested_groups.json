@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "disable ldap nested groups.", 
+    "manager_versions": [
+        "4.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/authentication/ldap_authentication.py"
+            ], 
+            "patch_file": "disable_ldap_nested_groups_cloudify_premium_authentication_ldap_authentication.py", 
+            "sha256sum": "104543810683c6bf8c982acc8c697f0fd297c8cc42cc500e3033f1291a41232d"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/authentication/ldap_authentication.py": [
+            "22562e0aa0bbaf4c4f3980426cec900b28d5d23b4a8d7f80c86cfd321fc3efc4"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/authentication/ldap_authentication.py": [
+            "76232b3bec713e59c0a5e5f9bc4ad6ca7e6a72719921fabcedd26ec191f4abcf"
+        ]
+    }
+}
