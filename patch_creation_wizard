@@ -450,6 +450,22 @@ def generate_patch(patch_name, patch_description, path_to_repo, commit,
             json.dumps(patch_definition, indent=4, sort_keys=True)
         )
 
+    if not before or not after:
+        sys.stderr.write(
+            'No destinations were found to be patched.\n'
+            'Please check the path detection above, and confirm that:\n'
+            '1. All recommended patches (patchify manager-updates apply) '
+            'were applied to this manager before attempting to create the '
+            'patch.\n'
+            '2. You are creating the patch from the relevant version branch '
+            'in the target repository, and that branch has commits for all '
+            'other recommended patches before your patch.\n'
+            'Patch creation failure. Patch definition: {path}\n'.format(
+                path=patch_path,
+            )
+        )
+        sys.exit(1)
+
     patch_files = diff_files.keys()
     return patch_path, patch_files
 
