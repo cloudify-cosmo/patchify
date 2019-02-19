@@ -33,6 +33,17 @@
       "patch_id": "create_deployment_no_capabilities-11b5c91bb015e03f9a2886969274fb853c79d9a9822ffbce1581ccc120e0ba1d", 
       "patch_name": "create_deployment_no_capabilities", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_5_5_fixing_backward_compatibly_blueprint_deletion.json", 
+      "patch_description": "Compatibly issue fix due to blueprint protection against deletion when imported, which was added in 4.5.5 with a new metadata section to the blueprints.", 
+      "patch_files": [
+        "4_5_5_fixing_backward_compatibly_blueprint_deletion_rest-service_manager_rest_resource_manager.py"
+      ], 
+      "patch_hash": "be2b58655b66141c348738d644f2dffe8962e7faf2154361bf6d92335988b190", 
+      "patch_id": "4_5_5_fixing_backward_compatibly_blueprint_deletion-be2b58655b66141c348738d644f2dffe8962e7faf2154361bf6d92335988b190", 
+      "patch_name": "4_5_5_fixing_backward_compatibly_blueprint_deletion", 
+      "supports_community": true
     }
   ]
 }
