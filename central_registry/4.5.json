@@ -137,6 +137,17 @@
       "patch_id": "45_agents_install_custom_parameters-b8a8dd3feedfdb41d50d06bb4845ad4d955c630e4f3d7f5bdaafae3b5078a3cc", 
       "patch_name": "45_agents_install_custom_parameters", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "45_agent_proxy_evaluate_functions.json", 
+      "patch_description": "Proxy agents: evaluate_functions in nodes.get.", 
+      "patch_files": [
+        "45_agent_proxy_evaluate_functions_cloudify_workflows_tasks.py"
+      ], 
+      "patch_hash": "552ed9165ad4cc482c78f8406761391006dd1453324a91ac624eda8ff9cfefef", 
+      "patch_id": "45_agent_proxy_evaluate_functions-552ed9165ad4cc482c78f8406761391006dd1453324a91ac624eda8ff9cfefef", 
+      "patch_name": "45_agent_proxy_evaluate_functions", 
+      "supports_community": false
     }
   ]
 }

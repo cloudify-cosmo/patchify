@@ -1,0 +1,45 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker" 
+    ], 
+    "community": false, 
+    "description": "Proxy agents: evaluate_functions in nodes.get.", 
+    "manager_versions": [
+        "4.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/tasks.py"
+            ], 
+            "patch_file": "45_agent_proxy_evaluate_functions_cloudify_workflows_tasks.py", 
+            "sha256sum": "2846f0f1cb77b1bb37de5b7552f0c40e4c525caa3a44fe4af4638dab50e5ac44"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "3b4896b3413f5198c18877b89cac3e12328f239653fa6df94cbfa4896076d49f"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "3b4896b3413f5198c18877b89cac3e12328f239653fa6df94cbfa4896076d49f"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "3b4896b3413f5198c18877b89cac3e12328f239653fa6df94cbfa4896076d49f"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "36ef128b351f0b191331066ea1760eba2122b9b9ada8dcb84aeddf5ec72eadb8"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "36ef128b351f0b191331066ea1760eba2122b9b9ada8dcb84aeddf5ec72eadb8"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "36ef128b351f0b191331066ea1760eba2122b9b9ada8dcb84aeddf5ec72eadb8"
+        ]
+    }
+}
