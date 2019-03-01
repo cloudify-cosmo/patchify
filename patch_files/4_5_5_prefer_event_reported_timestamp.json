@@ -1,0 +1,46 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "4.5.5 prefer event reported_timestamp.", 
+    "manager_versions": [
+        "4.5.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/event.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/event.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/event.py"
+            ], 
+            "patch_file": "4_5_5_prefer_event_reported_timestamp_cloudify_event.py", 
+            "sha256sum": "d1aa5cb0efd67fe65fbfd43cd11d7b3cac95768b8fba628076162fd9bc4350b3"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/event.py": [
+            "6df367e5fb0aaa33b846b182ae32615362a308d36a596ba6312ddf8d51243c17"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "6df367e5fb0aaa33b846b182ae32615362a308d36a596ba6312ddf8d51243c17"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "6df367e5fb0aaa33b846b182ae32615362a308d36a596ba6312ddf8d51243c17"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/event.py": [
+            "8358376c11facee7d127b8426eca58701dc9cbe345a41772cbb68e83dde596c6"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "8358376c11facee7d127b8426eca58701dc9cbe345a41772cbb68e83dde596c6"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "8358376c11facee7d127b8426eca58701dc9cbe345a41772cbb68e83dde596c6"
+        ]
+    }
+}
