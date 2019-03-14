@@ -1,0 +1,46 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "amqp_client: make deleting queue/exchange threadsafe.", 
+    "manager_versions": [
+        "4.5.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/amqp_client.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/amqp_client.py"
+            ], 
+            "patch_file": "455_delete_queue_exchange_threadsafe_cloudify_amqp_client.py", 
+            "sha256sum": "9fbd90666bb46f99b3b38c1e520fba444cca6f7f6a5a1ae2cece2f8b9a81269f"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "7cb5841123808ba331f1b7eb0209c8689bc2b9c2a799aebb5d68b64ba1ebef0d"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "7cb5841123808ba331f1b7eb0209c8689bc2b9c2a799aebb5d68b64ba1ebef0d"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "7cb5841123808ba331f1b7eb0209c8689bc2b9c2a799aebb5d68b64ba1ebef0d"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "deccbe019e9f26efc227bec2bf5407102b4789167b85c47020d815da89b1a36f"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "deccbe019e9f26efc227bec2bf5407102b4789167b85c47020d815da89b1a36f"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "deccbe019e9f26efc227bec2bf5407102b4789167b85c47020d815da89b1a36f"
+        ]
+    }
+}
