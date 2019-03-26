@@ -44,6 +44,17 @@
       "patch_id": "4_5_5_fixing_backward_compatibly_blueprint_deletion-be2b58655b66141c348738d644f2dffe8962e7faf2154361bf6d92335988b190", 
       "patch_name": "4_5_5_fixing_backward_compatibly_blueprint_deletion", 
       "supports_community": true
+    }, 
+    {
+      "patch_definition_path": "4_5_5_dont_break_amqp_postgres.json", 
+      "patch_description": "amqp-postgres: don't break on ProgrammingError.", 
+      "patch_files": [
+        "4_5_5_dont_break_amqp_postgres_amqp-postgres_amqp_postgres_postgres_publisher.py"
+      ], 
+      "patch_hash": "a09f3055ac1f0a562d033ba167effbed98e519dbfa438da0034c6b97c3acd20c", 
+      "patch_id": "4_5_5_dont_break_amqp_postgres-a09f3055ac1f0a562d033ba167effbed98e519dbfa438da0034c6b97c3acd20c", 
+      "patch_name": "4_5_5_dont_break_amqp_postgres", 
+      "supports_community": false
     }
   ]
 }
