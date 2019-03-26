@@ -1,0 +1,32 @@
+{
+    "affected_services": [
+        "cloudify-amqp-postgres", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "amqp-postgres: don't break on ProgrammingError.", 
+    "manager_versions": [
+        "4.5.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/amqp_postgres/postgres_publisher.py"
+            ], 
+            "patch_file": "4_5_5_dont_break_amqp_postgres_amqp-postgres_amqp_postgres_postgres_publisher.py", 
+            "sha256sum": "d21a07d606eb8ba5f05ee5c05ae3ee4addaa346f14b7e36c099aa1215087e83f"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/amqp_postgres/postgres_publisher.py": [
+            "ef217b434f9c1f158c25eb9379a45e50f593130672e3d832d16f558995c72554"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/amqp_postgres/postgres_publisher.py": [
+            "0a59ed1253004a3b7b48fc1c6343ecd91a86a1c3d2373fd8dd337bdd190c0cd2"
+        ]
+    }
+}
