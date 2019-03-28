@@ -133,8 +133,8 @@
       "patch_files": [
         "45_agents_install_custom_parameters_cloudify_cli_commands_agents.py"
       ], 
-      "patch_hash": "b8a8dd3feedfdb41d50d06bb4845ad4d955c630e4f3d7f5bdaafae3b5078a3cc", 
-      "patch_id": "45_agents_install_custom_parameters-b8a8dd3feedfdb41d50d06bb4845ad4d955c630e4f3d7f5bdaafae3b5078a3cc", 
+      "patch_hash": "62df0ee3074c6678198a2967a622865d04cfbd40f4e7efb5b557c5a7317a1983",
+      "patch_id": "45_agents_install_custom_parameters-62df0ee3074c6678198a2967a622865d04cfbd40f4e7efb5b557c5a7317a1983", 
       "patch_name": "45_agents_install_custom_parameters", 
       "supports_community": false
     }, 
