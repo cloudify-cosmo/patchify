@@ -14,12 +14,17 @@ import sys
 import tempfile
 import time
 import urllib2
+try:
+    import yaml
+except ImportError:
+    yaml = None
 
 BASE_MANAGER_PATCH_STORAGE_PATH = '/etc/cloudify/patches'
 PATCH_REGISTRY_FILE_NAME = 'patch_registry.json'
 PATCH_REGISTRY_PATH = os.path.join(
     BASE_MANAGER_PATCH_STORAGE_PATH, PATCH_REGISTRY_FILE_NAME
 )
+PATCHIFY_LOG_PATH = ""
 SHA256SUM_SCRIPT = """#! /usr/bin/env python
 import hashlib
 import sys
@@ -45,7 +50,7 @@ PATCH_VERSIONS = {
                          'sha256sums_before', 'sha256sums_after']),
     },
 }
-PATCHIFY_VERSION = (1, 0, 3)
+PATCHIFY_VERSION = (1, 1, 0)
 
 
 class VersionError(Exception):
@@ -116,6 +121,20 @@ class PatchAlreadyApplied(Exception):
     pass
 
 
+def get_log_path():
+    path = os.path.expanduser('~/.cloudify/logs/patchify.log')
+    if yaml:
+        cli_config_path = os.path.expanduser('~/.cloudify/config.yaml')
+        if os.path.exists(cli_config_path):
+            with open(cli_config_path) as conf_handle:
+                cli_conf = yaml.load(conf_handle.read())
+            cli_log_dir = os.path.dirname(
+                os.path.expanduser(cli_conf['logging']['filename'])
+            )
+            path = os.path.join(cli_log_dir, 'patchify.log')
+    return path
+
+
 def exit_with_sadness(message, action):
     sadly_say(message)
     sadly_say('FAILED {action}!'.format(action=action))
@@ -124,10 +143,26 @@ def exit_with_sadness(message, action):
 
 def say(message):
     print(message)
+    log_to_file(message, 'INF')
 
 
 def sadly_say(message):
     sys.stderr.write('%s\n' % message)
+    log_to_file(message, 'ERR')
+
+
+def log_to_file(message, level):
+    lines = message.splitlines()
+    if PATCHIFY_LOG_PATH:
+        with open(PATCHIFY_LOG_PATH, 'a') as log_handle:
+            for line in lines:
+                log_handle.write(
+                    '{timestamp} ({level}): {message}\n'.format(
+                        timestamp=generate_timestamp(),
+                        level=level,
+                        message=line,
+                    )
+                )
 
 
 def get_patchify_version_output():
@@ -2990,6 +3025,18 @@ def add_install_patch_command_arg(parser):
     )
 
 
+def add_logger_arg(parser):
+    parser.add_argument(
+        '-L', '--log-path',
+        help=(
+            'The path to log patchify information to. '
+            'To avoid logging to file, set this as an empty string (e.g. "").'
+        ),
+        default=get_log_path(),
+        required=False,
+    )
+
+
 def nullable_int(value):
     if value is not None:
         try:
@@ -3023,6 +3070,7 @@ def main():
     list_patch_args = subparsers.add_parser('list',
                                             help='List installed patches')
     add_list_output_args(list_patch_args)
+    add_logger_arg(list_patch_args)
 
     apply_patch_args = subparsers.add_parser('apply',
                                              help='Apply a patch')
@@ -3038,6 +3086,7 @@ def main():
     )
     add_install_patch_command_arg(apply_patch_args)
     add_apply_and_remove_args(apply_patch_args)
+    add_logger_arg(apply_patch_args)
 
     remove_patch_args = subparsers.add_parser('remove',
                                               help='Remove a patch')
@@ -3050,6 +3099,7 @@ def main():
         required=True,
     )
     add_apply_and_remove_args(remove_patch_args)
+    add_logger_arg(remove_patch_args)
 
     manager_updates = subparsers.add_parser(
         'manager-updates',
@@ -3076,6 +3126,7 @@ def main():
     )
     add_list_output_args(list_mgr_updates_args)
     add_manager_updates_args(list_mgr_updates_args, repo_root=False)
+    add_logger_arg(list_mgr_updates_args)
 
     download_mgr_updates_args = manager_updates_subparsers.add_parser(
         'download',
@@ -3093,6 +3144,7 @@ def main():
         required=True,
     )
     add_manager_updates_args(download_mgr_updates_args)
+    add_logger_arg(download_mgr_updates_args)
 
     apply_mgr_updates_args = manager_updates_subparsers.add_parser(
         'apply',
@@ -3113,8 +3165,30 @@ def main():
     )
     add_install_patch_command_arg(apply_mgr_updates_args)
     add_manager_updates_args(apply_mgr_updates_args)
+    add_logger_arg(apply_mgr_updates_args)
 
     args = parser.parse_args()
+
+    if hasattr(args, 'log_path') and args.log_path:
+        global PATCHIFY_LOG_PATH
+        PATCHIFY_LOG_PATH = args.log_path
+        log_size = 0
+        units = 'B'
+        if os.path.exists(PATCHIFY_LOG_PATH):
+            log_size = os.path.getsize(PATCHIFY_LOG_PATH)
+            if log_size > (1024 * 1024):
+                log_size = log_size / (1024.0*1024)
+                units = 'MiB'
+            elif log_size > 1024:
+                log_size = log_size / 1024.0
+                units = 'KiB'
+        say(
+            'Log file {path} is currently {size:.2f}{units}'.format(
+                path=PATCHIFY_LOG_PATH,
+                size=log_size,
+                units=units
+            )
+        )
 
     if args.action == 'apply':
         patch_applier(args.patch_file, args.skip_services,

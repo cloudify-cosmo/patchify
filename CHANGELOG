@@ -1,3 +1,4 @@
+1.1.0 - Add file logging.
 1.0.3 - Fixes to work with restrictive umasks.
 1.0.2 - Fix list command to work when there are no installed patches.
 1.0.1 - Fix subcommands failing on missing version error. Add trailing slashes automatically to central repo paths.
