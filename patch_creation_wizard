@@ -538,6 +538,18 @@ def check_patch_description(description):
     return description
 
 
+def apply_recommended_patches():
+    """
+        To ensure that patches are compatible with current recommended
+        patches, we apply all of them first.
+    """
+    print('Ensuring manager patches are up to date.')
+    subprocess.check_call([
+        os.path.join(PATCHIFY_PATH, 'patchify'),
+        'manager-updates', 'apply', '--install-patch-command',
+    ])
+
+
 def main():
     """Get arguments, generate, and test the patch."""
     parser = argparse.ArgumentParser(
@@ -594,6 +606,7 @@ def main():
     args = parser.parse_args()
 
     check_required_commands()
+    apply_recommended_patches()
 
     location_mappings = process_location_mappings(
         args.manager_location_mappings,
