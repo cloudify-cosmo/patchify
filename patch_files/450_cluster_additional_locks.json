@@ -1,0 +1,57 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Add additional locks to cluster handlers.", 
+    "manager_versions": [
+        "4.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/minority.py"
+            ], 
+            "patch_file": "450_cluster_additional_locks_cloudify_premium_ha_minority.py", 
+            "sha256sum": "b3703a89e222980957c176b8eda9be6109ef34f468151ca63f1b3680a26f91ff"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/handlers.py"
+            ], 
+            "patch_file": "450_cluster_additional_locks_cloudify_premium_ha_handlers.py", 
+            "sha256sum": "95a87df9fa9f9fe09c59b010103328e311730fc03389e2fa5ce257361432272e"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/options.py"
+            ], 
+            "patch_file": "450_cluster_additional_locks_cloudify_premium_ha_options.py", 
+            "sha256sum": "75d1408dfcfdd1b3e97544cbfc4a6b16c1b50e9cd7667eaa403dd98f15b92b8c"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/handlers.py": [
+            "dd60c1d046d51d5a6945748443aab2555343ae18403f2304f29868745779dcb0"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/minority.py": [
+            "2030db147fbdc2cc3882120048f5cb7c023ce1f960997c9869a4eab22a16afd7"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/options.py": [
+            "b8bc1029c15a77dba57deeafc506817aa29dfb1d852385b8eaae2fefa80df529"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/handlers.py": [
+            "6247de23f87f7fe0d3719a31d2e6a3c61512ec45998b20756e967b8f355c99aa"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/minority.py": [
+            "adaa81ee80354be47aafb3ebc79b6cd15b035f13858ec75e9f8e5513bf3769dc"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/options.py": [
+            "eccb8e1e7a68309c855d298e7ca58b3d428da3b18e2c6795df06244e6c08688b"
+        ]
+    }
+}
