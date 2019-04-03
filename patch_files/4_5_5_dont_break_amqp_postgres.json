@@ -15,13 +15,13 @@
                 "/opt/manager/env/lib/python2.7/site-packages/amqp_postgres/postgres_publisher.py"
             ], 
             "patch_file": "4_5_5_dont_break_amqp_postgres_amqp-postgres_amqp_postgres_postgres_publisher.py", 
-            "sha256sum": "d21a07d606eb8ba5f05ee5c05ae3ee4addaa346f14b7e36c099aa1215087e83f"
+            "sha256sum": "57c5ad420a061c5518eb87066d9a518f1959def524639bc14bb0e6a63f1bcddf"
         }
     ], 
     "premium": true, 
     "sha256sums_after": {
         "/opt/manager/env/lib/python2.7/site-packages/amqp_postgres/postgres_publisher.py": [
-            "ef217b434f9c1f158c25eb9379a45e50f593130672e3d832d16f558995c72554"
+            "1929bf6e577b9153f8dd0101bd7aa85117592db825fa3f3dd4564e6b05e38960"
         ]
     }, 
     "sha256sums_before": {
