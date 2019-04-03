@@ -51,8 +51,8 @@
       "patch_files": [
         "4_5_5_dont_break_amqp_postgres_amqp-postgres_amqp_postgres_postgres_publisher.py"
       ], 
-      "patch_hash": "a09f3055ac1f0a562d033ba167effbed98e519dbfa438da0034c6b97c3acd20c", 
-      "patch_id": "4_5_5_dont_break_amqp_postgres-a09f3055ac1f0a562d033ba167effbed98e519dbfa438da0034c6b97c3acd20c", 
+      "patch_hash": "40e84b73352a48d52faccf70b385534cf927e760829e7df98f7e5dad6add7946", 
+      "patch_id": "4_5_5_dont_break_amqp_postgres-40e84b73352a48d52faccf70b385534cf927e760829e7df98f7e5dad6add7946", 
       "patch_name": "4_5_5_dont_break_amqp_postgres", 
       "supports_community": false
     }
