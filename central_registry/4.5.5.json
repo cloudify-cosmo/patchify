@@ -55,6 +55,17 @@
       "patch_id": "4_5_5_dont_break_amqp_postgres-40e84b73352a48d52faccf70b385534cf927e760829e7df98f7e5dad6add7946", 
       "patch_name": "4_5_5_dont_break_amqp_postgres", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_5_5_fetching_none_capabilities.json", 
+      "patch_description": "While fetching deployments from previous version snapshot with no capabilites, caused acessoing a none var.", 
+      "patch_files": [
+        "4_5_5_fetching_none_capabilities_rest-service_manager_rest_dsl_functions.py"
+      ], 
+      "patch_hash": "67ce00462d3e51c96ef7ddbc8190471edd41665580e4701de9d793d55eea035f", 
+      "patch_id": "4_5_5_fetching_none_capabilities-67ce00462d3e51c96ef7ddbc8190471edd41665580e4701de9d793d55eea035f", 
+      "patch_name": "4_5_5_fetching_none_capabilities", 
+      "supports_community": false
     }
   ]
 }

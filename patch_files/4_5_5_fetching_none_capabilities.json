@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "While fetching deployments from previous version snapshot with no capabilites, caused acessoing a none var.", 
+    "manager_versions": [
+        "4.5.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/dsl_functions.py"
+            ], 
+            "patch_file": "4_5_5_fetching_none_capabilities_rest-service_manager_rest_dsl_functions.py", 
+            "sha256sum": "cae629cc917ef85bc0b33edd5d97825b9d874a06dc64361f1bc5c9e3d804fbdd"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/dsl_functions.py": [
+            "85961d6d2af11fc4f11cd3739386aa12f135a6a0563fd1b2de55a381fe16a406"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/dsl_functions.py": [
+            "c207b06298cc35d930a7b5db7f34f7f8bf2473b2cb25e8c8146260bccc580539"
+        ]
+    }
+}
