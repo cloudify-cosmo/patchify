@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Allow 'cfy status' command to work even when no Cloudify license is uploaded to the Manager.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/constants.py"
+            ], 
+            "patch_file": "4_6_fix_cfy_status_rest-service_manager_rest_constants.py", 
+            "sha256sum": "6f9179deb7bc2987e10e57e28bf7d2e8e3674f7546b6332e39424569875e8f8b"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/constants.py": [
+            "04b5213a3b30fb8609533e989adb1a0141b2c1be929c786437d8292e3580b673"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/constants.py": [
+            "b1e6b1b0fe82784cc06453ef7f11ce04b6222b8cb902b3668fa2dea23be91002"
+        ]
+    }
+}
