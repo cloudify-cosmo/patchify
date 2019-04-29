@@ -1,0 +1,17 @@
+{
+  "patch_root_path": "https://raw.githubusercontent.com/cloudify-cosmo/patchify/master/patch_files/", 
+  "patches": [
+    {
+      "patch_definition_path": "46_local_tasks_restore.json", 
+      "patch_description": "Dump/restore support for local tasks.", 
+      "patch_files": [
+        "46_local_tasks_restore_cloudify_workflows_tasks.py", 
+        "46_local_tasks_restore_cloudify_workflows_workflow_context.py"
+      ], 
+      "patch_hash": "316b313c3bc441abec887e1e0233223c1d0f2021a973a7c5ed2f700dce2ddd42", 
+      "patch_id": "46_local_tasks_restore-316b313c3bc441abec887e1e0233223c1d0f2021a973a7c5ed2f700dce2ddd42", 
+      "patch_name": "46_local_tasks_restore", 
+      "supports_community": false
+    }
+  ]
+}

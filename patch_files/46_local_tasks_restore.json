@@ -1,0 +1,73 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Dump/restore support for local tasks.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/tasks.py"
+            ], 
+            "patch_file": "46_local_tasks_restore_cloudify_workflows_tasks.py", 
+            "sha256sum": "e51d618709c7bde252184fc7577eda2011c5ad0e8832934468059539fd74a574"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py"
+            ], 
+            "patch_file": "46_local_tasks_restore_cloudify_workflows_workflow_context.py", 
+            "sha256sum": "f3754718c21ea3e47a9ccc852ba932c4a13d39e7b89ab5143cec8c2a46c9dc7f"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "f99860cb709ac1726a560e0579ff6b085e9af5d827789e7479aa408e1e87f3cd"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "35dfb07231b9c53d49c1584509ab059899c8811c03106bb5f761635170eb11d3"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "f99860cb709ac1726a560e0579ff6b085e9af5d827789e7479aa408e1e87f3cd"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "35dfb07231b9c53d49c1584509ab059899c8811c03106bb5f761635170eb11d3"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "f99860cb709ac1726a560e0579ff6b085e9af5d827789e7479aa408e1e87f3cd"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "35dfb07231b9c53d49c1584509ab059899c8811c03106bb5f761635170eb11d3"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "7aaf4d1458eccb883bd9d91a5bbc108650329c64abe45cebc149482cd8169fb7"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "db057a0c378a008b325930ba29b614102061f369d3b41a714c81d6e4acc8450c"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "7aaf4d1458eccb883bd9d91a5bbc108650329c64abe45cebc149482cd8169fb7"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "db057a0c378a008b325930ba29b614102061f369d3b41a714c81d6e4acc8450c"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "7aaf4d1458eccb883bd9d91a5bbc108650329c64abe45cebc149482cd8169fb7"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "db057a0c378a008b325930ba29b614102061f369d3b41a714c81d6e4acc8450c"
+        ]
+    }
+}
