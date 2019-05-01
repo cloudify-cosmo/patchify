@@ -23,6 +23,19 @@
       "patch_id": "4_6_fix_cfy_status-07606535edb47639e39dbc9dfe22778127de40eb7d9fbfd075c03e22bc548ea2", 
       "patch_name": "4_6_fix_cfy_status", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_fix_hooks_with_plugins.json", 
+      "patch_description": "Fix for actionable events (hooks) with plugin implementation.", 
+      "patch_files": [
+        "4_6_fix_hooks_with_plugins_cloudify_agent_worker.py", 
+        "4_6_fix_hooks_with_plugins_cloudify_dispatch.py", 
+        "4_6_fix_hooks_with_plugins_cloudify_logs.py"
+      ], 
+      "patch_hash": "dfe41214d8d5968ce8db07d4f382b7fe84a7222c3c65244e296dc4eb7a7cee5d", 
+      "patch_id": "4_6_fix_hooks_with_plugins-dfe41214d8d5968ce8db07d4f382b7fe84a7222c3c65244e296dc4eb7a7cee5d", 
+      "patch_name": "4_6_fix_hooks_with_plugins", 
+      "supports_community": false
     }
   ]
 }

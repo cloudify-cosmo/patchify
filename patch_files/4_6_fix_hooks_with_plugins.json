@@ -1,0 +1,86 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker",
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Fix for actionable events (hooks) with plugin implementation.",
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/worker.py"
+            ], 
+            "patch_file": "4_6_fix_hooks_with_plugins_cloudify_agent_worker.py", 
+            "sha256sum": "d553ca4e8bf228edbeb5c687dafe835f3ad37dce679e6459af7d966c74bed77b"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/dispatch.py",
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py",
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/dispatch.py"
+            ],
+            "patch_file": "4_6_fix_hooks_with_plugins_cloudify_dispatch.py",
+            "sha256sum": "7124d0243fa60b1dc109dfefa1d57526e5387a0595dbc85f6965b8bc8842a0b1"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/logs.py",
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/logs.py",
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/logs.py"
+            ],
+            "patch_file": "4_6_fix_hooks_with_plugins_cloudify_logs.py",
+            "sha256sum": "dbebe6c5139125c0e973d51000c8748a3033dc6b5e6467834684238510387e02"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/worker.py": [
+            "5230cf4687519a47684bc3536e76966b2c7ae46421ed1c8c4e4b35e40ff3b191"
+        ],
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/dispatch.py": [
+            "a75852be7cc1a41f17b6684699e1105e077965f246a0c79743547771ce9847a8"
+        ],
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/logs.py": [
+            "2bd3b298ea3746187464f7334fa7e16077161617e06bca88fd621c479055d649"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/dispatch.py": [
+            "a75852be7cc1a41f17b6684699e1105e077965f246a0c79743547771ce9847a8"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "2bd3b298ea3746187464f7334fa7e16077161617e06bca88fd621c479055d649"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py": [
+            "a75852be7cc1a41f17b6684699e1105e077965f246a0c79743547771ce9847a8"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "2bd3b298ea3746187464f7334fa7e16077161617e06bca88fd621c479055d649"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/worker.py": [
+            "90b5b11deae80c4d1156ad4026cbb44f98058524eda26854a938cdf63b458506"
+        ],
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/dispatch.py": [
+            "3244d9e03d2bd7d1a4d0e6fa52f9a145e4c8922d262140f0a288c4367810c0bc"
+        ],
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/logs.py": [
+            "ec3365822141c27ce293116e120aff9ac4f5e696672b11471933888fc1727532"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/dispatch.py": [
+            "3244d9e03d2bd7d1a4d0e6fa52f9a145e4c8922d262140f0a288c4367810c0bc"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "ec3365822141c27ce293116e120aff9ac4f5e696672b11471933888fc1727532"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py": [
+            "3244d9e03d2bd7d1a4d0e6fa52f9a145e4c8922d262140f0a288c4367810c0bc"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "ec3365822141c27ce293116e120aff9ac4f5e696672b11471933888fc1727532"
+        ]
+    }
+}
