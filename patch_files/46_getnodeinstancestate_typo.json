@@ -1,0 +1,46 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Fix typo in GetNodeInstanceState task.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/tasks.py"
+            ], 
+            "patch_file": "46_getnodeinstancestate_typo_cloudify_workflows_tasks.py", 
+            "sha256sum": "175f59f19e6cee04fefb30797a729e4088d209a2fa93bacf52b35a4c03cc95c3"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "80e57b6267d28cb0a84558efd23bfad1fc0f5600b32f9086c0e5b907ec2b22fc"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "80e57b6267d28cb0a84558efd23bfad1fc0f5600b32f9086c0e5b907ec2b22fc"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "80e57b6267d28cb0a84558efd23bfad1fc0f5600b32f9086c0e5b907ec2b22fc"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "f99860cb709ac1726a560e0579ff6b085e9af5d827789e7479aa408e1e87f3cd"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "f99860cb709ac1726a560e0579ff6b085e9af5d827789e7479aa408e1e87f3cd"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "f99860cb709ac1726a560e0579ff6b085e9af5d827789e7479aa408e1e87f3cd"
+        ]
+    }
+}

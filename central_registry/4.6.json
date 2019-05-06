@@ -36,6 +36,17 @@
       "patch_id": "4_6_fix_hooks_with_plugins-dfe41214d8d5968ce8db07d4f382b7fe84a7222c3c65244e296dc4eb7a7cee5d", 
       "patch_name": "4_6_fix_hooks_with_plugins", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_getnodeinstancestate_typo.json", 
+      "patch_description": "Fix typo in GetNodeInstanceState task.", 
+      "patch_files": [
+        "46_getnodeinstancestate_typo_cloudify_workflows_tasks.py"
+      ], 
+      "patch_hash": "6191046f297c4c0838b7d673064d9f8c5ef7d19fda8c8206c1a97601611bc7e1", 
+      "patch_id": "46_getnodeinstancestate_typo-6191046f297c4c0838b7d673064d9f8c5ef7d19fda8c8206c1a97601611bc7e1", 
+      "patch_name": "46_getnodeinstancestate_typo", 
+      "supports_community": false
     }
   ]
 }
