@@ -1391,7 +1391,7 @@ def wait_for_healthy_services(patch_definition, backup_root, delete_root,
     if unhealthy_services:
         rollback(manager_connection_string, ssh_port, patch_definition,
                  backup_root, delete_root, keyfile, skip_services)
-        ServiceHealthFailure(
+        raise ServiceHealthFailure(
             'Services did not restart correctly. '
             'Unhealthy services: {services}\n'
             'Changes rolled back.'.format(
