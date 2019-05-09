@@ -1,0 +1,57 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "Give more helpful output when a snapshot DB restore fails.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/postgres.py"
+            ], 
+            "patch_file": "4_6_improve_failed_snapshot_restore_output_workflows_cloudify_system_workflows_snapshots_postgres.py", 
+            "sha256sum": "80d13ce95f77ec4f61f2ff38cf337c1d8fc8d637988102f7a444f7ba593c9981"
+        }, 
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py"
+            ], 
+            "patch_file": "4_6_improve_failed_snapshot_restore_output_workflows_cloudify_system_workflows_snapshots_snapshot_restore.py", 
+            "sha256sum": "f9f2579415c84f9b29e7f7d50ffeb3f0718ef9b3dd43de283552eb0f9d1f074d"
+        }, 
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/utils.py"
+            ], 
+            "patch_file": "4_6_improve_failed_snapshot_restore_output_workflows_cloudify_system_workflows_snapshots_utils.py", 
+            "sha256sum": "4c456bfb540d14a6f64dec04d958cc2f40e2c6636be98969c4f8081238ebd6fa"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/postgres.py": [
+            "c11c831c1f3f94a9fd8ab693b9f7b9a2f978bd66063c2fc3faf50d2407698262"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
+            "8a6edf0ced0dcb93652c484633527219b2c448f5397f9128f75a26dbd907c449"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/utils.py": [
+            "afadc52e57a5466116b5d9bb01b5b0b9477b2cc29e7add0039d3623e5126e28c"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/postgres.py": [
+            "06e017f9b14a7362215dd9e6814d44d11b7105d66d2cdf5b8988b627689b5ba1"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
+            "06826086c154bca8e6a15258393acaebc34b188762825270b9c45d82ceeb0f8d"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/utils.py": [
+            "b19811da2b41c20bfe89b2953f0f8bfd3845adc84119fbaaae8ac4cdcdab80b2"
+        ]
+    }
+}

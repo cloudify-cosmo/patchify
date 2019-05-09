@@ -47,6 +47,19 @@
       "patch_id": "46_getnodeinstancestate_typo-6191046f297c4c0838b7d673064d9f8c5ef7d19fda8c8206c1a97601611bc7e1", 
       "patch_name": "46_getnodeinstancestate_typo", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_improve_failed_snapshot_restore_output.json", 
+      "patch_description": "Give more helpful output when a snapshot DB restore fails.", 
+      "patch_files": [
+        "4_6_improve_failed_snapshot_restore_output_workflows_cloudify_system_workflows_snapshots_postgres.py", 
+        "4_6_improve_failed_snapshot_restore_output_workflows_cloudify_system_workflows_snapshots_snapshot_restore.py", 
+        "4_6_improve_failed_snapshot_restore_output_workflows_cloudify_system_workflows_snapshots_utils.py"
+      ], 
+      "patch_hash": "5e7d774790d66846c19d518445dd038234a87594273e9cb174afc747aa6f826f", 
+      "patch_id": "4_6_improve_failed_snapshot_restore_output-5e7d774790d66846c19d518445dd038234a87594273e9cb174afc747aa6f826f", 
+      "patch_name": "4_6_improve_failed_snapshot_restore_output", 
+      "supports_community": false
     }
   ]
 }
