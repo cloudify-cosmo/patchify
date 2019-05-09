@@ -1,3 +1,4 @@
+1.1.2 - Handle unexpected service dependencies by starting services again if they're taking time coming up.
 1.1.1 - Raise error correctly when rolling back on service failure.
 1.1.0 - Add file logging.
 1.0.3 - Fixes to work with restrictive umasks.
