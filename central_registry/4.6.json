@@ -60,6 +60,18 @@
       "patch_id": "4_6_improve_failed_snapshot_restore_output-5e7d774790d66846c19d518445dd038234a87594273e9cb174afc747aa6f826f", 
       "patch_name": "4_6_improve_failed_snapshot_restore_output", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_refresh_ni_scale.json", 
+      "patch_description": "Scale workflow: refresh node instances.", 
+      "patch_files": [
+        "46_refresh_ni_scale_cloudify_plugins_workflows.py", 
+        "46_refresh_ni_scale_cloudify_workflows_workflow_context.py"
+      ], 
+      "patch_hash": "7216e5739778b8afc9db680f2551ddf77a9d31255ac3da02ac4294d94c410f6e", 
+      "patch_id": "46_refresh_ni_scale-7216e5739778b8afc9db680f2551ddf77a9d31255ac3da02ac4294d94c410f6e", 
+      "patch_name": "46_refresh_ni_scale", 
+      "supports_community": false
     }
   ]
 }
