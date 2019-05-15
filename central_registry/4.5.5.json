@@ -66,6 +66,17 @@
       "patch_id": "4_5_5_fetching_none_capabilities-67ce00462d3e51c96ef7ddbc8190471edd41665580e4701de9d793d55eea035f", 
       "patch_name": "4_5_5_fetching_none_capabilities", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_5_5_handle_null_failed_logins_counter.json", 
+      "patch_description": "Allow snapshot restore to work with null failed_logins_counter.", 
+      "patch_files": [
+        "4_5_5_handle_null_failed_logins_counter_resources_rest-service_cloudify_migrations_versions_1fbd6bf39e84_4_5_to_4_5_5.py"
+      ], 
+      "patch_hash": "fb1d886daee5e8f944c5314b1a694554f20d9e1e00676ec5442af1657b823b0e", 
+      "patch_id": "4_5_5_handle_null_failed_logins_counter-fb1d886daee5e8f944c5314b1a694554f20d9e1e00676ec5442af1657b823b0e", 
+      "patch_name": "4_5_5_handle_null_failed_logins_counter", 
+      "supports_community": false
     }
   ]
 }
