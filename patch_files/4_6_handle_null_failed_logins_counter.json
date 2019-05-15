@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Allow snapshot restore to work with null failed_logins_counter.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/resources/cloudify/migrations/versions/1fbd6bf39e84_4_5_to_4_5_5.py"
+            ], 
+            "patch_file": "4_6_handle_null_failed_logins_counter_resources_rest-service_cloudify_migrations_versions_1fbd6bf39e84_4_5_to_4_5_5.py", 
+            "sha256sum": "d80117058836ba5206af883c86a18b43c06292258d024186c0da3d4dba11f016"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/resources/cloudify/migrations/versions/1fbd6bf39e84_4_5_to_4_5_5.py": [
+            "b31c6665e092f87fa0095b41c70a17e99f8fac6a7d22437f0f9099359e466019"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/resources/cloudify/migrations/versions/1fbd6bf39e84_4_5_to_4_5_5.py": [
+            "11c29d0e2bb71623393bcadd26157eb094619a1e1dc4072aee3299ecbaefcb51"
+        ]
+    }
+}
