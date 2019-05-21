@@ -77,6 +77,17 @@
       "patch_id": "4_5_5_handle_null_failed_logins_counter-fb1d886daee5e8f944c5314b1a694554f20d9e1e00676ec5442af1657b823b0e", 
       "patch_name": "4_5_5_handle_null_failed_logins_counter", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_5_5_update_error_param_workflow_failed_trap.json", 
+      "patch_description": "update the error parameter in the workflow_failed snmp trap.", 
+      "patch_files": [
+        "4_5_5_update_error_param_workflow_failed_trap_cloudify_snmp_snmp_trap.py"
+      ], 
+      "patch_hash": "2702b2baa53a2c6524f1dd95ae406e9bd3c1aade163b2ffbb7d8ef27e15544e6", 
+      "patch_id": "4_5_5_update_error_param_workflow_failed_trap-2702b2baa53a2c6524f1dd95ae406e9bd3c1aade163b2ffbb7d8ef27e15544e6", 
+      "patch_name": "4_5_5_update_error_param_workflow_failed_trap", 
+      "supports_community": false
     }
   ]
 }
