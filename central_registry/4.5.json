@@ -133,7 +133,7 @@
       "patch_files": [
         "45_agents_install_custom_parameters_cloudify_cli_commands_agents.py"
       ], 
-      "patch_hash": "62df0ee3074c6678198a2967a622865d04cfbd40f4e7efb5b557c5a7317a1983",
+      "patch_hash": "62df0ee3074c6678198a2967a622865d04cfbd40f4e7efb5b557c5a7317a1983", 
       "patch_id": "45_agents_install_custom_parameters-62df0ee3074c6678198a2967a622865d04cfbd40f4e7efb5b557c5a7317a1983", 
       "patch_name": "45_agents_install_custom_parameters", 
       "supports_community": false
@@ -147,6 +147,17 @@
       "patch_hash": "552ed9165ad4cc482c78f8406761391006dd1453324a91ac624eda8ff9cfefef", 
       "patch_id": "45_agent_proxy_evaluate_functions-552ed9165ad4cc482c78f8406761391006dd1453324a91ac624eda8ff9cfefef", 
       "patch_name": "45_agent_proxy_evaluate_functions", 
+      "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_5_update_error_param_workflow_failed_trap.json", 
+      "patch_description": "update the error parameter in the workflow_failed snmp trap.", 
+      "patch_files": [
+        "4_5_update_error_param_workflow_failed_trap_cloudify_snmp_snmp_trap.py"
+      ], 
+      "patch_hash": "67509b5c935fca846d65bd57103f773a46e937798fc928cf6a69bc52ca0f7b81", 
+      "patch_id": "4_5_update_error_param_workflow_failed_trap-67509b5c935fca846d65bd57103f773a46e937798fc928cf6a69bc52ca0f7b81", 
+      "patch_name": "4_5_update_error_param_workflow_failed_trap", 
       "supports_community": false
     }
   ]

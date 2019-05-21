@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "update the error parameter in the workflow_failed snmp trap.", 
+    "manager_versions": [
+        "4.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/snmp/snmp_trap.py"
+            ], 
+            "patch_file": "4_5_update_error_param_workflow_failed_trap_cloudify_snmp_snmp_trap.py", 
+            "sha256sum": "28d6c562ee9104db3c0f82a119ff8980920f3fd913e51712c3c3ec2e18c1de17"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/snmp/snmp_trap.py": [
+            "c0a40a878ff1cabf47bf7d51dd229027e71bf2df015f4c642ede1606e5935092"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/snmp/snmp_trap.py": [
+            "996463d613ebdb8215a3e0d3f1c5664ff17653aee14ffba7f7bf61cd76af103b"
+        ]
+    }
+}
