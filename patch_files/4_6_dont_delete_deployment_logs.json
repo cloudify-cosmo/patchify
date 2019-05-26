@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "dont delete deployment logs.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/deployment_environment.py"
+            ], 
+            "patch_file": "4_6_dont_delete_deployment_logs_workflows_cloudify_system_workflows_deployment_environment.py", 
+            "sha256sum": "b667d00a14e4111b77ec2ba71f77f142ec253266382459516b06c6a5936ce155"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/deployment_environment.py": [
+            "8eef77f387c4b348ebe9811de322a0c179542558004ff9496847c57f1466e6fd"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/deployment_environment.py": [
+            "73f3dfa577f5ba8e35e713e3fd120504e3693f8b37c4733cdd111ed81ec0610b"
+        ]
+    }
+}
