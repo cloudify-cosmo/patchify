@@ -12,14 +12,14 @@ index 2fea55c..16f2a53 100644
      @classmethod
      def restore(cls, ctx, graph, task_descr):
          params = task_descr.parameters
-@@ -147,6 +150,7 @@ class WorkflowTask(object):
-             'name': self.name,
+@@ -148,6 +151,7 @@ class WorkflowTask(object):
              'state': self._state,
              'type': self.task_type,
-+            'retried_task': self.retried_task,
              'parameters': {
++                'retried_task': self.retried_task,
                  'current_retries': self.current_retries,
                  'send_task_events': self.send_task_events,
+                 'info': self.info,
 @@ -313,6 +317,7 @@ class WorkflowTask(object):
          dup = self._duplicate()
          dup.execute_after = execute_after

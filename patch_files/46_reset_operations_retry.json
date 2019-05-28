@@ -15,7 +15,7 @@
                 "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py"
             ],
             "patch_file": "46_reset_operations_retry_cloudify_workflows_tasks.py",
-            "sha256sum": "e3aa468ad50b62971bad0e137d8a203efc46b7fd93d3f826661564e3d6395427"
+            "sha256sum": "a638147f89be6945e136344809d58c8bbeb5465d4d9aad7b50eb44eff8bc1280"
         },
         {
             "destinations": [
@@ -28,7 +28,7 @@
     "premium": true,
     "sha256sums_after": {
         "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
-            "40193832a8a6c80eafcc7f446aaf224a8dcb640eafca80465f303ebde817159c"
+            "47aeebe5bee681f3ed4281c07a1adef84e4baa99fa7d132dcacf8bb1bb493d87"
         ],
         "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
             "f5c5337540190011cd5c67ed5940509d930b760331626a5bf2484e2b02269112"
