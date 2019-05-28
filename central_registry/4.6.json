@@ -94,6 +94,18 @@
       "patch_id": "4_6_update_error_param_workflow_failed_trap-d04c3b8c1390097c8c564f1e5b0fa1ebe418e42c74b1d4da48fe2fddd0c06243", 
       "patch_name": "4_6_update_error_param_workflow_failed_trap", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_reset_operations_retry.json", 
+      "patch_description": "Don't run retried tasks twice in resume with reset-operations.", 
+      "patch_files": [
+        "46_reset_operations_retry_cloudify_workflows_tasks.py", 
+        "46_reset_operations_retry_manager_rest-service_manager_rest_resource_manager.py"
+      ], 
+      "patch_hash": "2da2a23b3f6c7271300956678a18802d08ae28b44274be238ebd63c5c440937f", 
+      "patch_id": "46_reset_operations_retry-2da2a23b3f6c7271300956678a18802d08ae28b44274be238ebd63c5c440937f", 
+      "patch_name": "46_reset_operations_retry", 
+      "supports_community": false
     }
   ]
 }

@@ -1,0 +1,45 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker",
+        "cloudify-restservice"
+    ],
+    "community": false,
+    "description": "Don't run retried tasks twice in resume with reset-operations.",
+    "manager_versions": [
+        "4.6"
+    ],
+    "patch_version": "2.0.0",
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py"
+            ],
+            "patch_file": "46_reset_operations_retry_cloudify_workflows_tasks.py",
+            "sha256sum": "e3aa468ad50b62971bad0e137d8a203efc46b7fd93d3f826661564e3d6395427"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py"
+            ],
+            "patch_file": "46_reset_operations_retry_manager_rest-service_manager_rest_resource_manager.py",
+            "sha256sum": "781c9b4fca6e4c8a57f41a112f2719e44dbdace8d78aa2210a3266dfc88480ba"
+        }
+    ],
+    "premium": true,
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "40193832a8a6c80eafcc7f446aaf224a8dcb640eafca80465f303ebde817159c"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "f5c5337540190011cd5c67ed5940509d930b760331626a5bf2484e2b02269112"
+        ]
+    },
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "80e57b6267d28cb0a84558efd23bfad1fc0f5600b32f9086c0e5b907ec2b22fc"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "fdf424f38e59f89ede50c45bf28c76cd037b5287c2d9c931bb119858c03706b8"
+        ]
+    }
+}
