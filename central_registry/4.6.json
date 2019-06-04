@@ -125,6 +125,17 @@
       "patch_id": "46_resume_cancelled-b3a9d44a0498bc69e5a465b6e263594804323cc109bb4ebb63c9155b757b2580", 
       "patch_name": "46_resume_cancelled", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_store_failed_operations.json", 
+      "patch_description": "Correctly store failed operations state.", 
+      "patch_files": [
+        "46_store_failed_operations_cloudify_dispatch.py"
+      ], 
+      "patch_hash": "797f2d730bf6dd1c343f3d5b4baa97914aede9ea3bf4103b368ed567312d524c", 
+      "patch_id": "46_store_failed_operations-797f2d730bf6dd1c343f3d5b4baa97914aede9ea3bf4103b368ed567312d524c", 
+      "patch_name": "46_store_failed_operations", 
+      "supports_community": false
     }
   ]
 }

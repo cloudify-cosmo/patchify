@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "Correctly store failed operations state.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py"
+            ], 
+            "patch_file": "46_store_failed_operations_cloudify_dispatch.py", 
+            "sha256sum": "301bb480d9097b3e3fd3316b49f352d5588029613c3b8028ab68132ba12b576a"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py": [
+            "467def25046a55c79336a85d997a92f1f5ddf0f91fbd7577b3775522e07b580f"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py": [
+            "aadb51d59f23d4f9ddaa67a2d40688cf15ddc18bbc4ee61b9903fb592d636ace"
+        ]
+    }
+}
