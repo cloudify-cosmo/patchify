@@ -1,0 +1,136 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker",
+        "cloudify-restservice"
+    ],
+    "community": false,
+    "description": "Allow resuming cancelled workflows.",
+    "manager_versions": [
+        "4.6"
+    ],
+    "patch_version": "2.0.0",
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py"
+            ],
+            "patch_file": "46_resume_cancelled_cloudify_workflows_tasks.py",
+            "sha256sum": "8af07826659cf3ddd27ba4d278ff6dcfdb2c4118a15cb0eb2cad10f4e7c5beab"
+        },
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py"
+            ],
+            "patch_file": "46_resume_cancelled_cloudify_amqp_client.py",
+            "sha256sum": "e8381f3ab1d67a3211c0e8e8c9db689126ad65e72bd257f13fdebcdd0a8aaaf4"
+        },
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/endpoint.py"
+            ],
+            "patch_file": "46_resume_cancelled_cloudify_endpoint.py",
+            "sha256sum": "6828c99011a555639f6b1ef15b6913a938838dd367441dc5879ab24b2ce402b7"
+        },
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/context.py"
+            ],
+            "patch_file": "46_resume_cancelled_cloudify_context.py",
+            "sha256sum": "64f811de96c0cf9994042a9d877a0d47f4359a876a9e6a33024f82392e5aa257"
+        },
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py"
+            ],
+            "patch_file": "46_resume_cancelled_cloudify_dispatch.py",
+            "sha256sum": "83daa37b1753a2457f6b7384240c960dc7f4ab8ce17217a214d3412dceb0b35d"
+        },
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/tests/mocks/mock_rest_client.py"
+            ],
+            "patch_file": "46_resume_cancelled_cloudify_tests_mocks_mock_rest_client.py",
+            "sha256sum": "4b0c3aff9602127d3c728b4ac076c78da27793d543f681add83030ef6101d24d"
+        },
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/tests/test_dispatch.py"
+            ],
+            "patch_file": "46_resume_cancelled_cloudify_tests_test_dispatch.py",
+            "sha256sum": "24c1528980295fa62f271cd1bdf5ce9ee4fa934aaa2084fa3268a789fed788ae"
+        },
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py"
+            ],
+            "patch_file": "46_resume_cancelled_cloudify_workflows_workflow_context.py",
+            "sha256sum": "939b3d99b18477070652e85c43ad95ebbd96808ae5b7a4d9dca753c49a5a1b83"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py"
+            ],
+            "patch_file": "46_resume_cancelled_manager_rest-service_manager_rest_resource_manager.py",
+            "sha256sum": "24db272cba90fdb0a1087a408fb5e039c6e6a7e4124ba85f6cb293095b4a8043"
+        }
+    ],
+    "premium": true,
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "172a9b114cf4ca2429d09cb2b892bf5ffa87c377bd16224be103045efbf82770"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/context.py": [
+            "446848bf78da0eccc431a7922d0b0ffe79f518f0e5b5f79547f85d1ac8868473"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py": [
+            "aadb51d59f23d4f9ddaa67a2d40688cf15ddc18bbc4ee61b9903fb592d636ace"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/endpoint.py": [
+            "e6ee931666dd53ca8dd9adfb56c250a871c850cb9aff08f1a6e5727e32960431"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/tests/mocks/mock_rest_client.py": [
+            "b534093f94526ac4e000c2d9459e71888f9981ab6ffe56c36b4dd47acd96690b"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/tests/test_dispatch.py": [
+            "3ba36133593bb3612d7bc46fd0a42fe024085b63134e76ca4fa57266d6aee599"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "c00bbd6b24594f3b8cba12af704564bd3fc6986489f64e6b58f845a51a8be759"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "91a4869ebd76c5172a418579ca60562e093b11c33be46efb462d9642c6eeed7b"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "bc1acd2a999a64f9b9aaa0e343886198fe618e1de0bc96c87b1aff92f7aa0eaf"
+        ]
+    },
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "7cb5841123808ba331f1b7eb0209c8689bc2b9c2a799aebb5d68b64ba1ebef0d"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/context.py": [
+            "e7183f93b7e20cfc82bbeec0e04c89eb990548a2f3e2c446285bafdc2fc7332e"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py": [
+            "a75852be7cc1a41f17b6684699e1105e077965f246a0c79743547771ce9847a8"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/endpoint.py": [
+            "b379fe40bd330a0b5e1d6b2a34cdad854e32433e31cbc930d15410a5d7c38058"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/tests/mocks/mock_rest_client.py": [
+            "908a4dab6dda487e412479405c928886b61ba7447697b8a3d7b5f2011cef8683"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/tests/test_dispatch.py": [
+            "fb9551180f798de7fb1f7cc61b9b165ca10b3e91b19dca4c60183c11e68085a2"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "47aeebe5bee681f3ed4281c07a1adef84e4baa99fa7d132dcacf8bb1bb493d87"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "f253311a7383015754d6f9631fb2bda9d14f302d49762e64bcd246229db61ee3"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "f5c5337540190011cd5c67ed5940509d930b760331626a5bf2484e2b02269112"
+        ]
+    }
+}

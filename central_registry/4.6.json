@@ -106,6 +106,25 @@
       "patch_id": "46_reset_operations_retry-280b1c5e3173f35e2670979c8f6e4805c0bae41912bf9c46c4208d343b2879a7", 
       "patch_name": "46_reset_operations_retry", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_resume_cancelled.json", 
+      "patch_description": "Allow resuming cancelled workflows.", 
+      "patch_files": [
+        "46_resume_cancelled_cloudify_workflows_tasks.py", 
+        "46_resume_cancelled_cloudify_amqp_client.py", 
+        "46_resume_cancelled_cloudify_endpoint.py", 
+        "46_resume_cancelled_cloudify_context.py", 
+        "46_resume_cancelled_cloudify_dispatch.py", 
+        "46_resume_cancelled_cloudify_tests_mocks_mock_rest_client.py", 
+        "46_resume_cancelled_cloudify_tests_test_dispatch.py", 
+        "46_resume_cancelled_cloudify_workflows_workflow_context.py", 
+        "46_resume_cancelled_manager_rest-service_manager_rest_resource_manager.py"
+      ], 
+      "patch_hash": "b3a9d44a0498bc69e5a465b6e263594804323cc109bb4ebb63c9155b757b2580", 
+      "patch_id": "46_resume_cancelled-b3a9d44a0498bc69e5a465b6e263594804323cc109bb4ebb63c9155b757b2580", 
+      "patch_name": "46_resume_cancelled", 
+      "supports_community": false
     }
   ]
 }
