@@ -1,0 +1,79 @@
+diff --git a/opt/manager/authorization.conf b/../cloudify-manager-install/cfy_manager/components/restservice/config/authorization.conf
+index f55dc36..e7a9969 100644
+--- a/opt/manager/authorization.conf
++++ b/../cloudify-manager-install/cfy_manager/components/restservice/config/authorization.conf
+@@ -794,4 +794,72 @@ permissions:
+     - user
+     - operations
+     - viewer
+-    - default
+\ No newline at end of file
++    - default
++
++  tasksgraph_list:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - viewer
++    - default
++
++  tasksgraph_get:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - viewer
++    - default
++  tasksgraph_create:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - default
++  tasksgraph_update:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - default
++  tasksgraph_delete:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - default
++
++
++  operation_list:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - viewer
++    - default
++  operation_get:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - viewer
++    - default
++  operation_create:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - default
++  operation_update:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - default
++  operation_delete:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - default

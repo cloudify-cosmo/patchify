@@ -136,6 +136,17 @@
       "patch_id": "46_store_failed_operations-797f2d730bf6dd1c343f3d5b4baa97914aede9ea3bf4103b368ed567312d524c", 
       "patch_name": "46_store_failed_operations", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_authorization_tasksgraph.json", 
+      "patch_description": "Add fine-grained access control for tasks graphs and operations.", 
+      "patch_files": [
+        "46_authorization_add_tasksgraphs"
+      ], 
+      "patch_hash": "d59f250a0bb6656728a85b2b2a4638a17b2371a0a9a3227cfac87896dc897853", 
+      "patch_id": "46_authorization_tasksgraph-d59f250a0bb6656728a85b2b2a4638a17b2371a0a9a3227cfac87896dc897853", 
+      "patch_name": "46_authorization_tasksgraph", 
+      "supports_community": false
     }
   ]
 }
