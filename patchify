@@ -50,7 +50,7 @@ PATCH_VERSIONS = {
                          'sha256sums_before', 'sha256sums_after']),
     },
 }
-PATCHIFY_VERSION = (1, 1, 3)
+PATCHIFY_VERSION = (1, 1, 4)
 
 
 class VersionError(Exception):
@@ -771,9 +771,9 @@ def upload_hash_commands(manager_connection_string, ssh_port, keyfile):
         )
 
 
-def hashes_match(check_list, manager_connection_string, ssh_port, keyfile,
-                 hash_type):
-    matching = True
+def hash_mismatches(check_list, manager_connection_string, ssh_port, keyfile,
+                    hash_type):
+    mismatches = []
     for file_path, acceptable_hashes in check_list.items():
         say(
             'Checking {hash_type}sum for {path}'.format(
@@ -791,7 +791,7 @@ def hashes_match(check_list, manager_connection_string, ssh_port, keyfile,
             continue
 
         # Hash mismatch, give helpful error messages
-        matching = False
+        mismatches.append(file_path)
         if acceptable_hashes == ["DOESNOTEXIST"]:
             message = (
                 '{file_path} should not exist, but file with '
@@ -811,7 +811,7 @@ def hashes_match(check_list, manager_connection_string, ssh_port, keyfile,
             hash_type=hash_type,
         ))
 
-    return matching
+    return mismatches
 
 
 def can_ssh(manager_connection_string, ssh_port, keyfile):
@@ -1208,16 +1208,34 @@ def abort_on_missing_patch_command(manager_connection_string, ssh_port,
 def check_hashes_before(patch_definition, manager_connection_string,
                         ssh_port, keyfile, hash_type):
     definition_key = hash_type + 'sums_before'
+    after_key = hash_type + 'sums_after'
 
     say("Checking hashes are as expected.")
-    if not hashes_match(patch_definition[definition_key],
-                        manager_connection_string,
-                        ssh_port,
-                        keyfile,
-                        hash_type=hash_type):
-        raise HashCheckFailure(
-            'Unexpected hashes found before starting patch installation.',
-        )
+    mismatches = hash_mismatches(patch_definition[definition_key],
+                                 manager_connection_string,
+                                 ssh_port,
+                                 keyfile,
+                                 hash_type=hash_type)
+    if mismatches:
+        already_applied = {
+            file_path: hashes
+            for file_path, hashes in patch_definition[after_key].items()
+            if file_path in mismatches
+        }
+        unexpected = hash_mismatches(already_applied,
+                                     manager_connection_string,
+                                     ssh_port,
+                                     keyfile,
+                                     hash_type=hash_type)
+        if unexpected:
+            raise HashCheckFailure(
+                'Unexpected hashes found before starting patch installation.',
+            )
+        else:
+            # List of files that are already patched (thanks, syncthing)
+            return already_applied
+    else:
+        return {}
 
 
 def generate_patch_data_dir(patch_name, patch_definition, timestamp,
@@ -1363,11 +1381,11 @@ def check_hashes_after(patch_definition,
     definition_key = hash_type + 'sums_after'
 
     say("Checking post-patch hashes.")
-    if not hashes_match(patch_definition[definition_key],
-                        manager_connection_string,
-                        ssh_port,
-                        keyfile,
-                        hash_type):
+    if hash_mismatches(patch_definition[definition_key],
+                       manager_connection_string,
+                       ssh_port,
+                       keyfile,
+                       hash_type):
         rollback(manager_connection_string, ssh_port, patch_definition,
                  backup_root, delete_root, keyfile, skip_services)
         raise HashCheckFailure(
@@ -1692,8 +1710,9 @@ def apply_patch(patch_definition, patch_name, definition_file, skip_services,
             )
         )
 
-    check_hashes_before(patch_definition, manager_connection_string,
-                        ssh_port, keyfile, hash_type=hash_type)
+    skip_files = check_hashes_before(patch_definition,
+                                     manager_connection_string,
+                                     ssh_port, keyfile, hash_type=hash_type)
 
     timestamp = generate_timestamp()
     say("Patching timestamp is: {timestamp}".format(timestamp=timestamp))
@@ -1711,6 +1730,14 @@ def apply_patch(patch_definition, patch_name, definition_file, skip_services,
     say("Applying patches.")
     for patch in patch_definition['patches']:
         for destination in patch['destinations']:
+            if destination in skip_files:
+                # Cope with syncthing
+                say(
+                    'File {target} already patched, skipping.'.format(
+                        target=destination,
+                    )
+                )
+                continue
             say(
                 'Applying {patch} to {target}'.format(
                     patch=patch['patch_file'],
@@ -1866,7 +1893,10 @@ def patch_remover(target_patch_id, skip_services):
                     exit_with_sadness(
                         (
                             'Failed to remove patch from node.\n'
-                            'Aborting patch removal attempt.'
+                            'Aborting patch removal attempt.\n'
+                            'Error was: {error}'.format(
+                                error=str(err),
+                            )
                         ),
                         action,
                     )
@@ -2049,7 +2079,9 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
     say("Checking for correct files to restore.")
     files_to_delete = []
     files_to_restore = []
+    files_to_skip = []
     hash_check_key = '{hash_type}sums_after'.format(hash_type=hash_type)
+    alt_check_key = '{hash_type}sums_before'.format(hash_type=hash_type)
     for target_file, valid_hashes in new_definition[hash_check_key].items():
         target_backup_path = os.path.join(
             backup_path,
@@ -2064,6 +2096,21 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
             hash_type=hash_type,
         )
         if backup_hash not in valid_hashes:
+            pre_applied = new_definition[alt_check_key][target_file]
+            if backup_hash in pre_applied:
+                # This was probably a synced file, ignore it
+                say(
+                    'Skipping {target} as it was patched before the patch '
+                    'applied (e.g. the file was synced).'.format(
+                        target=target_file,
+                    )
+                )
+                files_to_skip.append(target_file)
+                # We don't want to check the file if we're skipping it
+                new_definition[hash_check_key].pop(target_file)
+                new_definition[alt_check_key].pop(target_file)
+                continue
+
             raise InvalidBackup(
                 'File to be restored does not match any acceptable MD5sums.\n'
                 'File to be restored was: {target_file}\n'
