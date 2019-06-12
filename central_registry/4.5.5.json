@@ -88,6 +88,17 @@
       "patch_id": "4_5_5_update_error_param_workflow_failed_trap-2702b2baa53a2c6524f1dd95ae406e9bd3c1aade163b2ffbb7d8ef27e15544e6", 
       "patch_name": "4_5_5_update_error_param_workflow_failed_trap", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "455_authorization_tasksgraph.json", 
+      "patch_description": "Add fine-grained access control for tasks graphs and operations.", 
+      "patch_files": [
+        "455_authorization_add_tasksgraphs"
+      ], 
+      "patch_hash": "e9f146b5a1e9add72e6c6e861d31cd3612c01c724da5687d1f889fa13d64e1fb", 
+      "patch_id": "455_authorization_tasksgraph-e9f146b5a1e9add72e6c6e861d31cd3612c01c724da5687d1f889fa13d64e1fb", 
+      "patch_name": "455_authorization_tasksgraph", 
+      "supports_community": false
     }
   ]
 }

@@ -1,0 +1,79 @@
+diff --git a/opt/manager/authorization.conf b/opt/manager/authorization2.conf
+index c82a7af..b590a1a 100644
+--- a/opt/manager/authorization.conf
++++ b/opt/manager/authorization2.conf
+@@ -785,4 +785,72 @@ permissions:
+     - manager
+     - user
+     - operations
+-    - viewer
+\ No newline at end of file
++    - viewer
++
++  tasksgraph_list:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - viewer
++    - default
++
++  tasksgraph_get:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - viewer
++    - default
++  tasksgraph_create:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - default
++  tasksgraph_update:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - default
++  tasksgraph_delete:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - default
++
++  operation_list:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - viewer
++    - default
++  operation_get:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - viewer
++    - default
++  operation_create:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - default
++  operation_update:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - default
++  operation_delete:
++    - sys_admin
++    - manager
++    - user
++    - operations
++    - default
++

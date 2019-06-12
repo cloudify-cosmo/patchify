@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ],
+    "premium": true,
+    "description": "Add fine-grained access control for tasks graphs and operations.",
+    "sha256sums_after": {
+        "/opt/manager/authorization.conf": [
+            "d2a74bb5f85d9ce0f6607477484efabb27784f3aa28e344aaf1c2978a5005f66"
+        ]
+    },
+    "community": false,
+    "patch_version": "2.0.0",
+    "sha256sums_before": {
+        "/opt/manager/authorization.conf": [
+            "fd30381b7a727c999a049db4436173cc9ab6ecdee0173e72e760db08fb8254eb"
+        ]
+    },
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/authorization.conf"
+            ],
+            "patch_file": "455_authorization_add_tasksgraphs",
+            "sha256sum": "0f5685182f4ec3836323109c79f55445f0d63e1b7458f5a8c2614c462c4e08bc"
+        }
+    ],
+    "manager_versions": [
+        "4.5.5"
+    ]
+}
