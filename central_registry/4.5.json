@@ -159,6 +159,17 @@
       "patch_id": "4_5_update_error_param_workflow_failed_trap-67509b5c935fca846d65bd57103f773a46e937798fc928cf6a69bc52ca0f7b81", 
       "patch_name": "4_5_update_error_param_workflow_failed_trap", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "45_stage_chmod_widgets.json", 
+      "patch_description": "4.5: chmod stage widgets on failovers.", 
+      "patch_files": [
+        "45_stage_chmod_widgets_cloudify_premium_ha_resources_sudo_trampoline.py"
+      ], 
+      "patch_hash": "88b8c7c0b88d44efc1a75dca9f6cfd03bd8ea9003ca99102a50d062033c52bd1", 
+      "patch_id": "45_stage_chmod_widgets-88b8c7c0b88d44efc1a75dca9f6cfd03bd8ea9003ca99102a50d062033c52bd1", 
+      "patch_name": "45_stage_chmod_widgets", 
+      "supports_community": false
     }
   ]
 }

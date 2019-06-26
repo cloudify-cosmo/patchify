@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "4.5: chmod stage widgets on failovers.", 
+    "manager_versions": [
+        "4.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/resources/sudo_trampoline.py"
+            ], 
+            "patch_file": "45_stage_chmod_widgets_cloudify_premium_ha_resources_sudo_trampoline.py", 
+            "sha256sum": "be6745696c791747df64ea409cfebd72d12c178bd21c0a1876d9f2d30104b2d2"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/resources/sudo_trampoline.py": [
+            "232be088907ad6aaa1f5b7b18114bb70159324739052ee287f3a185a3f413697"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/resources/sudo_trampoline.py": [
+            "a5ad2922fc3bcf4043ceba43f297428043b491895cdd3115d6f90abc4b06d524"
+        ]
+    }
+}
