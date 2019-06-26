@@ -1,3 +1,4 @@
+1.1.5 - Cope with downloading files with unexpected permissions.
 1.1.4 - Cope with patching files in replicated locations on a cluster.
 1.1.3 - Make sure all generated json files are pretty-formatted.
 1.1.2 - Handle unexpected service dependencies by starting services again if they're taking time coming up.

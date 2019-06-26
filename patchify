@@ -50,7 +50,7 @@ PATCH_VERSIONS = {
                          'sha256sums_before', 'sha256sums_after']),
     },
 }
-PATCHIFY_VERSION = (1, 1, 4)
+PATCHIFY_VERSION = (1, 1, 5)
 
 
 class VersionError(Exception):
@@ -945,7 +945,9 @@ def download(file_name, source_path, dest_path,
         manager_connection_string,
         ssh_port,
         keyfile,
-        'sudo cp {src_path} {tmp_path}'.format(
+        'sudo cp {src_path} {tmp_path} '
+        '&& sudo chown $(whoami). {tmp_path} '
+        '&& sudo chmod 400 {tmp_path}'.format(
             src_path=src_path,
             tmp_path=tmp_path,
         ),
