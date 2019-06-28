@@ -50,7 +50,7 @@ PATCH_VERSIONS = {
                          'sha256sums_before', 'sha256sums_after']),
     },
 }
-PATCHIFY_VERSION = (1, 1, 5)
+PATCHIFY_VERSION = (1, 1, 6)
 
 
 class VersionError(Exception):
@@ -1686,7 +1686,6 @@ def apply_patch(patch_definition, patch_name, definition_file, skip_services,
     # Use the correct hash type for this patch definition version
     if 'sha256sums_before' in patch_definition:
         hash_type = 'sha256'
-        upload_hash_commands(manager_connection_string, ssh_port, keyfile)
     else:
         hash_type = 'md5'
 
@@ -1715,6 +1714,9 @@ def apply_patch(patch_definition, patch_name, definition_file, skip_services,
     skip_files = check_hashes_before(patch_definition,
                                      manager_connection_string,
                                      ssh_port, keyfile, hash_type=hash_type)
+
+    # SHA256 script is always needed, so make sure it is present
+    upload_hash_commands(manager_connection_string, ssh_port, keyfile)
 
     timestamp = generate_timestamp()
     say("Patching timestamp is: {timestamp}".format(timestamp=timestamp))
