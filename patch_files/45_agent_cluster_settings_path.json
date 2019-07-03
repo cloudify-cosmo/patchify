@@ -1,0 +1,30 @@
+{
+    "affected_services": [
+    ], 
+    "community": false, 
+    "description": "Patch CLUSTER_SETTINGS_PATH in newly installed agents.", 
+    "manager_versions": [
+        "4.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template"
+            ], 
+            "patch_file": "45_agent_cluster_settings_path_cloudify_agent_resources_script_linux.sh.template", 
+            "sha256sum": "66a6386a52a688a20ceecea327d8ca4a710c3d781c006afda98bba11afebdbbe"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template": [
+            "7a6124d931a48a0fc7881317b77890f308d29cae283f1ab601b25417138b1a51"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/resources/script/linux.sh.template": [
+            "ba0efd0295410cbc41bda80b5804de171fc1e2ff999024c9fe2f5928b197f2a7"
+        ]
+    }
+}

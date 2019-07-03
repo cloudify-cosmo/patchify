@@ -170,6 +170,17 @@
       "patch_id": "45_stage_chmod_widgets-88b8c7c0b88d44efc1a75dca9f6cfd03bd8ea9003ca99102a50d062033c52bd1", 
       "patch_name": "45_stage_chmod_widgets", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "45_agent_cluster_settings_path.json", 
+      "patch_description": "Patch CLUSTER_SETTINGS_PATH in newly installed agents.", 
+      "patch_files": [
+        "45_agent_cluster_settings_path_cloudify_agent_resources_script_linux.sh.template"
+      ], 
+      "patch_hash": "d38e6a3892553bf17dafabf2b6969fcaee465e1ef8f1fe534393fd2ff7cfa0b4", 
+      "patch_id": "45_agent_cluster_settings_path-d38e6a3892553bf17dafabf2b6969fcaee465e1ef8f1fe534393fd2ff7cfa0b4", 
+      "patch_name": "45_agent_cluster_settings_path", 
+      "supports_community": false
     }
   ]
 }

@@ -1,0 +1,34 @@
+diff --git a/cloudify_agent/resources/script/linux.sh.template b/cloudify_agent/resources/script/linux.sh.template
+index 6b1ef07..d5450d8 100644
+--- a/cloudify_agent/resources/script/linux.sh.template
++++ b/cloudify_agent/resources/script/linux.sh.template
+@@ -124,6 +124,21 @@ export -f configure_agent
+ ###################### Start ######################
+ ###################################################
+ 
++patch_cluster_path()
++{
++    initd_file=/etc/default/cloudify-worker-{{ conf.name }}
++    systemd_file=/etc/sysconfig/cloudify-worker-{{ conf.name }}
++
++    if [ -f "$initd_file" ]; then
++        echo 'export CLOUDIFY_CLUSTER_SETTINGS_PATH=$CLOUDIFY_DAEMON_STORAGE_DIRECTORY/cluster-{{ conf.name }}.json' | sudo tee -a "$initd_file"
++    fi
++    if [ -f "$systemd_file" ]; then
++        target=~{{ conf.user }}/.cfy-agent/cluster-{{ conf.name }}.json
++        echo "CLOUDIFY_CLUSTER_SETTINGS_PATH=$target" | sudo tee -a "$systemd_file"
++    fi
++}
++export -f patch_cluster_path
++
+ {% if start %}
+ create_custom_env_file()
+ {
+@@ -148,6 +163,7 @@ start_daemon()
+     fi
+ 
+     cfy-agent daemons configure
++    patch_cluster_path
+     cfy-agent daemons start
+ }
+ export -f start_daemon
