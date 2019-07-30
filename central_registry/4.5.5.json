@@ -99,6 +99,17 @@
       "patch_id": "455_authorization_tasksgraph-e9f146b5a1e9add72e6c6e861d31cd3612c01c724da5687d1f889fa13d64e1fb", 
       "patch_name": "455_authorization_tasksgraph", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "455_increase_recursion_limit.json", 
+      "patch_description": "Recursion limit was increased from 10 to 50 to avoid breaking multi layers blueprints.", 
+      "patch_files": [
+        "455_increase_recursion_limit_dsl_parser_functions.py"
+      ], 
+      "patch_hash": "6e80e2b3a49dc2d4f52bcd500900d50ecb02bc524134a4e3b9fa91b010c65670", 
+      "patch_id": "455_increase_recursion_limit-6e80e2b3a49dc2d4f52bcd500900d50ecb02bc524134a4e3b9fa91b010c65670", 
+      "patch_name": "455_increase_recursion_limit", 
+      "supports_community": true
     }
   ]
 }

@@ -149,6 +149,17 @@
       "supports_community": false
     }, 
     {
+      "patch_definition_path": "46_increase_recursion_limit.json", 
+      "patch_description": "Recursion limit was increased from 10 to 50 to avoid breaking multi layers blueprints.", 
+      "patch_files": [
+        "46_increase_recursion_limit_dsl_parser_functions.py"
+      ], 
+      "patch_hash": "85221417381b5412b460093eb041b89aaa288e7fda59d57553d3fd62411631ea", 
+      "patch_id": "46_increase_recursion_limit-85221417381b5412b460093eb041b89aaa288e7fda59d57553d3fd62411631ea", 
+      "patch_name": "46_increase_recursion_limit", 
+      "supports_community": true
+    },
+    {
       "patch_definition_path": "4_6_use_concat_everywhere.json", 
       "patch_description": "Removing any restriction on concat use.", 
       "patch_files": [

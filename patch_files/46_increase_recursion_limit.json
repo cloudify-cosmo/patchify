@@ -1,0 +1,46 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Recursion limit was increased from 10 to 50 to avoid breaking multi layers blueprints.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/functions.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/functions.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/functions.py"
+            ], 
+            "patch_file": "46_increase_recursion_limit_dsl_parser_functions.py", 
+            "sha256sum": "a405d1e36eeec91723ce21a0f7628e951c417b8705ab960edb1c006c7741c84c"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/functions.py": [
+            "bb031241904378ec1ec62ab4e30e408fcc7fdf2cb5b8d6a54bd6fbf634a36e93"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/functions.py": [
+            "bb031241904378ec1ec62ab4e30e408fcc7fdf2cb5b8d6a54bd6fbf634a36e93"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/functions.py": [
+            "bb031241904378ec1ec62ab4e30e408fcc7fdf2cb5b8d6a54bd6fbf634a36e93"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/functions.py": [
+            "f2a01abff93aee594a04ddc07635ee0abdaffd5e30a8455b66081e8ab0d4cb40"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/functions.py": [
+            "f2a01abff93aee594a04ddc07635ee0abdaffd5e30a8455b66081e8ab0d4cb40"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/functions.py": [
+            "f2a01abff93aee594a04ddc07635ee0abdaffd5e30a8455b66081e8ab0d4cb40"
+        ]
+    }
+}
