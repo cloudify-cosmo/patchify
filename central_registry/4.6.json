@@ -147,6 +147,17 @@
       "patch_id": "46_authorization_tasksgraph-d59f250a0bb6656728a85b2b2a4638a17b2371a0a9a3227cfac87896dc897853", 
       "patch_name": "46_authorization_tasksgraph", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_use_concat_everywhere.json", 
+      "patch_description": "Removing any restriction on concat use.", 
+      "patch_files": [
+        "4_6_use_concat_everywhere_dsl_parser_functions.py"
+      ], 
+      "patch_hash": "b5a11f584e1dabe05bfaed30ab1ddd917505979c9faea141bd7f173afa954424", 
+      "patch_id": "4_6_use_concat_everywhere-b5a11f584e1dabe05bfaed30ab1ddd917505979c9faea141bd7f173afa954424", 
+      "patch_name": "4_6_use_concat_everywhere", 
+      "supports_community": false
     }
   ]
 }

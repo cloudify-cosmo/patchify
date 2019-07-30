@@ -1,0 +1,46 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": true, 
+    "description": "Removing any restriction on concat use.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/functions.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/functions.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/functions.py"
+            ], 
+            "patch_file": "4_6_use_concat_everywhere_dsl_parser_functions.py", 
+            "sha256sum": "f414b31c1fc09f84754d8a03132a3a2a3519278eace916f3e813c00f73813777"
+        } 
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/functions.py": [
+            "7d06e3cf996f387b7e63d4ff3d849dbc1f909d4e76cf8a9e34aa4228809a39ca"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/functions.py": [
+            "7d06e3cf996f387b7e63d4ff3d849dbc1f909d4e76cf8a9e34aa4228809a39ca"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/functions.py": [
+            "7d06e3cf996f387b7e63d4ff3d849dbc1f909d4e76cf8a9e34aa4228809a39ca"
+        ] 
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/functions.py": [
+            "f2a01abff93aee594a04ddc07635ee0abdaffd5e30a8455b66081e8ab0d4cb40"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/functions.py": [
+            "f2a01abff93aee594a04ddc07635ee0abdaffd5e30a8455b66081e8ab0d4cb40"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/functions.py": [
+            "f2a01abff93aee594a04ddc07635ee0abdaffd5e30a8455b66081e8ab0d4cb40"
+        ]
+    }
+}
