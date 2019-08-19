@@ -1,0 +1,16 @@
+{
+  "patch_root_path": "https://raw.githubusercontent.com/cloudify-cosmo/patchify/master/patch_files/", 
+  "patches": [
+    {
+      "patch_definition_path": "5_0_0_use_concat_everywhere.json", 
+      "patch_description": "Removing any restriction on concat use.", 
+      "patch_files": [
+        "5_0_0_use_concat_everywhere_dsl_parser_functions.py"
+      ], 
+      "patch_hash": "d4fad6eed13763fe64874449115c7315b34499ca62d5da13a3d7b755d87a1f4c", 
+      "patch_id": "5_0_0_use_concat_everywhere-d4fad6eed13763fe64874449115c7315b34499ca62d5da13a3d7b755d87a1f4c", 
+      "patch_name": "5_0_0_use_concat_everywhere", 
+      "supports_community": true
+    }
+  ]
+}
