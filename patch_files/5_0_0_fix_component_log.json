@@ -1,0 +1,41 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "Fixed component logging.", 
+    "manager_versions": [
+        "5.0.0"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [], 
+            "patch_file": "5_0_0_fix_component_log_cloudify_types_cloudify_types_component_tests_base_test_suite.py", 
+            "sha256sum": "3f123ca2c022c4d5d16f3b527b5fe4eeecefbdb13d5e5c6ddbed9a5e93995422"
+        }, 
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_types/component/polling.py"
+            ], 
+            "patch_file": "5_0_0_fix_component_log_cloudify_types_cloudify_types_component_polling.py", 
+            "sha256sum": "a8830a306c8264e9523c44a26a1f253a03d20e08fd75de052de3c2d663f064c2"
+        }, 
+        {
+            "destinations": [], 
+            "patch_file": "5_0_0_fix_component_log_cloudify_types_cloudify_types_component_tests_test_polling.py", 
+            "sha256sum": "4d3e282be53f3a17846da5a552bc26dd4d630f91364de6357aed723f7028079c"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_types/component/polling.py": [
+            "393c65d6f7dd9f3936825ea57f41649ac02c9a2bd531225520afe9177589d797"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_types/component/polling.py": [
+            "aa92a7d63bcf99b648db44f156446f41b3fdf708b5c29c7a34a60ba9568761c6"
+        ]
+    }
+}

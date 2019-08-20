@@ -11,6 +11,19 @@
       "patch_id": "5_0_0_use_concat_everywhere-d4fad6eed13763fe64874449115c7315b34499ca62d5da13a3d7b755d87a1f4c", 
       "patch_name": "5_0_0_use_concat_everywhere", 
       "supports_community": true
+    }, 
+    {
+      "patch_definition_path": "5_0_0_fix_component_log.json", 
+      "patch_description": "Fixed component logging.", 
+      "patch_files": [
+        "5_0_0_fix_component_log_cloudify_types_cloudify_types_component_tests_base_test_suite.py", 
+        "5_0_0_fix_component_log_cloudify_types_cloudify_types_component_polling.py", 
+        "5_0_0_fix_component_log_cloudify_types_cloudify_types_component_tests_test_polling.py"
+      ], 
+      "patch_hash": "e3aae75f9e8a6ff3edb38d0d4066d2712040372ea7bad751e72deb1b84c4ff38", 
+      "patch_id": "5_0_0_fix_component_log-e3aae75f9e8a6ff3edb38d0d4066d2712040372ea7bad751e72deb1b84c4ff38", 
+      "patch_name": "5_0_0_fix_component_log", 
+      "supports_community": true
     }
   ]
 }
