@@ -110,6 +110,18 @@
       "patch_id": "455_increase_recursion_limit-6e80e2b3a49dc2d4f52bcd500900d50ecb02bc524134a4e3b9fa91b010c65670", 
       "patch_name": "455_increase_recursion_limit", 
       "supports_community": true
+    }, 
+    {
+      "patch_definition_path": "4_5_5_hiding_postgres_credentials.json", 
+      "patch_description": "4.5.5 Hiding Postgres credentials in logs.", 
+      "patch_files": [
+        "4_5_5_hiding_postgres_credentials_workflows_cloudify_system_workflows_snapshots_utils.py", 
+        "4_5_5_hiding_postgres_credentials_workflows_cloudify_system_workflows_snapshots_postgres.py"
+      ], 
+      "patch_hash": "2a15255faa8eaf361cc5dd81167e597826186a58d6db2d4cfe4d932f67fa6a51", 
+      "patch_id": "4_5_5_hiding_postgres_credentials-2a15255faa8eaf361cc5dd81167e597826186a58d6db2d4cfe4d932f67fa6a51", 
+      "patch_name": "4_5_5_hiding_postgres_credentials", 
+      "supports_community": false
     }
   ]
 }
