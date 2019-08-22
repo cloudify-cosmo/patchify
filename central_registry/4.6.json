@@ -158,7 +158,7 @@
       "patch_id": "46_increase_recursion_limit-85221417381b5412b460093eb041b89aaa288e7fda59d57553d3fd62411631ea", 
       "patch_name": "46_increase_recursion_limit", 
       "supports_community": true
-    },
+    }, 
     {
       "patch_definition_path": "4_6_use_concat_everywhere.json", 
       "patch_description": "Removing any restriction on concat use.", 
@@ -169,7 +169,7 @@
       "patch_id": "4_6_use_concat_everywhere-ed356318d564c394067863fb1a8f8917c00000263d35c69b8716af854b3f304a", 
       "patch_name": "4_6_use_concat_everywhere", 
       "supports_community": false
-    },
+    }, 
     {
       "patch_definition_path": "4_6_do_not_try_to_re_restore_license.json", 
       "patch_description": "Stop failing to restore snapshots that contain licenses.", 
@@ -179,6 +179,19 @@
       "patch_hash": "770559bf3068561c57a1a70f3f900948f86057eca09b6df2b2a12af366b7b15e", 
       "patch_id": "4_6_do_not_try_to_re_restore_license-770559bf3068561c57a1a70f3f900948f86057eca09b6df2b2a12af366b7b15e", 
       "patch_name": "4_6_do_not_try_to_re_restore_license", 
+      "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_hiding_postgres_credentials.json", 
+      "patch_description": "Do not show postgres credentials in snapshot restore logs.", 
+      "patch_files": [
+        "4_6_hiding_postgres_credentials_workflows_cloudify_system_workflows_snapshots_utils.py", 
+        "4_6_hiding_postgres_credentials_workflows_cloudify_system_workflows_snapshots_postgres.py", 
+        "4_6_hiding_postgres_credentials_workflows_cloudify_system_workflows_snapshots_snapshot_restore.py"
+      ], 
+      "patch_hash": "db6aef8b8958f2b0ad8d82396dc3f025db49b438d343cfc1a5e95c687e89bd34", 
+      "patch_id": "4_6_hiding_postgres_credentials-db6aef8b8958f2b0ad8d82396dc3f025db49b438d343cfc1a5e95c687e89bd34", 
+      "patch_name": "4_6_hiding_postgres_credentials", 
       "supports_community": false
     }
   ]
