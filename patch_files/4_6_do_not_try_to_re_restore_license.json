@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "Stop failing to restore snapshots that contain licenses.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py"
+            ], 
+            "patch_file": "4_6_do_not_try_to_re_restore_license_workflows_cloudify_system_workflows_snapshots_snapshot_restore.py", 
+            "sha256sum": "5960c7d27b06d6fac8dfe056e2ffa1cecd97ec182ed8c6b43a9b344811bef381"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
+            "8dfa9b6b63c29dc884aae5429adae36cda75d6a9485a4717254cfac6e4fdbc33"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
+            "8a6edf0ced0dcb93652c484633527219b2c448f5397f9128f75a26dbd907c449"
+        ]
+    }
+}

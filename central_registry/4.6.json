@@ -169,6 +169,17 @@
       "patch_id": "4_6_use_concat_everywhere-ed356318d564c394067863fb1a8f8917c00000263d35c69b8716af854b3f304a", 
       "patch_name": "4_6_use_concat_everywhere", 
       "supports_community": false
+    },
+    {
+      "patch_definition_path": "4_6_do_not_try_to_re_restore_license.json", 
+      "patch_description": "Stop failing to restore snapshots that contain licenses.", 
+      "patch_files": [
+        "4_6_do_not_try_to_re_restore_license_workflows_cloudify_system_workflows_snapshots_snapshot_restore.py"
+      ], 
+      "patch_hash": "770559bf3068561c57a1a70f3f900948f86057eca09b6df2b2a12af366b7b15e", 
+      "patch_id": "4_6_do_not_try_to_re_restore_license-770559bf3068561c57a1a70f3f900948f86057eca09b6df2b2a12af366b7b15e", 
+      "patch_name": "4_6_do_not_try_to_re_restore_license", 
+      "supports_community": false
     }
   ]
 }
