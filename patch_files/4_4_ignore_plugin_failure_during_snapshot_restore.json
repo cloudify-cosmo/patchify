@@ -47,7 +47,8 @@
     "premium": true, 
     "sha256sums_after": {
         "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
-            "5e690de187844a311163c20e8b489094b5a061908e49def075b6267a033eb429"
+            "5e690de187844a311163c20e8b489094b5a061908e49def075b6267a033eb429",
+            "834b6520b564b44306cb3a21ba9b18e6a660712c21dbf8896100c10602935133"
         ], 
         "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v2/snapshots.py": [
             "05af85838d5a82124ddfd1441f7d6ae38f336e1bb20f6ea2e6c3ee2e20f8f570"
@@ -61,7 +62,8 @@
     }, 
     "sha256sums_before": {
         "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
-            "3ef2827881c726f433a91547c6ca32a1521ae7b67698cd991d8d51f1332829ef"
+            "3ef2827881c726f433a91547c6ca32a1521ae7b67698cd991d8d51f1332829ef",
+            "2a1b822f6bd0cffe8f933e84599b635564b840f5744a89baeca6fdae65cfb6e8"
         ], 
         "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v2/snapshots.py": [
             "1d12195bebca7aa0c1a84526e86242d7b43fdca2e3bb448ddcea7658013130d0"
