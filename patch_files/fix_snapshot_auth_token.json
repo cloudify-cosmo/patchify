@@ -1,0 +1,49 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "Handle auth token correctly for large snapshots.", 
+    "manager_versions": [
+        "4.4"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/constants.py"
+            ], 
+            "patch_file": "fix_snapshot_auth_token_workflows_cloudify_system_workflows_snapshots_constants.py", 
+            "sha256sum": "4783ef8470c4f330a039d4514bf6b70f0cc4635cd19dd275c683a8708e5202ae"
+        }, 
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py"
+            ], 
+            "patch_file": "fix_snapshot_auth_token_workflows_cloudify_system_workflows_snapshots_snapshot_restore.py", 
+            "sha256sum": "0cd9061208e71b022baf4e83e1ee48bb8bfc8d44c358bedcb1fd74884dbda4ca"
+        }, 
+        {
+            "destinations": [], 
+            "patch_file": "fix_snapshot_auth_token_workflows_cloudify_system_workflows_snapshots_generate_new_rest_token.py", 
+            "sha256sum": "0c9f570025999de52ba7c8e53ba6d66ae4a036fa6527320910784400344cf96b"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/constants.py": [
+            "888922a9304f77ea882eeb0f3248dbd4c7bb54511d9d0e793f5a44f4fbd14976"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
+            "88b26581713905473d03ef2a5390ca16f3bd2bf6e05001fe53014c4b33b30194"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/constants.py": [
+            "a5b075c65c858f38693f0d05ae0dfd6fb786fe39bae94a2492f78b94be75737c"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
+            "d38c59f91e697d3825fed99a4c374f6e3681fc8af27b0650a36c7b8a725736c4"
+        ]
+    }
+}
