@@ -1,0 +1,14 @@
+---
+ cloudify-handle-large-snapshots | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 cloudify-handle-large-snapshots
+
+diff --git a/cloudify-handle-large-snapshots b/cloudify-handle-large-snapshots
+new file mode 100644
+index 0000000..fb8bb7a
+--- /dev/null
++++ b/cloudify-handle-large-snapshots
+@@ -0,0 +1 @@
++cfyuser ALL=(root) NOPASSWD:/usr/bin/sed
+-- 
+1.8.3.1
