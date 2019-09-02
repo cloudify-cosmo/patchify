@@ -1,5 +1,5 @@
 diff --git a/workflows/cloudify_system_workflows/snapshots/snapshot_restore.py b/workflows/cloudify_system_workflows/snapshots/snapshot_restore.py
-index 40d412b17..8eeb1e39d 100644
+index 40d412b17..ecbba7d9d 100644
 --- a/workflows/cloudify_system_workflows/snapshots/snapshot_restore.py
 +++ b/workflows/cloudify_system_workflows/snapshots/snapshot_restore.py
 @@ -69,7 +69,6 @@ from .constants import (
@@ -29,20 +29,94 @@ index 40d412b17..8eeb1e39d 100644
          self._post_restore_commands = []
  
          self._tempdir = None
-@@ -176,12 +178,6 @@ class SnapshotRestore(object):
-                             deployment=deployment_id,
-                         )
+@@ -141,9 +143,15 @@ class SnapshotRestore(object):
+             ctx.logger.debug('Removing temp dir: {0}'.format(self._tempdir))
+             shutil.rmtree(self._tempdir)
+ 
++    def __should_ignore_plugin_failure(self,
++                                       message):
++        return 'cloudify_agent.operations.install_plugins' in \
++               message and self._ignore_plugin_installation_failure
++
+     def _restore_deployment_envs(self, postgres):
+         deps = utils.get_dep_contexts(self._snapshot_version)
+         token_info = postgres.get_deployment_creator_ids_and_tokens()
++        failed_deployments = []
+         for tenant, deployments in deps:
+             ctx.logger.info(
+                 'Restoring deployment environments for {tenant}'.format(
+@@ -152,36 +160,42 @@ class SnapshotRestore(object):
+             )
+             tenant_client = get_rest_client(tenant=tenant)
+             for deployment_id, dep_ctx in deployments.iteritems():
+-                ctx.logger.info('Restoring deployment {dep_id}'.format(
+-                    dep_id=deployment_id,
+-                ))
+-                api_token = self._get_api_token(
+-                    token_info[tenant][deployment_id]
+-                )
+-                with dep_ctx:
+-                    dep = tenant_client.deployments.get(deployment_id)
+-                    blueprint = tenant_client.blueprints.get(
+-                        dep_ctx.blueprint.id,
+-                    )
+-                    tasks_graph = self._get_tasks_graph(
+-                        dep_ctx,
+-                        blueprint,
+-                        dep,
+-                        api_token,
++                try:
++                    ctx.logger.info('Restoring deployment {dep_id}'.format(
++                        dep_id=deployment_id,
++                    ))
++                    api_token = self._get_api_token(
++                        token_info[tenant][deployment_id]
                      )
+-                    tasks_graph.execute()
+-                    ctx.logger.info(
+-                        'Successfully created deployment environment '
+-                        'for deployment {deployment}'.format(
+-                            deployment=deployment_id,
++                    with dep_ctx:
++                        dep = tenant_client.deployments.get(deployment_id)
++                        blueprint = tenant_client.blueprints.get(
++                            dep_ctx.blueprint.id,
+                         )
+-                    )
 -            ctx.logger.info(
 -                'Finished restoring deployment environments for '
 -                '{tenant}'.format(
 -                    tenant=tenant,
 -                )
 -            )
++                        tasks_graph = self._get_tasks_graph(
++                            dep_ctx,
++                            blueprint,
++                            dep,
++                            api_token,
++                        )
++                        tasks_graph.execute()
++                        ctx.logger.info(
++                            'Successfully created deployment environment '
++                            'for deployment {deployment}'.format(
++                                deployment=deployment_id,
++                            )
++                        )
++                except RuntimeError as re:
++                    if self.__should_ignore_plugin_failure(re.message):
++                        ctx.logger.warning('Failed to create deployment: {0},'
++                                           'ignore_plugin_installation_failure'
++                                           'flag used, proceeding...'
++                                           .format(deployment_id))
++                        ctx.logger.debug('Deployment creation error: {0}'
++                                         .format(re))
++                        failed_deployments.append(deployment_id)
++                    else:
++                        raise re
  
      def _restore_amqp_vhosts_and_users(self):
          subprocess.check_call(
-@@ -218,9 +214,9 @@ class SnapshotRestore(object):
+@@ -218,9 +232,9 @@ class SnapshotRestore(object):
  
          if not os.path.exists(
                  os.path.join(archive_cert_dir, INTERNAL_CA_CERT_FILENAME)):
@@ -55,7 +129,7 @@ index 40d412b17..8eeb1e39d 100644
                  source = os.path.join(CERT_DIR, source)
                  target = os.path.join(CERT_DIR, target)
                  command += 'cp {source} {target};'.format(
-@@ -319,7 +315,7 @@ class SnapshotRestore(object):
+@@ -319,7 +333,7 @@ class SnapshotRestore(object):
          # if this snapshot version is the same as the manager version
          # or from 4.3 onwards we support stage upgrade
          if self._snapshot_version == self._manager_version or \
@@ -64,7 +138,7 @@ index 40d412b17..8eeb1e39d 100644
              stage_restore_override = True
          else:
              stage_restore_override = False
-@@ -504,6 +500,7 @@ class SnapshotRestore(object):
+@@ -504,6 +518,7 @@ class SnapshotRestore(object):
  
          :param existing_plugins: Names of already installed plugins
          """
@@ -72,7 +146,7 @@ index 40d412b17..8eeb1e39d 100644
          def should_install(plugin):
              # Can't just do 'not in' as plugin is a dict
              hashable_existing = (frozenset(p) for p in existing_plugins)
-@@ -555,9 +552,12 @@ class SnapshotRestore(object):
+@@ -555,9 +570,12 @@ class SnapshotRestore(object):
              shutil.copyfile(plugin['path'], temp_plugin)
  
          client.plugins.delete(plugin['id'], force=True)
@@ -88,7 +162,7 @@ index 40d412b17..8eeb1e39d 100644
  
      def _wait_for_plugin_executions(self, client):
          while True:
-@@ -576,10 +576,32 @@ class SnapshotRestore(object):
+@@ -576,10 +594,32 @@ class SnapshotRestore(object):
                  msg = ', '.join('{0} (state: {1})'
                                  .format(execution.id, execution.status))
                  ctx.logger.info(
@@ -123,7 +197,7 @@ index 40d412b17..8eeb1e39d 100644
      def _restore_plugins(self, existing_plugins):
          """Install any plugins that weren't installed prior to the restore
  
-@@ -587,16 +609,34 @@ class SnapshotRestore(object):
+@@ -587,16 +627,34 @@ class SnapshotRestore(object):
          """
          ctx.logger.info('Restoring plugins')
          plugins_to_install = self._get_plugins_to_install(existing_plugins)

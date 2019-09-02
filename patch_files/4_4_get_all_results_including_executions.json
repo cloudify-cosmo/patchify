@@ -21,13 +21,13 @@
     "sha256sums_after": {
         "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
             "baf618b1e4d1282c41cfd250c6c654a99b08f1c1d061eea46784d3dc639540f7",
-            "d38c59f91e697d3825fed99a4c374f6e3681fc8af27b0650a36c7b8a725736c4"
+            "74d52362d4f92da9d5ff607bbb523a314ea044acd5b928d1d89e7a08cad08a9b"
         ]
     }, 
     "sha256sums_before": {
         "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
             "6720d3d00d4d49e06c5b5b2524fe70ac89147ca756984bd4c4f9f94d144ed697",
-            "8890638517450cf34c453e80d3c473d915c2af1c26ad33b3bc0045e10b8a7aea"
+            "51859db0a3951ee73628f8c3cfd263e654e7f9b82475b625bd8822989b9379a0"
         ]
     }
 }

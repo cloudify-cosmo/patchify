@@ -22,7 +22,7 @@
                 "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py"
             ], 
             "patch_file": "4_4_ignore_plugin_failure_during_snapshot_restore_workflows_cloudify_system_workflows_snapshots_snapshot_restore.py", 
-            "sha256sum": "840cf5d8d30376c5a6e6daaeda04056b0921154cff11ca129698806f63ce1c0b"
+            "sha256sum": "9de8009706c9747b662935ed3e0933ad2a182dfee6d96e6a41fecb33a0ac5633"
         }, 
         {
             "destinations": [
@@ -32,14 +32,9 @@
             "sha256sum": "6ffd0388416d2a0221c65519805348c148aa0ab366d8814a0eeed48af22b5f86"
         }, 
         {
-            "destinations": [], 
-            "patch_file": "4_4_ignore_plugin_failure_during_snapshot_restore_tests_integration_tests_tests_agentless_tests_test_snapshot.py", 
-            "sha256sum": "396889ab89b9f90b0814bac7420c5ad2d334e056864c03216c23bea35a436dd2"
-        }, 
-        {
             "destinations": [
                 "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py"
-            ], 
+            ],
             "patch_file": "4_4_ignore_plugin_failure_during_snapshot_restore_rest-service_manager_rest_resource_manager.py", 
             "sha256sum": "804ce27397abd0194c81dc43c6166420fe45938dbf166de1cbb8a09aa6a88554"
         }
@@ -49,7 +44,7 @@
         "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
             "5e690de187844a311163c20e8b489094b5a061908e49def075b6267a033eb429",
             "834b6520b564b44306cb3a21ba9b18e6a660712c21dbf8896100c10602935133"
-        ], 
+        ],
         "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v2/snapshots.py": [
             "05af85838d5a82124ddfd1441f7d6ae38f336e1bb20f6ea2e6c3ee2e20f8f570"
         ], 
@@ -57,14 +52,14 @@
             "2f48a47e1430e4bcc7450217b530c2eaaee3c6182f8dde4f4a54e687649e532a"
         ], 
         "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
-            "8890638517450cf34c453e80d3c473d915c2af1c26ad33b3bc0045e10b8a7aea"
+            "51859db0a3951ee73628f8c3cfd263e654e7f9b82475b625bd8822989b9379a0"
         ]
     }, 
     "sha256sums_before": {
         "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
             "3ef2827881c726f433a91547c6ca32a1521ae7b67698cd991d8d51f1332829ef",
             "2a1b822f6bd0cffe8f933e84599b635564b840f5744a89baeca6fdae65cfb6e8"
-        ], 
+        ],
         "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v2/snapshots.py": [
             "1d12195bebca7aa0c1a84526e86242d7b43fdca2e3bb448ddcea7658013130d0"
         ], 
