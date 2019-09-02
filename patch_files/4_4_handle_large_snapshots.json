@@ -27,7 +27,8 @@
     "premium": true, 
     "sha256sums_after": {
         "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
-            "b5be870d4b0660d0bcd8b4a44112e644d329f867812e4e3942ca2450b1f9ed73"
+            "b5be870d4b0660d0bcd8b4a44112e644d329f867812e4e3942ca2450b1f9ed73",
+            "a03aa6f3cb329a7d720e7904ff32ad5e2d6628009a6883514ca758510a9e8978"
         ],
         "/etc/sudoers.d/cloudify-handle-large-snapshots": [
             "55a083a336d0bc465e07a759dc1af17675c8f5b919e427c6308103a51dd18782"
@@ -35,7 +36,9 @@
     }, 
     "sha256sums_before": {
         "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
-            "51859db0a3951ee73628f8c3cfd263e654e7f9b82475b625bd8822989b9379a0"
+            "51859db0a3951ee73628f8c3cfd263e654e7f9b82475b625bd8822989b9379a0",
+            "baf618b1e4d1282c41cfd250c6c654a99b08f1c1d061eea46784d3dc639540f7",
+            "74d52362d4f92da9d5ff607bbb523a314ea044acd5b928d1d89e7a08cad08a9b"
         ],
         "/etc/sudoers.d/cloudify-handle-large-snapshots": [
             "DOESNOTEXIST"
