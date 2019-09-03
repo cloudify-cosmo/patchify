@@ -1,0 +1,10 @@
+diff --git a/cloudify-restservice b/cloudify-restservice
+index c979e7a..1d4faea 100644
+--- a/cloudify-restservice
++++ b/cloudify-restservice
+@@ -11,4 +11,4 @@ WORKER_COUNT=5
+ MAX_WORKER_COUNT=12
+ 
+ GUNICORN_WORKER_COUNT=5
+-GUNICORN_MAX_REQUESTS=1000
++GUNICORN_MAX_REQUESTS=0

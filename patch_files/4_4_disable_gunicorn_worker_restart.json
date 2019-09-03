@@ -1,0 +1,29 @@
+{
+    "affected_services": ["cloudify-restservice"], 
+    "community": false, 
+    "description": "Disable gunicorn worker restart to allow large snapshot restores to work.", 
+    "manager_versions": [
+        "4.4"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/etc/sysconfig/cloudify-restservice"
+            ], 
+            "patch_file": "4_4_disable_gunicorn_worker_restart_cloudify-restservice", 
+            "sha256sum": "2daf45a3b3fc199337ec41184a7353a94ad9ff02d2560881b5daeb6cf8ab4b47"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/etc/sysconfig/cloudify-restservice": [
+            "66820bef32b6ef193de8068b83c8b4063a95aca0cecf15d79687b13525fd1426"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/etc/sysconfig/cloudify-restservice": [
+            "204334c1410ab8367efaf1dca23795e3bc56910091786087588437b200f5431c"
+        ]
+    }
+}
