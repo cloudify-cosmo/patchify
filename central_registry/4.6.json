@@ -193,6 +193,18 @@
       "patch_id": "4_6_hiding_postgres_credentials-db6aef8b8958f2b0ad8d82396dc3f025db49b438d343cfc1a5e95c687e89bd34", 
       "patch_name": "4_6_hiding_postgres_credentials", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_reevaluate_ops_inputs_on_update.json", 
+      "patch_description": "Reevaluate operation inputs on deployment update.", 
+      "patch_files": [
+        "46_reevaluate_ops_inputs_on_update_rest-service_manager_rest_deployment_update_handlers.py", 
+        "46_reevaluate_ops_inputs_on_update_rest-service_manager_rest_storage_storage_manager.py"
+      ], 
+      "patch_hash": "e2ba885fe4970eb538b42ba7295024194c5f338b6f7472d00864299d0a2ca170", 
+      "patch_id": "46_reevaluate_ops_inputs_on_update-e2ba885fe4970eb538b42ba7295024194c5f338b6f7472d00864299d0a2ca170", 
+      "patch_name": "46_reevaluate_ops_inputs_on_update", 
+      "supports_community": false
     }
   ]
 }

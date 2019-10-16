@@ -1,0 +1,44 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Reevaluate operation inputs on deployment update.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/deployment_update/handlers.py"
+            ], 
+            "patch_file": "46_reevaluate_ops_inputs_on_update_rest-service_manager_rest_deployment_update_handlers.py", 
+            "sha256sum": "880fd1958d1469160d34c0c49e2d557f03448550adc2461c06ba892453cd1109"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/storage_manager.py"
+            ], 
+            "patch_file": "46_reevaluate_ops_inputs_on_update_rest-service_manager_rest_storage_storage_manager.py", 
+            "sha256sum": "a8514bfe349410601ffd346c6e261e398876048af591d07f832c71c2d08abeef"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/deployment_update/handlers.py": [
+            "b696345ecfc17f84fe012f3f2a3ece3b37d230a7c49b0a427a71be61887244d4"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/storage_manager.py": [
+            "1c8a431ce7e3394ab59f320c89ad39297cc4201399e43f0e6b90c38a23051efc"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/deployment_update/handlers.py": [
+            "4b603727ce172c697743f505da7b85714d93dcc7636d323059e68b4cac1b29fb"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/storage_manager.py": [
+            "419c968dbdde0540f396173cc0d9723ff3aecb708dfa60134ce5522df4f22bb1"
+        ]
+    }
+}
