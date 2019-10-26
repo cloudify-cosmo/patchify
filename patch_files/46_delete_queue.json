@@ -1,0 +1,85 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker",
+        "cloudify-restservice"
+    ],
+    "community": false,
+    "description": "Delete request/response queues from rabbitmq.",
+    "manager_versions": [
+        "4.6"
+    ],
+    "patch_version": "2.0.0",
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py"
+            ],
+            "patch_file": "46_delete_queue_cloudify_amqp_client.py",
+            "sha256sum": "94301e2d825ea55f39a8d980d5b2ffa745811baa08e427cfdfc15679445cccff"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/utils.py",
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/utils.py",
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/utils.py"
+            ],
+            "patch_file": "46_delete_queue_cloudify_utils.py",
+            "sha256sum": "6a2793a1e91c23473e27dc355b7c9b917f931c98dbc6e40677f36ad049512648"
+        },
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py"
+            ],
+            "patch_file": "46_delete_queue_cloudify_workflows_workflow_context.py",
+            "sha256sum": "62c71b83fcbe6216dc0c722e585a54f22092e0ab7b50b676dacfc023d8ec6b18"
+        },
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py"
+            ],
+            "patch_file": "46_delete_queue_agent_cloudify_agent_operations.py",
+            "sha256sum": "bdad690442b5338d9b02459990695ff2a57d10015dc4a397231d4a0723fe21a7"
+        }
+    ],
+    "premium": true,
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/utils.py": [
+            "0d13c6e11fe17904bd7c0e857026301a33db3f1701ff7938385dee33579153ee"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "0d13c6e11fe17904bd7c0e857026301a33db3f1701ff7938385dee33579153ee"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "cc9126ee7860956bfff492d981692b08fe31f7474b3b591245444bf2c1e2b934"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "0d13c6e11fe17904bd7c0e857026301a33db3f1701ff7938385dee33579153ee"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "be0b9e1e3f301f32485fac6241ae62ac4b7c198711463585dd8ed66910598b0a"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py": [
+            "34df2ea51648244ad052002e04228bf1cd71af695985e7554036d20d8f2985bc"
+        ]
+    },
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/utils.py": [
+            "2aa55890aa7aae2ef43643a71b06b4583132cfb4348526284e2352440dcf6661"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "2aa55890aa7aae2ef43643a71b06b4583132cfb4348526284e2352440dcf6661"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "172a9b114cf4ca2429d09cb2b892bf5ffa87c377bd16224be103045efbf82770"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "2aa55890aa7aae2ef43643a71b06b4583132cfb4348526284e2352440dcf6661"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "91a4869ebd76c5172a418579ca60562e093b11c33be46efb462d9642c6eeed7b"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py": [
+            "d0ae71d3d32c42b7fc12de99c80f41f6ecbbcc7697f8a1886c4c7c473d6da05d"
+        ]
+    }
+}

@@ -205,6 +205,20 @@
       "patch_id": "46_reevaluate_ops_inputs_on_update-e2ba885fe4970eb538b42ba7295024194c5f338b6f7472d00864299d0a2ca170", 
       "patch_name": "46_reevaluate_ops_inputs_on_update", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_delete_queue.json", 
+      "patch_description": "Delete request/response queues from rabbitmq.", 
+      "patch_files": [
+        "46_delete_queue_cloudify_amqp_client.py", 
+        "46_delete_queue_cloudify_utils.py", 
+        "46_delete_queue_cloudify_workflows_workflow_context.py", 
+        "46_delete_queue_agent_cloudify_agent_operations.py"
+      ], 
+      "patch_hash": "d48b8b24425a15013277af51d7928145506c239adb54ba56b9e66844e449fc89", 
+      "patch_id": "46_delete_queue-d48b8b24425a15013277af51d7928145506c239adb54ba56b9e66844e449fc89", 
+      "patch_name": "46_delete_queue", 
+      "supports_community": false
     }
   ]
 }
