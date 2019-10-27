@@ -1,0 +1,12 @@
+diff --git a/packaging/mgmtworker/files/usr/lib/systemd/system/cloudify-mgmtworker.service b/packaging/mgmtworker/files/usr/lib/systemd/system/cloudify-mgmtworker.service
+index 0501d42..32070ad 100644
+--- a/packaging/mgmtworker/files/usr/lib/systemd/system/cloudify-mgmtworker.service
++++ b/packaging/mgmtworker/files/usr/lib/systemd/system/cloudify-mgmtworker.service
+@@ -5,6 +5,7 @@ After=cloudify-rabbitmq.service
+ 
+ [Service]
+ TimeoutStartSec=0
++RestartSec=3
+ Restart=on-failure
+ User=cfyuser
+ Group=cfyuser

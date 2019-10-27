@@ -1,0 +1,159 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ],
+    "community": false,
+    "description": "Use synchronous replication for 4.6 cluster.",
+    "manager_versions": [
+        "4.6"
+    ],
+    "patch_version": "2.0.0",
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/checks.py"
+            ],
+            "patch_file": "46_sync_replica_2_cloudify_premium_ha_checks.py",
+            "sha256sum": "2c64c5f9d3ae05fa6f0f190a24db196f25c13fa845aae7152ed1fb26588860dd"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/database.py"
+            ],
+            "patch_file": "46_sync_replica_2_cloudify_premium_ha_database.py",
+            "sha256sum": "8bb37ae1292ebeab8b468b27142c789d911f63bfc3e8ff4d7f1114524b6f5690"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/resources/postgresql.cluster.conf"
+            ],
+            "patch_file": "46_sync_replica_2_cloudify_premium_ha_resources_postgresql.cluster.conf",
+            "sha256sum": "e59216491c1add93a4dc930cc6977658d66ba123a6e46dfb243ad0c9038ec76d"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/resources/sudo_trampoline.py"
+            ],
+            "patch_file": "46_sync_replica_2_cloudify_premium_ha_resources_sudo_trampoline.py",
+            "sha256sum": "d51c132733f03cfc86080b0db7a7db4a5a322dbf6632347bcb71e46b2ca75cbe"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/handlers.py"
+            ],
+            "patch_file": "46_sync_replica_2_cloudify_premium_ha_handlers.py",
+            "sha256sum": "cdad463cac603aa2459a901db7609353d14787142d59d13ba1aff05571722383"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/utils.py"
+            ],
+            "patch_file": "46_sync_replica_2_cloudify_premium_ha_utils.py",
+            "sha256sum": "82eeeac51b1caf129c21fde3f6f322156e3c535568de59fd13a7c1d864239d9e"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/consul.py"
+            ],
+            "patch_file": "46_sync_replica_2_cloudify_premium_ha_consul.py",
+            "sha256sum": "25342fd491095137c3e68e4fbf01970eaef6ecc03a77db847d587b86b399d7db"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/agents.py"
+            ],
+            "patch_file": "46_sync_replica_2_cloudify_premium_ha_agents.py",
+            "sha256sum": "8591576f5e9e3bd9e8ae2b385fd888188019dc46f3ed2d74d5057a97081fa148"
+        },
+        {
+            "destinations": ["/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/fix.py"],
+            "patch_file": "46_sync_replica_2_cloudify_premium_ha_fix.py",
+            "sha256sum": "23a82a504b6a5c43eb1f3c1225c9116cb57df1929f5e16f1e37c3c008a34cd23"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/watch_handlers.py"
+            ],
+            "patch_file": "46_sync_replica_2_cloudify_premium_ha_watch_handlers.py",
+            "sha256sum": "a3f8ef252b75a6f0d294f05e52bc7ec73bd3defda8d5c59f5ddff71f042e47dd"
+        },
+        {
+            "destinations": [
+                "/usr/lib/systemd/system/cloudify-mgmtworker.service"
+            ],
+            "patch_file": "46_mgmtworker_restart_packaging_mgmtworker_files_usr_lib_systemd_system_cloudify-mgmtworker.service",
+            "sha256sum": "a089da04f1989afa15081157b641fe29958f079ac860062f9603d689e3c26e95"
+        }
+    ],
+    "premium": true,
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/agents.py": [
+            "7efc0068b9cb9e682e1bc88d32dda67fd101a463223a04007888c2b665944d1e"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/checks.py": [
+            "f74e0c1dd89f3253e628751faaab7ab929cefba17694434d4be308d9088ea2f1"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/consul.py": [
+            "327b37c4b3bb7bdd3849d24ce4d685ca5db4f0d891ef7967b2e794846c346b60"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/database.py": [
+            "afb81fa8fa94c512c8129d139eaeeb8d02ebabd656abff717948d454359fa45f"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/handlers.py": [
+            "c1173c4d64be74044cb1be70bb949b8f1ee5a3e4ffc4d963fdc660e8d51bf26c"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/resources/postgresql.cluster.conf": [
+            "580cf1fb550992170168f41ed2129f6130f200ca3d4501af702ac9fe48f32c50"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/resources/sudo_trampoline.py": [
+            "358ff417dc7fe765bc2f1de3c6a668327577f3a2477019706e947fd110dffa9a"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/utils.py": [
+            "f2f632f469b900cc32bc7be0d2fa8e584c771542e21f46c460b471f67f30a53c"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/watch_handlers.py": [
+            "3faf9250dabe3621ffcf7b314f8b46d171feecf9eee9f59fba25afa4dda1354e"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/fix.py": [
+            "2c6bda3b467d0216efe17150068f00f8a1944505b1df2b026018b8168d3c85ad"
+        ],
+        "/usr/lib/systemd/system/cloudify-mgmtworker.service": [
+            "b3b0e43570a443e47c070d947f0ec3ad79d4e60e98089874c46f03ddea736d3d"
+        ]
+    },
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/agents.py": [
+            "cda228713215ca6c04aac8433bcfd9e8760b2763767c2f5f112fa87ab97b5ad3"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/checks.py": [
+            "53ee015550353dc78bbc819877a494cbbf036710c28dba8362a3afde77ba7ce4"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/consul.py": [
+            "eb6c4c065a061c5474ed25d18b4d14d5faaead51dfa97e318dcf316af9c4e2bd"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/database.py": [
+            "0598824998d8e249e1ddb4208cde15d332721641ef4018da99846a2414474b7a"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/handlers.py": [
+            "2f11f1f32a541faf3003413d581e00f894b53307f43db099e25a3ec7c62e860f"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/resources/postgresql.cluster.conf": [
+            "7f6dd516f79f17bc35ebc54b623cc6b5c14885933581d380886e503466279cc6"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/resources/sudo_trampoline.py": [
+            "a5ad2922fc3bcf4043ceba43f297428043b491895cdd3115d6f90abc4b06d524"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/utils.py": [
+            "7f0e3fd24e3aecb1462c16170519689df1f4d105207244ff93da408b8de623e3"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/watch_handlers.py": [
+            "731be0dfe5cee5477cce2220b8069687ffaf7ec859b3408c10b2edb837549e85"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/fix.py": [
+            "DOESNOTEXIST"
+        ],
+        "/usr/lib/systemd/system/cloudify-mgmtworker.service": [
+            "45440db6aff467aeb6297201499346ad8d90a3d5853f54f5c83da4e9577e7e14"
+        ]
+    }
+}

@@ -219,6 +219,27 @@
       "patch_id": "46_delete_queue-d48b8b24425a15013277af51d7928145506c239adb54ba56b9e66844e449fc89", 
       "patch_name": "46_delete_queue", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_sync_replica.json", 
+      "patch_description": "Use synchronous replication for 4.6 cluster.", 
+      "patch_files": [
+        "46_sync_replica_2_cloudify_premium_ha_checks.py", 
+        "46_sync_replica_2_cloudify_premium_ha_database.py", 
+        "46_sync_replica_2_cloudify_premium_ha_resources_postgresql.cluster.conf", 
+        "46_sync_replica_2_cloudify_premium_ha_resources_sudo_trampoline.py", 
+        "46_sync_replica_2_cloudify_premium_ha_handlers.py", 
+        "46_sync_replica_2_cloudify_premium_ha_utils.py", 
+        "46_sync_replica_2_cloudify_premium_ha_consul.py", 
+        "46_sync_replica_2_cloudify_premium_ha_agents.py", 
+        "46_sync_replica_2_cloudify_premium_ha_fix.py", 
+        "46_sync_replica_2_cloudify_premium_ha_watch_handlers.py", 
+        "46_mgmtworker_restart_packaging_mgmtworker_files_usr_lib_systemd_system_cloudify-mgmtworker.service"
+      ], 
+      "patch_hash": "01fd11e9ecb796b296349b879ce21ce46f36b02af29d275ba4e7ef1e848044dc", 
+      "patch_id": "46_sync_replica-01fd11e9ecb796b296349b879ce21ce46f36b02af29d275ba4e7ef1e848044dc", 
+      "patch_name": "46_sync_replica", 
+      "supports_community": false
     }
   ]
 }
