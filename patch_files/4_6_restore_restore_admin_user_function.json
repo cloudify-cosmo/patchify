@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "retoring the function _restore_admin_user.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py"
+            ], 
+            "patch_file": "4_6_restore_restore_admin_user_function_workflows_cloudify_system_workflows_snapshots_snapshot_restore.py", 
+            "sha256sum": "263010c4488148a6ac2c388606862b924116a414fa25bd35b1bb928c67f91173"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
+            "8dfa9b6b63c29dc884aae5429adae36cda75d6a9485a4717254cfac6e4fdbc33"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
+            "cae72f456c3d3b0125bcad8ffabaabfc3b532f7a81c98ba0b5e7df7a51259f5d"
+        ]
+    }
+}

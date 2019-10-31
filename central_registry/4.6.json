@@ -240,6 +240,17 @@
       "patch_id": "46_sync_replica-01fd11e9ecb796b296349b879ce21ce46f36b02af29d275ba4e7ef1e848044dc", 
       "patch_name": "46_sync_replica", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_restore_restore_admin_user_function.json", 
+      "patch_description": "retoring the function _restore_admin_user.", 
+      "patch_files": [
+        "4_6_restore_restore_admin_user_function_workflows_cloudify_system_workflows_snapshots_snapshot_restore.py"
+      ], 
+      "patch_hash": "7017f1bbe51640d2b57be4945383d31810a6f97d95f6dc622717389dc1004926", 
+      "patch_id": "4_6_restore_restore_admin_user_function-7017f1bbe51640d2b57be4945383d31810a6f97d95f6dc622717389dc1004926", 
+      "patch_name": "4_6_restore_restore_admin_user_function", 
+      "supports_community": false
     }
   ]
 }
