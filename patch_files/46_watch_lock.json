@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-handler-runner"
+    ],
+    "community": false,
+    "description": "Make watch handlers only acquire locks when necessary.",
+    "manager_versions": [
+        "4.6"
+    ],
+    "patch_version": "2.0.0",
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/watch_handlers.py"
+            ],
+            "patch_file": "46_watch_lock_cloudify_premium_ha_watch_handlers.py",
+            "sha256sum": "a601fd1214498dddeca139cc5875529c17edda87c2e72ae8d55076cf5c50b88b"
+        }
+    ],
+    "premium": true,
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/watch_handlers.py": [
+            "388c860e1ba71881cd5e1da0a0dae799bccae9d6d294e756f79cb25ee6596140"
+        ]
+    },
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/watch_handlers.py": [
+            "3faf9250dabe3621ffcf7b314f8b46d171feecf9eee9f59fba25afa4dda1354e"
+        ]
+    }
+}

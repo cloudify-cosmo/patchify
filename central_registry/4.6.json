@@ -251,6 +251,17 @@
       "patch_id": "4_6_restore_restore_admin_user_function-7017f1bbe51640d2b57be4945383d31810a6f97d95f6dc622717389dc1004926", 
       "patch_name": "4_6_restore_restore_admin_user_function", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_watch_lock.json", 
+      "patch_description": "Make watch handlers only acquire locks when necessary.", 
+      "patch_files": [
+        "46_watch_lock_cloudify_premium_ha_watch_handlers.py"
+      ], 
+      "patch_hash": "4a496dfea24bf41c1b31ecdf6e212118cf8525b20b4bbbf1fa2967a608b3e35a", 
+      "patch_id": "46_watch_lock-4a496dfea24bf41c1b31ecdf6e212118cf8525b20b4bbbf1fa2967a608b3e35a", 
+      "patch_name": "46_watch_lock", 
+      "supports_community": false
     }
   ]
 }
