@@ -1,3 +1,4 @@
+1.1.8 - Ignore errors when attempting to start/stop optional services which are not installed
 1.1.7 - Make sha256sum-based patch pre-check work again.
 1.1.6 - Fix md5sum-based patch handling.
 1.1.5 - Cope with downloading files with unexpected permissions.

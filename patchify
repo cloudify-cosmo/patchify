@@ -50,7 +50,13 @@ PATCH_VERSIONS = {
                          'sha256sums_before', 'sha256sums_after']),
     },
 }
-PATCHIFY_VERSION = (1, 1, 7)
+PATCHIFY_VERSION = (1, 1, 8)
+OPTIONAL_SERVICES = {
+    'cloudify-handler-runner',
+    'cloudify-check-runner',
+    'cloudify-consul-watcher',
+    'cloudify-syncthing'
+}
 
 
 class VersionError(Exception):
@@ -985,14 +991,33 @@ def download(file_name, source_path, dest_path,
         )
 
 
+@contextmanager
+def ignore_optional_service(service):
+    """Ignore failure if service is optional.
+
+    Not all services must exist on the manager: cloudify-handler-runner,
+    cloudify-check-runner, cloudify-consul-watcher, and cloudify-syncthing
+    will only exist after a cluster has been created
+    """
+    try:
+        yield
+    except subprocess.CalledProcessError as e:
+        # 5 = EXIT_NOTINSTALLED = The program is not installed.
+        if e.returncode == 5 and service in OPTIONAL_SERVICES:
+            pass
+        else:
+            raise
+
+
 def stop_services(manager_connection_string, ssh_port, services, keyfile):
     for service in services:
-        ssh(
-            manager_connection_string,
-            ssh_port,
-            keyfile,
-            'sudo systemctl stop {service}'.format(service=service),
-        )
+        with ignore_optional_service(service):
+            ssh(
+                manager_connection_string,
+                ssh_port,
+                keyfile,
+                'sudo systemctl stop {service}'.format(service=service),
+            )
 
 
 def start_services(manager_connection_string, ssh_port, services, keyfile):
@@ -1004,12 +1029,13 @@ def start_services(manager_connection_string, ssh_port, services, keyfile):
         'sudo systemctl daemon-reload',
     )
     for service in services:
-        ssh(
-            manager_connection_string,
-            ssh_port,
-            keyfile,
-            'sudo systemctl start {service}'.format(service=service),
-        )
+        with ignore_optional_service(service):
+            ssh(
+                manager_connection_string,
+                ssh_port,
+                keyfile,
+                'sudo systemctl start {service}'.format(service=service),
+            )
 
 
 def upload_and_verify_patch_files(manager_connection_string, ssh_port,
@@ -3240,7 +3266,7 @@ def main():
         if os.path.exists(PATCHIFY_LOG_PATH):
             log_size = os.path.getsize(PATCHIFY_LOG_PATH)
             if log_size > (1024 * 1024):
-                log_size = log_size / (1024.0*1024)
+                log_size = log_size / (1024.0 * 1024)
                 units = 'MiB'
             elif log_size > 1024:
                 log_size = log_size / 1024.0
