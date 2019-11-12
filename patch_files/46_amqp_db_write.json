@@ -1,0 +1,44 @@
+{
+    "affected_services": [
+        "cloudify-handler-runner"
+    ], 
+    "community": false, 
+    "description": "Cluster: don't write to the db when replicating AMQP resources.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/amqp_manager.py"
+            ], 
+            "patch_file": "46_amqp_db_write_rest-service_manager_rest_amqp_manager.py", 
+            "sha256sum": "221903913586b65dc1decae59e199bc32eb3ff9605456bcce47e20b5b900e0c0"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/commands.py"
+            ], 
+            "patch_file": "46_amqp_db_write_premium_cloudify_premium_ha_commands.py", 
+            "sha256sum": "ff7efe09e0ca058ae681b1162faca97eeaecf64197ab3c1088aacdf4bc011223"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/amqp_manager.py": [
+            "be5e0fd303cf0bffff5ab5460366ffad3cc0effc828baadd5335b5a578d8b4b5"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/commands.py": [
+            "5405dff350128ba649e421d2198c782e725350c3a9e3981ce2f254104f890379"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/amqp_manager.py": [
+            "f518acb42453c9f2adb885faed6bd89d77927e649e861a1f1e86d8563552affa"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/commands.py": [
+            "374424e06f3617367598e0e99f043f2e54157b541465f62c92d522042acdd318"
+        ]
+    }
+}

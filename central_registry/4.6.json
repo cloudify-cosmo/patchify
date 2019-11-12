@@ -262,6 +262,18 @@
       "patch_id": "46_watch_lock-4a496dfea24bf41c1b31ecdf6e212118cf8525b20b4bbbf1fa2967a608b3e35a", 
       "patch_name": "46_watch_lock", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_amqp_db_write.json", 
+      "patch_description": "Cluster: don't write to the db when replicating AMQP resources.", 
+      "patch_files": [
+        "46_amqp_db_write_rest-service_manager_rest_amqp_manager.py", 
+        "46_amqp_db_write_premium_cloudify_premium_ha_commands.py"
+      ], 
+      "patch_hash": "fd80b8d289521242c7d51a6feb4c466f534673873b0f8088ea84a31450a66060", 
+      "patch_id": "46_amqp_db_write-fd80b8d289521242c7d51a6feb4c466f534673873b0f8088ea84a31450a66060", 
+      "patch_name": "46_amqp_db_write", 
+      "supports_community": false
     }
   ]
 }
