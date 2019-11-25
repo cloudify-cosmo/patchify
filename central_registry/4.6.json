@@ -274,6 +274,17 @@
       "patch_id": "46_amqp_db_write-fd80b8d289521242c7d51a6feb4c466f534673873b0f8088ea84a31450a66060", 
       "patch_name": "46_amqp_db_write", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_hook_update_operation.json", 
+      "patch_description": "Don't store operation state when running hooks.", 
+      "patch_files": [
+        "46_hook_update_operation_cloudify_dispatch.py"
+      ], 
+      "patch_hash": "8374066e943b306a2a4db66dfc3e5675f56467a04442fdde7f25fc9e7bcd9ad9", 
+      "patch_id": "46_hook_update_operation-8374066e943b306a2a4db66dfc3e5675f56467a04442fdde7f25fc9e7bcd9ad9", 
+      "patch_name": "46_hook_update_operation", 
+      "supports_community": false
     }
   ]
 }

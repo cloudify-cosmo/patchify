@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "Don't store operation state when running hooks.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py"
+            ], 
+            "patch_file": "46_hook_update_operation_cloudify_dispatch.py", 
+            "sha256sum": "64e768f88a3f6a982141c57bb4d5dbe7c5230bbcd4a924feb28378f2b3cff5dd"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py": [
+            "2ea646f107f10f9bf598e117c96828793d0093f38e50a6d0a01cfd594b95a4bf"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/dispatch.py": [
+            "467def25046a55c79336a85d997a92f1f5ddf0f91fbd7577b3775522e07b580f"
+        ]
+    }
+}
