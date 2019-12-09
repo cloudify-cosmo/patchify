@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ],
+    "community": false,
+    "description": "Don't break agent operations with unicode in env after a failover.",
+    "manager_versions": [
+        "4.6"
+    ],
+    "patch_version": "2.0.0",
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py"
+            ],
+            "patch_file": "46_agent_env_unicode_cloudify_workflows_workflow_context.py",
+            "sha256sum": "0de4b32f68fdda986ca275a66c085eff3b9952c2ef288b5817ee3a13d2771cad"
+        }
+    ],
+    "premium": true,
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "3a01d18d0342ba5a99c14d50d6fa67473922b111602035f30466ae57495387d6"
+        ]
+    },
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "be0b9e1e3f301f32485fac6241ae62ac4b7c198711463585dd8ed66910598b0a"
+        ]
+    }
+}

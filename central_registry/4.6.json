@@ -285,6 +285,17 @@
       "patch_id": "46_hook_update_operation-8374066e943b306a2a4db66dfc3e5675f56467a04442fdde7f25fc9e7bcd9ad9", 
       "patch_name": "46_hook_update_operation", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_agent_env_unicode.json", 
+      "patch_description": "Don't break agent operations with unicode in env after a failover.", 
+      "patch_files": [
+        "46_agent_env_unicode_cloudify_workflows_workflow_context.py"
+      ], 
+      "patch_hash": "c186b0d8ed3709b8aa3c05aa7ee5f0428084646fc8107a1c1c635c77f534eb9f", 
+      "patch_id": "46_agent_env_unicode-c186b0d8ed3709b8aa3c05aa7ee5f0428084646fc8107a1c1c635c77f534eb9f", 
+      "patch_name": "46_agent_env_unicode", 
+      "supports_community": false
     }
   ]
 }
