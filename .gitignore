@@ -1,2 +1,5 @@
 .cloudify/
 
+# IDE or editor
+.DS_Store
+.idea/
