@@ -1,7 +1,7 @@
 {
   "patch_version": "2.0.0",
   "description": "Test patch modifying existing patches for testing patchify.",
-  "manager_versions": ["4.5", "4.5.5"],
+  "manager_versions": ["4.5", "4.5.5", "4.6", "5.0.5"],
   "community": true,
   "premium": true,
   "patches": [
@@ -17,7 +17,7 @@
     }
   ],
   "affected_services": [
-    "cloudify-rabbitmq"
+    "cloudify-restservice"
   ],
   "sha256sums_before": {
     "/opt/cloudify/test_patch_1": ["9f6741fafb8cbb75e20c3f1eec11f0cb5b3a13e89552232068476811fa449bda"],

@@ -4,7 +4,9 @@
 from __future__ import print_function
 import argparse
 from contextlib import contextmanager
+import copy
 import datetime
+from functools import total_ordering
 import hashlib
 import json
 import os
@@ -50,13 +52,17 @@ PATCH_VERSIONS = {
                          'sha256sums_before', 'sha256sums_after']),
     },
 }
-PATCHIFY_VERSION = (1, 1, 8)
+PATCHIFY_VERSION = (1, 2, 0)
 OPTIONAL_SERVICES = {
     'cloudify-handler-runner',
     'cloudify-check-runner',
     'cloudify-consul-watcher',
     'cloudify-syncthing'
 }
+# This is set when the manager version is first retrieved to avoid an issue
+# with checking whether we're on 5.0.5+ mid-service check when a service does
+# not restart properly
+_MANAGER_VERSION = None
 
 
 class VersionError(Exception):
@@ -127,6 +133,40 @@ class PatchAlreadyApplied(Exception):
     pass
 
 
+class InvalidNodeType(Exception):
+    pass
+
+
+@total_ordering
+class Version(object):
+    def __init__(self, version_string, raw=None, edition=None):
+        version = version_string.split('.')
+        try:
+            self._version = tuple(int(part) for part in version)
+        except ValueError:
+            raise VersionError(
+                'Version string must contain only integer components. '
+                'Found: {version}'.format(version=version),
+            )
+        self.edition = edition
+        self.raw = raw
+
+    def __repr__(self):
+        return self._version
+
+    def __str__(self):
+        return '.'.join(str(part) for part in self._version)
+
+    def __eq__(self, other):
+        return self._version == other
+
+    def __lt__(self, other):
+        return self._version < other
+
+    def __getitem__(self, index):
+        return self._version[index]
+
+
 def get_log_path():
     path = os.path.expanduser('~/.cloudify/logs/patchify.log')
     if yaml:
@@ -178,7 +218,7 @@ def get_patchify_version_output():
         'Patchify version {ver}. '
         'Supported patch definitions: {def_vers}.'
     ).format(
-        ver='.'.join(str(i) for i in PATCHIFY_VERSION),
+        ver=PATCHIFY_VERSION,
         def_vers=', '.join(supported_def_vers)
     )
 
@@ -251,51 +291,30 @@ def output_table_row(lengths, entries):
 
 
 def get_manager_version():
+    global _MANAGER_VERSION
+    if _MANAGER_VERSION:
+        return _MANAGER_VERSION
     try:
         version_output = subprocess.check_output(['cfy', '--version'])
     except subprocess.CalledProcessError:
         return None
 
-    community = 'Community edition' in version_output
-    version = None
+    edition = (
+        'community' if 'Community edition' in version_output
+        else 'premium'
+    )
 
     for line in version_output.splitlines():
         if line.lower().startswith('cloudify manager'):
             # Expecting line to be similar to:
             # Cloudify Manager 4.2.0 [ip=10.239.3.199]
-            version = line.split(' ')[2]
+            version_string = line.split(' ')[2]
             break
 
-    return {
-        'version': version,
-        'community': community,
-        'raw': version_output,
-    }
+    _MANAGER_VERSION = Version(version_string, edition=edition,
+                               raw=version_output)
 
-
-def parse_version_string(version):
-    """
-        Parse a version string in semantic versioning format.
-    """
-    version = version.split('.')
-
-    if len(version) != 3:
-        raise VersionError(
-            'Version string must contain three components. '
-            'Found: {split_version}'.format(
-                split_version=version,
-            ),
-        )
-
-    try:
-        version = tuple(int(part) for part in version)
-    except ValueError:
-        raise VersionError(
-            'Version string must contain only integer components. '
-            'Found: {version}'.format(version=version),
-        )
-
-    return version
+    return _MANAGER_VERSION
 
 
 def load_patch_definition(filename):
@@ -359,7 +378,7 @@ def load_patch_definition(filename):
     #   }
     # }
     try:
-        patch_version = parse_version_string(definition['patch_version'])
+        patch_version = Version(definition['patch_version'])
     except KeyError:
         add_definition_error(
             message=(
@@ -484,9 +503,19 @@ def add_definition_error(message, definition, fatal=False):
 
 
 def get_unhealthy_services():
+    if get_manager_version() >= Version('5.0.5'):
+        command = ['cluster', 'status']
+        expected = ['OK']
+    else:
+        command = ['status']
+        expected = ['running', 'up']
+
     try:
-        _, results = get_cfy_output(['status'])
+        _, results = get_cfy_output(command)
     except subprocess.CalledProcessError:
+        return ['All processes (is cfy pointing at a working manager?)']
+
+    if len(results) == 0:
         return ['All processes (is cfy pointing at a working manager?)']
 
     unhealthy_services = []
@@ -494,7 +523,7 @@ def get_unhealthy_services():
     for result in results:
         service = result[1]
         status = result[2]
-        if status not in ('running', 'up'):
+        if status not in expected:
             unhealthy_services.append(service)
 
     return unhealthy_services
@@ -515,18 +544,24 @@ def get_profile_ssh_details(action):
         )
 
     ssh_user_pos = headers.index('ssh_user')
-    manager_ip_pos = headers.index('manager_ip')
     ssh_port_pos = headers.index('ssh_port')
     ssh_key_path_pos = headers.index('ssh_key_path')
     try:
-        cluster_node_name_pos = headers.index('cluster node name')
+        if get_manager_version() >= Version('5.0.5'):
+            cluster_node_name_pos = headers.index('Manager hostname')
+            manager_ip_pos = headers.index('Manager ip')
+        else:
+            cluster_node_name_pos = headers.index('cluster node name')
+            manager_ip_pos = headers.index('manager_ip')
     except ValueError:
         cluster_node_name_pos = None
+        manager_ip_pos = headers.index('manager_ip')
 
     manager_connection_details = []
     for result in results:
         manager_connection_details.append({
             'manager_ip': result[manager_ip_pos],
+            'ssh_user': result[ssh_user_pos],
             'connection_string': (
                 result[ssh_user_pos] + '@' + result[manager_ip_pos]
             ),
@@ -539,6 +574,66 @@ def get_profile_ssh_details(action):
         })
 
     return manager_connection_details
+
+
+def _get_node_details(type_name, ssh_base, name_ref, address_ref):
+    headers, results = get_cfy_output(['cluster', type_name, 'list'])
+
+    name_pos = headers.index(name_ref)
+    addr_pos = headers.index(address_ref)
+
+    nodes = []
+
+    for result in results:
+        node_name = result[name_pos]
+        node_address = result[addr_pos]
+        node = copy.copy(ssh_base)
+        node.update({
+            'manager_ip': node_address,
+            'connection_string': ssh_base['ssh_user'] + '@' + node_address,
+            'cluster_node_name': node_name,
+        })
+        nodes.append(node)
+
+    return nodes
+
+
+def get_cluster_nodes(ssh_details, include_node_types=None):
+    if include_node_types is None:
+        include_node_types = ['managers']
+
+    valid_node_types = ['managers', 'dbs', 'brokers']
+    for element in include_node_types:
+        if element not in valid_node_types:
+            raise InvalidNodeType(
+                'Node type {specified} is invalid. Valid node types are: '
+                '{valid}'.format(
+                    specified=element,
+                    valid=', '.join(valid_node_types),
+                )
+            )
+
+    # Because we don't store separate ssh information for the brokers and dbs,
+    # we need to assume that all the nodes use the same ssh details, just with
+    # different addresses
+    ssh_base = ssh_details[0]
+
+    nodes = []
+
+    if 'managers' in include_node_types:
+        nodes.extend(
+            _get_node_details('managers', ssh_base, 'hostname', 'private_ip')
+        )
+    if 'dbs' in include_node_types:
+        nodes.extend(
+            _get_node_details('db-nodes', ssh_base, 'name', 'host')
+        )
+    if 'brokers' in include_node_types:
+        nodes.extend(
+            _get_node_details('brokers', ssh_base, 'name', 'host')
+        )
+
+    return nodes
 
 
 def get_cluster_members():
@@ -556,9 +651,9 @@ def get_cluster_members():
         if node_state == 'leader':
             if leader_node is not None:
                 raise ClusterUnhealthy(
-                    'Found multiple leader nodes in the cluster. This should '
-                    'not happen! Both {leader1} and {leader2} had their '
-                    'state set to "leader".'.format(
+                    'Found multiple leader nodes in the cluster. This '
+                    'should not happen! Both {leader1} and {leader2} had '
+                    'their state set to "leader".'.format(
                         leader1=leader_node,
                         leader2=node_name,
                     ),
@@ -1476,7 +1571,6 @@ def patch_applier(definition_file, skip_services, install_patch_command,
     if not skip_version_check:
         say("Checking manager version is valid.")
         manager_version = get_manager_version()
-        raw_version_output = manager_version.pop('raw')
         if manager_version is None:
             exit_with_sadness(
                 'Could not get manager version! '
@@ -1487,37 +1581,34 @@ def patch_applier(definition_file, skip_services, install_patch_command,
         supported_versions = []
         if patch_definition['premium']:
             for version in patch_definition['manager_versions']:
-                supported_versions.append({
-                    'version': version,
-                    'community': False,
-                })
+                supported_versions.append(
+                    Version(version, edition='premium')
+                )
         if patch_definition['community']:
             for version in patch_definition['manager_versions']:
-                supported_versions.append({
-                    'version': version,
-                    'community': True,
-                })
+                supported_versions.append(
+                    Version(version, edition='community')
+                )
         if manager_version not in supported_versions:
-            manager_version_output = manager_version['version']
             try:
                 manager_version_output = build_manager_version_output_string(
-                    version=manager_version['version'],
-                    community=manager_version['community'],
+                    version=manager_version,
+                    community=manager_version.edition == 'community',
                 )
             except Exception as err:
                 exit_with_sadness(
                     'Could not determine manager version.\n'
                     'Version check output was: {raw_output}\n'
                     'Error was: {err}'.format(
-                        raw_output=raw_version_output,
+                        raw_output=manager_version.raw,
                         err=str(err),
                     ),
                     action,
                 )
             supported_versions_output = ', '.join([
                 build_manager_version_output_string(
-                    version=version['version'],
-                    community=version['community'],
+                    version=version,
+                    community=version.edition == 'community',
                 )
                 for version in supported_versions
             ])
@@ -1533,24 +1624,33 @@ def patch_applier(definition_file, skip_services, install_patch_command,
 
     if len(ssh_details) > 1:
         say("Attempting to apply patch to cluster.")
-        leader, members, offline = get_cluster_members()
 
-        if offline:
-            exit_with_sadness(
-                (
-                    'Cluster members {offline} are offline. Please ensure '
-                    'cluster is healthy before attempting to apply the '
-                    'patch.'.format(
-                        offline=', '.join(offline),
-                    )
-                ),
-                action,
-            )
+        if get_manager_version() >= Version('5.0.5'):
+            ssh_details = get_cluster_nodes(ssh_details)
 
-        # We will process the members in arbitrary order, followed by the
-        # current leader, as we need to switch the leader after each
-        # application to ensure services still work without the patch
-        members.append(leader)
+            members = [entry['cluster_node_name'] for entry in ssh_details]
+            # There are no leaders in 5.0.5
+            leader = None
+        else:
+            leader, members, offline = get_cluster_members()
+
+            if offline:
+                exit_with_sadness(
+                    (
+                        'Cluster members {offline} are offline. Please ensure '
+                        'cluster is healthy before attempting to apply the '
+                        'patch.'.format(
+                            offline=', '.join(offline),
+                        )
+                    ),
+                    action,
+                )
+
+            # We will process the members in arbitrary order, followed by the
+            # current leader, as we need to switch the leader after each
+            # application to ensure services still work without the patch
+            members.append(leader)
+
         member_ssh = {
             entry['cluster_node_name']: entry for entry in ssh_details
         }
@@ -1583,12 +1683,16 @@ def patch_applier(definition_file, skip_services, install_patch_command,
                 )
             )
             try:
+                # We shouldn't play with services prior to 5.0.5 or we will
+                # cause problems with the cluster
+                skip_service_restart = (
+                    get_manager_version() < Version('5.0.5')
+                )
                 rollback_args = apply_patch(
                     patch_definition,
                     patch_name,
                     definition_file,
-                    # Don't play with services or the cluster will get unhappy
-                    True,
+                    skip_service_restart,
                     member_ssh[member],
                     action,
                 )
@@ -1619,17 +1723,41 @@ def patch_applier(definition_file, skip_services, install_patch_command,
             # Confirming health of cluster member
             try:
                 if applied_to_this_node:
-                    # If no other nodes needed modifying, the leader will
-                    # still be the original leader, so we must switch away
-                    # then back
-                    if member == leader \
-                       and apply_not_required == len(members) - 1:
-                        say(
-                            "Switching away from old leader temporarily to "
-                            "confirm services are healthy after modification."
-                        )
-                        change_cluster_leader(members[0])
-                    change_cluster_leader(member)
+                    if get_manager_version() >= Version('5.0.5'):
+                        # If the node came up but made the cluster unhealthy,
+                        # this will raise a ServiceHealthFailure and we will
+                        # roll back to avoid breaking anything further.
+                        abort_on_unhealthy_services()
+                    else:
+                        # If no other nodes needed modifying, the leader will
+                        # still be the original leader, so we must switch away
+                        # then back
+                        if member == leader \
+                           and apply_not_required == len(members) - 1:
+                            say(
+                                "Switching away from old leader temporarily "
+                                "to confirm services are healthy after "
+                                "modification."
+                            )
+                            change_cluster_leader(members[0])
+                        change_cluster_leader(member)
+            except ServiceHealthFailure:
+                sadly_say(
+                    "After patching {member}, the cluster became unhealthy.\n"
+                    "Attempting to roll back patch on this manager.".format(
+                        member=member,
+                    )
+                )
+                rollback(*rollback_args)
+                exit_with_sadness(
+                    (
+                        "Rolled back {member}. Patch has not been fully "
+                        "applied to cluster.\n"
+                        "Please verify cluster healthy before re-attempting "
+                        "this action."
+                    ),
+                    action,
+                )
             except ClusterLeaderChangeFailure as err:
                 sadly_say(
                     "Failed to switch to {member}.\n"
@@ -1850,24 +1978,32 @@ def patch_remover(target_patch_id, skip_services):
 
     if len(ssh_details) > 1:
         say("Attempting to remove patch from cluster.")
-        leader, members, offline = get_cluster_members()
+        if get_manager_version() >= Version('5.0.5'):
+            ssh_details = get_cluster_nodes(ssh_details)
 
-        if offline:
-            exit_with_sadness(
-                (
-                    'Cluster members {offline} are offline. Please ensure '
-                    'cluster is healthy before attempting to remove the '
-                    'patch.'.format(
-                        offline=', '.join(offline),
-                    )
-                ),
-                action,
-            )
+            members = [entry['cluster_node_name'] for entry in ssh_details]
+            # There are no leaders in 5.0.5
+            leader = None
+        else:
+            leader, members, offline = get_cluster_members()
 
-        # We will process the members in arbitrary order, followed by the
-        # current leader, as we need to switch the leader after each removal
-        # to ensure services still work without the patch
-        members.append(leader)
+            if offline:
+                exit_with_sadness(
+                    (
+                        'Cluster members {offline} are offline. Please '
+                        'ensure cluster is healthy before attempting to '
+                        'remove the patch.'.format(
+                            offline=', '.join(offline),
+                        )
+                    ),
+                    action,
+                )
+
+            # We will process the members in arbitrary order, followed by the
+            # current leader, as we need to switch the leader after each
+            # removal to ensure services still work without the patch
+            members.append(leader)
+
         member_ssh = {
             entry['cluster_node_name']: entry for entry in ssh_details
         }
@@ -1894,10 +2030,14 @@ def patch_remover(target_patch_id, skip_services):
                 )
             )
             try:
+                # We shouldn't play with services prior to 5.0.5 or we will
+                # cause problems with the cluster
+                skip_service_restart = (
+                    get_manager_version() < Version('5.0.5')
+                )
                 rollback_args = remove_patch(
                     target_patch_id,
-                    # Don't play with services or the cluster will get unhappy
-                    True,
+                    skip_service_restart,
                     member_ssh[member],
                     action,
                 )
@@ -1933,17 +2073,23 @@ def patch_remover(target_patch_id, skip_services):
             # Confirming health of cluster member
             try:
                 if removed_from_this_node:
-                    # If no other nodes needed modifying, the leader will
-                    # still be the original leader, so we must switch away
-                    # then back
-                    if member == leader \
-                       and removal_not_required == len(members) - 1:
-                        say(
-                            "Switching away from old leader temporarily to "
-                            "confirm services are healthy after modification."
-                        )
-                        change_cluster_leader(members[0])
-                    change_cluster_leader(member)
+                    if get_manager_version() >= Version('5.0.5'):
+                        # Wait for healthy services, and rollback if they do
+                        # not become healthy
+                        wait_for_healthy_services(**rollback_args)
+                    else:
+                        # If no other nodes needed modifying, the leader will
+                        # still be the original leader, so we must switch away
+                        # then back
+                        if member == leader \
+                           and removal_not_required == len(members) - 1:
+                            say(
+                                "Switching away from old leader temporarily "
+                                "to confirm services are healthy after "
+                                "modification."
+                            )
+                            change_cluster_leader(members[0])
+                        change_cluster_leader(member)
             except ClusterLeaderChangeFailure as err:
                 sadly_say(
                     "Failed to switch to {member}.\n"
@@ -1951,7 +2097,7 @@ def patch_remover(target_patch_id, skip_services):
                         member=member,
                     )
                 )
-                rollback(*rollback_args)
+                rollback(**rollback_args)
                 exit_with_sadness(
                     (
                         "Rolled back {member}. Patch has not been fully "
@@ -1968,6 +2114,19 @@ def patch_remover(target_patch_id, skip_services):
                         "because this node was already the leader.\n"
                         "Cluster appears to be undergoing unexpected leader "
                         "changes while patching.".format(
+                            member=member,
+                        )
+                    ),
+                    action,
+                )
+            except ServiceHealthFailure as err:
+                exit_with_sadness(
+                    (
+                        "Failure applying patch to {member}. "
+                        "Cluster health did not recover after patch was "
+                        "applied.\n"
+                        "Please verify cluster healthy before re-attempting "
+                        "this action.".format(
                             member=member,
                         )
                     ),
@@ -2248,15 +2407,15 @@ def remove_patch(target_patch_id, skip_services, ssh_details, action):
 
     # Return arguments required for rollback to allow rollback in cluster
     # patching
-    return (
-        manager_connection_string,
-        ssh_port,
-        new_definition,
-        backup_root,
-        delete_root,
-        keyfile,
-        skip_services,
-    )
+    return {
+        'manager_connection_string': manager_connection_string,
+        'ssh_port': ssh_port,
+        'patch_definition': new_definition,
+        'backup_root': backup_root,
+        'delete_root': delete_root,
+        'keyfile': keyfile,
+        'skip_services': skip_services,
+    }
 
 
 def generate_patch_id(patch_name, definition_hash):
@@ -2350,12 +2509,20 @@ def get_uninstall_blockers(patches):
 
 def retrieve_manager_patch_details(verbose, action):
     ssh_details = get_profile_ssh_details(action)
-    if len(ssh_details) > 1:
-        if verbose:
-            say("Determining cluster leader.")
-        leader, _, _ = get_cluster_members()
+    leader = None
+
+    if get_manager_version() >= Version('5.0.5'):
+        ssh_details = get_cluster_nodes(
+            ssh_details,
+        )
+        if len(ssh_details) > 1:
+            leader = ssh_details[0]['cluster_node_name']
     else:
-        leader = None
+        if len(ssh_details) > 1:
+            if verbose:
+                say("Determining cluster leader.")
+
+            leader, _, _ = get_cluster_members()
 
     manager_patches = {}
 
@@ -2398,56 +2565,79 @@ def list_patches(json_output, verbose):
     manager_patches, leader = retrieve_manager_patch_details(verbose,
                                                              action)
 
+    if get_manager_version() >= Version('5.0.5'):
+        on_other_nodes = 'on_nodes'
+    else:
+        on_other_nodes = 'on_replicas'
+
+    cluster = (
+        leader
+        or (
+            get_manager_version() >= Version('5.0.5')
+            and None not in manager_patches
+        )
+    )
+
     if json_output:
-        if leader:
+        if cluster:
             output_json(manager_patches)
         else:
             output_json(manager_patches[None])
     elif not verbose:
-        if leader:
+        if cluster:
             display = []
             patch_id_mapping = {}
-            replica_count = len(manager_patches) - 1
+            if get_manager_version() >= Version('5.0.5'):
+                replica_count = len(manager_patches)
+            else:
+                replica_count = len(manager_patches) - 1
             patch_num = 0
 
-            leader_patches = manager_patches.pop(leader)
+            if get_manager_version() >= Version('5.0.5'):
+                leader_patches = manager_patches.popitem()[1]
+            else:
+                leader_patches = manager_patches.pop(leader)
 
             for patch in leader_patches:
                 patch_num += 1
                 display.append({
                     'patch': patch_num,
                     'on_leader': True,
-                    'on_replicas': 0,
+                    on_other_nodes: 0,
                     'patch_id': patch['patch_id'],
                     'blocks': patch['blocks_uninstall_of'],
                 })
+                if get_manager_version() >= Version('5.0.5'):
+                    display[-1][on_other_nodes] = 1
                 patch_id_mapping[patch['patch_id']] = patch_num
 
             for replica in manager_patches.values():
                 for patch in replica:
                     if patch['patch_id'] in patch_id_mapping:
                         pos = patch_id_mapping[patch['patch_id']] - 1
-                        display[pos]['on_replicas'] += 1
+                        display[pos][on_other_nodes] += 1
                     else:
                         patch_num += 1
                         display.append({
                             'patch': patch_num,
                             'on_leader': False,
-                            'on_replicas': 1,
+                            on_other_nodes: 1,
                             'patch_id': patch['patch_id'],
                             'blocks': patch['blocks_uninstall_of'],
                         })
                         patch_id_mapping[patch['patch_id']] = patch_num
 
             for patch in display:
-                patch['on_replicas'] = '{on}/{total}'.format(
-                    on=patch['on_replicas'],
+                patch[on_other_nodes] = '{on}/{total}'.format(
+                    on=patch[on_other_nodes],
                     total=replica_count,
                 )
                 patch['patch'] = str(patch['patch'])
 
-            fields = ['patch', 'on_leader', 'on_replicas', 'patch_id',
+            fields = ['patch', 'on_leader', on_other_nodes, 'patch_id',
                       'blocks']
+            if get_manager_version() >= Version('5.0.5'):
+                fields.remove('on_leader')
         else:
             display = []
             patch_id_mapping = {}
@@ -2655,7 +2845,7 @@ def download_patch_registry(manager_connection_string, ssh_port, keyfile,
 def determine_central_registry_location(central_repository_location,
                                         manager_version):
     return (
-        central_repository_location + manager_version['version'] + '.json'
+        central_repository_location + str(manager_version) + '.json'
     )
 
 
@@ -2696,7 +2886,7 @@ def retrieve_central_patch_listing(registry_location, action,
             action,
         )
 
-    if manager_version['community']:
+    if manager_version.edition == 'community':
         if verbose:
             say('Filtering out premium-only patches.')
         central_listing['patches'] = [
@@ -2889,7 +3079,7 @@ def set_recommended_patch_status(central_listing, action,
     patch_id_mapping = {}
     for patch_idx, patch in enumerate(central_listing['patches']):
         patch['missing_on_manager'] = []
-        if leader:
+        if get_manager_version() >= Version('5.0.5') and leader:
             patch['missing_on_current_leader'] = False
         patch_id_mapping[patch['patch_id']] = patch_idx
 
@@ -2902,8 +3092,9 @@ def set_recommended_patch_status(central_listing, action,
         for patch in missing_patches:
             patch = central_listing['patches'][patch_id_mapping[patch]]
             patch['missing_on_manager'].append(manager)
-            if leader and manager == leader:
-                patch['missing_on_current_leader'] = True
+            if get_manager_version() >= Version('5.0.5'):
+                if leader and manager == leader:
+                    patch['missing_on_current_leader'] = True
 
     # Return these for comparisons with missing patch details
     return manager_patches, leader
@@ -2913,6 +3104,11 @@ def list_central_manager_patches(central_repository_location,
                                  skip_checking_manager,
                                  json_output, verbose):
     action = 'LISTING CENTRAL PATCHES'
+
+    if get_manager_version() >= Version('5.0.5'):
+        on_other_nodes = 'on_nodes'
+    else:
+        on_other_nodes = 'on_replicas'
 
     if verbose:
         say('Getting manager version to list correct patches.')
@@ -2953,18 +3149,23 @@ def list_central_manager_patches(central_repository_location,
                 installed_on_leader = leader not in missing_patches
 
                 missing_on_replicas = len(missing_patches)
-                if not installed_on_leader:
-                    missing_on_replicas -= 1
-                replica_count = len(manager_patches) - 1
+                if get_manager_version() >= Version('5.0.5'):
+                    replica_count = len(manager_patches)
+                else:
+                    if not installed_on_leader:
+                        missing_on_replicas -= 1
+                    replica_count = len(manager_patches) - 1
                 installed_on_replicas = replica_count - missing_on_replicas
 
                 display_patch['on_leader'] = installed_on_leader
-                display_patch['on_replicas'] = '{on}/{total}'.format(
+                display_patch[on_other_nodes] = '{on}/{total}'.format(
                     on=installed_on_replicas,
                     total=replica_count,
                 )
 
-                fields = ['on_leader', 'on_replicas', 'patch_id']
+                fields = ['on_leader', on_other_nodes, 'patch_id']
+                if get_manager_version() >= Version('5.0.5'):
+                    fields.remove('on_leader')
             else:
                 display_patch['installed'] = not missing_patches
                 fields = ['installed', 'patch_id']
@@ -2975,7 +3176,7 @@ def list_central_manager_patches(central_repository_location,
         say('')
         say(
             'Recommended patches for {version}:'.format(
-                version=manager_version['version'],
+                version=manager_version,
             )
         )
         missing_patches = False
