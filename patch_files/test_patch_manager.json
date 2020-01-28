@@ -1,0 +1,24 @@
+{
+  "patch_version": "2.1.0",
+  "description": "Patch for testing patching manager nodes.",
+  "manager_versions": ["5.0.5"],
+  "node_types": ["manager"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "test_patch_1",
+      "sha256sum": "7269dd3b082d59c5bb4f55e316424197114350bd767205dc67ab940627b24386",
+      "destinations": ["/opt/cloudify/test_patch_1"]
+    }
+  ],
+  "affected_services": [
+    "cloudify-status-reporter"
+  ],
+  "sha256sums_before": {
+    "/opt/cloudify/test_patch_1": ["DOESNOTEXIST"]
+  },
+  "sha256sums_after": {
+    "/opt/cloudify/test_patch_1": ["9f6741fafb8cbb75e20c3f1eec11f0cb5b3a13e89552232068476811fa449bda"]
+  }
+}

@@ -50,15 +50,21 @@ PATCH_VERSIONS = {
                          'patch_version', 'description',
                          'affected_services', 'patches',
                          'sha256sums_before', 'sha256sums_after']),
+        'minor_versions': {
+            1: {
+                'recommended': set(['node_types']),
+            },
+        },
     },
 }
-PATCHIFY_VERSION = (1, 2, 1)
+PATCHIFY_VERSION = (1, 3, 0)
 OPTIONAL_SERVICES = {
     'cloudify-handler-runner',
     'cloudify-check-runner',
     'cloudify-consul-watcher',
     'cloudify-syncthing'
 }
+NODE_TYPES = ['manager', 'db', 'broker']
 # This is set when the manager version is first retrieved to avoid an issue
 # with checking whether we're on 5.0.5+ mid-service check when a service does
 # not restart properly
@@ -341,7 +347,7 @@ def load_patch_definition(filename):
     # Currently this handles version 1.0.0, 1.1.0, and 2.0.0 of patch
     # definitions:
     # {
-    #   "patch_version": 1.0.0,  # or 1.1.0 or 2.0.0
+    #   "patch_version": 1.0.0,  # or 1.1.0, 2.0.0, 2.1.0
     #   "manager_versions": [4.2],  # List of supported cloudify managers
     #   "community": <true|false>,  # Whether community is supported
     #   "premium": <true|false>,  # Whether premium is supported
@@ -365,6 +371,13 @@ def load_patch_definition(filename):
     #                           # any rollbacks and started afterwards.
     #     "cloudify-service-1",
     #     "cloudify-service-2"
+    #   ],
+    #   # Node types are only valid for patch definition version 2.1.0+
+    #   "node_types": [ # List of affected node types.
+    #                   # Valid node typed are: manager, db, broker
+    #                   # Node types other than manager are not valid for
+    #                   # Cloudify versions below 5.0.5.
+    #     "manager"
     #   ],
     #   # Note that for 2.0.0 and above, sha256sums are used instead of MD5s.
     #   # Therefore, these sections will be "sha256sums_before" and
@@ -487,6 +500,28 @@ def load_patch_definition(filename):
         if not definition['description'].endswith('.'):
             add_definition_error(
                 message='Patch description must end with a full stop.',
+                definition=definition,
+                fatal=True,
+            )
+
+    if definition.get('node_types') and 'node_types' not in unsupported_keys:
+        if get_manager_version() >= Version('5.0.5'):
+            supported_node_types = NODE_TYPES
+        else:
+            supported_node_types = ['manager']
+        unsupported_node_types = [
+            node_type
+            for node_type in definition['node_types']
+            if node_type not in supported_node_types
+        ]
+        if unsupported_node_types:
+            add_definition_error(
+                message=(
+                    'Unsupported node types found in patch definition: '
+                    '{unsupported}'.format(unsupported=', '.join(
+                        unsupported_node_types,
+                    ))
+                ),
                 definition=definition,
                 fatal=True,
             )
@@ -617,18 +652,19 @@ def _get_node_details(type_name, ssh_base, name_ref, address_ref):
 
 def get_cluster_nodes(ssh_details, include_node_types=None):
     if include_node_types is None:
-        include_node_types = ['managers']
+        include_node_types = ['manager']
 
-    valid_node_types = ['managers', 'dbs', 'brokers']
     for element in include_node_types:
-        if element not in valid_node_types:
+        if element not in NODE_TYPES:
             raise InvalidNodeType(
                 'Node type {specified} is invalid. Valid node types are: '
                 '{valid}'.format(
                     specified=element,
-                    valid=', '.join(valid_node_types),
+                    valid=', '.join(NODE_TYPES),
                 )
             )
+
+    all_in_one = len(ssh_details) == 1
 
     # Because we don't store separate ssh information for the brokers and dbs,
     # we need to assume that all the nodes use the same ssh details, just with
@@ -637,15 +673,15 @@ def get_cluster_nodes(ssh_details, include_node_types=None):
 
     nodes = []
 
-    if 'managers' in include_node_types:
+    if 'manager' in include_node_types:
         nodes.extend(
             _get_node_details('managers', ssh_base, 'hostname', 'private_ip')
         )
-    if 'dbs' in include_node_types:
+    if not all_in_one and 'db' in include_node_types:
         nodes.extend(
             _get_node_details('db-nodes', ssh_base, 'name', 'host')
         )
-    if 'brokers' in include_node_types:
+    if not all_in_one and 'broker' in include_node_types:
         nodes.extend(
             _get_node_details('brokers', ssh_base, 'name', 'host')
         )
@@ -1643,7 +1679,10 @@ def patch_applier(definition_file, skip_services, install_patch_command,
         say("Attempting to apply patch to cluster.")
 
         if get_manager_version() >= Version('5.0.5'):
-            ssh_details = get_cluster_nodes(ssh_details)
+            ssh_details = get_cluster_nodes(
+                ssh_details,
+                include_node_types=patch_definition.get('node_types'),
+            )
 
             members = [entry['cluster_node_name'] for entry in ssh_details]
             # There are no leaders in 5.0.5
@@ -1812,6 +1851,11 @@ def patch_applier(definition_file, skip_services, install_patch_command,
         else:
             say("Patch applied to cluster.")
     else:
+        if get_manager_version() >= Version('5.0.5'):
+            applies_to = patch_definition.get('node_types', [])
+            if 'manager' not in applies_to:
+                say("Patch does not apply to managers, skipping.")
+                return
         say("Attempting to apply patch to manager.")
         ssh_details = ssh_details[0]
         try:
@@ -1996,7 +2040,10 @@ def patch_remover(target_patch_id, skip_services):
     if len(ssh_details) > 1:
         say("Attempting to remove patch from cluster.")
         if get_manager_version() >= Version('5.0.5'):
-            ssh_details = get_cluster_nodes(ssh_details)
+            ssh_details = get_cluster_nodes(
+                ssh_details,
+                include_node_types=NODE_TYPES,
+            )
 
             members = [entry['cluster_node_name'] for entry in ssh_details]
             # There are no leaders in 5.0.5
@@ -2467,6 +2514,7 @@ def add_patch_to_registry(registry, patch_id, timestamp,
         'modified_files': modified_files,
         'blocks_uninstall_of': block_uninstall,
         'description': patch_definition.get('description'),
+        'node_types': patch_definition.get('node_types'),
     }
 
     current_patches.append(new_patch)
@@ -2531,6 +2579,7 @@ def retrieve_manager_patch_details(verbose, action):
     if get_manager_version() >= Version('5.0.5'):
         ssh_details = get_cluster_nodes(
             ssh_details,
+            include_node_types=NODE_TYPES,
         )
         if len(ssh_details) > 1:
             leader = ssh_details[0]['cluster_node_name']
@@ -2574,6 +2623,31 @@ def retrieve_manager_patch_details(verbose, action):
                                                           [])
 
     return manager_patches, leader
+
+
+def get_node_type_counts(action, replica_count):
+    node_type_counts = {}
+    # We will need these to determine correct numbers for nodes
+    # that patches are expected to have been applied to
+    ssh_details = get_profile_ssh_details(action)
+    node_type_counts['db'] = len(
+        get_cluster_nodes(
+            ssh_details,
+            include_node_types=['db'],
+        )
+    )
+    node_type_counts['broker'] = len(
+        get_cluster_nodes(
+            ssh_details,
+            include_node_types=['broker'],
+        )
+    )
+    node_type_counts['manager'] = (
+        replica_count
+        - node_type_counts['db']
+        - node_type_counts['broker']
+    )
+    return node_type_counts
 
 
 def list_patches(json_output, verbose):
@@ -2626,6 +2700,10 @@ def list_patches(json_output, verbose):
                 })
                 if get_manager_version() >= Version('5.0.5'):
                     display[-1][on_other_nodes] = 1
+                    display[-1]['applies_to'] = patch.get(
+                        'node_types',
+                        ['manager'],
+                    )
                 patch_id_mapping[patch['patch_id']] = patch_num
 
             for replica in manager_patches.values():
@@ -2643,18 +2721,36 @@ def list_patches(json_output, verbose):
                             'blocks': patch['blocks_uninstall_of'],
                         })
                         patch_id_mapping[patch['patch_id']] = patch_num
+                        if get_manager_version() >= Version('5.0.5'):
+                            display[-1]['applies_to'] = patch.get(
+                                'node_types', ['manager']
+                            )
+
+            node_type_counts = None
+            if get_manager_version() >= Version('5.0.5'):
+                node_type_counts = get_node_type_counts(action, replica_count)
 
             for patch in display:
+                if patch.get('applies_to'):
+                    expected_nodes = sum(
+                        node_type_counts[entry]
+                        for entry in patch['applies_to']
+                    )
+                else:
+                    expected_nodes = replica_count
                 patch[on_other_nodes] = '{on}/{total}'.format(
                     on=patch[on_other_nodes],
-                    total=replica_count,
+                    total=expected_nodes,
                 )
                 patch['patch'] = str(patch['patch'])
+                if get_manager_version() >= Version('5.0.5'):
+                    patch['applies_to'] = ','.join(patch['applies_to'])
 
             fields = ['patch', 'on_leader', on_other_nodes, 'patch_id',
                       'blocks']
             if get_manager_version() >= Version('5.0.5'):
                 fields.remove('on_leader')
+                fields.append('applies_to')
         else:
             display = []
             patch_id_mapping = {}
@@ -3156,6 +3252,13 @@ def list_central_manager_patches(central_repository_location,
         output_json(central_listing)
     elif not verbose:
         display = []
+
+        replica_count = len(manager_patches)
+
+        node_type_counts = None
+        if get_manager_version() >= Version('5.0.5'):
+            node_type_counts = get_node_type_counts(action, replica_count)
+
         for patch in central_listing['patches']:
             display_patch = {
                 'patch_id': patch['patch_id'],
@@ -3166,23 +3269,38 @@ def list_central_manager_patches(central_repository_location,
                 installed_on_leader = leader not in missing_patches
 
                 missing_on_replicas = len(missing_patches)
-                if get_manager_version() >= Version('5.0.5'):
-                    replica_count = len(manager_patches)
-                else:
+                if get_manager_version() < Version('5.0.5'):
                     if not installed_on_leader:
                         missing_on_replicas -= 1
-                    replica_count = len(manager_patches) - 1
+                    replica_count -= 1
                 installed_on_replicas = replica_count - missing_on_replicas
+
+                if get_manager_version() >= Version('5.0.5'):
+                    for node_patches in manager_patches.values():
+                        for node_patch in node_patches:
+                            if node_patch['patch_id'] == patch['patch_id']:
+                                display_patch['applies_to'] = node_patch.get(
+                                    'node_types', ['manager']
+                                )
+
+                if display_patch.get('applies_to'):
+                    expected_nodes = sum(
+                        node_type_counts[entry]
+                        for entry in display_patch['applies_to']
+                    )
+                else:
+                    expected_nodes = replica_count
 
                 display_patch['on_leader'] = installed_on_leader
                 display_patch[on_other_nodes] = '{on}/{total}'.format(
                     on=installed_on_replicas,
-                    total=replica_count,
+                    total=expected_nodes,
                 )
 
                 fields = ['on_leader', on_other_nodes, 'patch_id']
                 if get_manager_version() >= Version('5.0.5'):
                     fields.remove('on_leader')
+                    fields.append('applies_to')
             else:
                 display_patch['installed'] = not missing_patches
                 fields = ['installed', 'patch_id']
