@@ -52,7 +52,7 @@ PATCH_VERSIONS = {
                          'sha256sums_before', 'sha256sums_after']),
     },
 }
-PATCHIFY_VERSION = (1, 2, 0)
+PATCHIFY_VERSION = (1, 2, 1)
 OPTIONAL_SERVICES = {
     'cloudify-handler-runner',
     'cloudify-check-runner',
@@ -167,10 +167,27 @@ class Version(object):
         return self._version[index]
 
 
+def get_cloudify_workdir():
+    base = os.environ.get('CFY_WORKDIR', os.path.expanduser('~'))
+    return os.path.join(base, '.cloudify')
+
+
+def abort_unless_profile_dir_exists():
+    if not os.path.exists(get_cloudify_workdir()):
+        sadly_say(
+            'Patchify requires an active cfy profile for the manager you '
+            'are attempting to patch.\n'
+            'Please ensure this profile exists with `cfy profiles use`.\n'
+            'FAILED TO START PATCHIFY.'
+        )
+        sys.exit(1)
+
+
 def get_log_path():
-    path = os.path.expanduser('~/.cloudify/logs/patchify.log')
+    workdir = get_cloudify_workdir()
+    path = os.path.join(workdir, 'logs', 'patchify.log')
     if yaml:
-        cli_config_path = os.path.expanduser('~/.cloudify/config.yaml')
+        cli_config_path = os.path.join(workdir, 'config.yaml')
         if os.path.exists(cli_config_path):
             with open(cli_config_path) as conf_handle:
                 cli_conf = yaml.load(conf_handle.read())
@@ -3340,6 +3357,8 @@ def nullable_int(value):
 
 
 def main():
+    abort_unless_profile_dir_exists()
+
     parser = argparse.ArgumentParser(
         description=(
             'Apply a patch to a cloudify manager.\n' +
