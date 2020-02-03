@@ -1,0 +1,16 @@
+{
+  "patch_root_path": "https://raw.githubusercontent.com/cloudify-cosmo/patchify/master/patch_files/", 
+  "patches": [
+    {
+      "patch_definition_path": "5_0_5_status_reporter_race.json", 
+      "patch_description": "Fixes status reporter race condition.", 
+      "patch_files": [
+        "5_0_5_status_reporter_race_rest-service_manager_rest_cluster_status_manager.py"
+      ], 
+      "patch_hash": "c70c3793c1b97b444625d43835391b9322c214e8d319944696d480d91b37cc6f", 
+      "patch_id": "5_0_5_status_reporter_race-c70c3793c1b97b444625d43835391b9322c214e8d319944696d480d91b37cc6f", 
+      "patch_name": "5_0_5_status_reporter_race", 
+      "supports_community": false
+    }
+  ]
+}

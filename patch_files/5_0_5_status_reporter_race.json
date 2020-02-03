@@ -1,0 +1,32 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Fixes status reporter race condition.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": ["manager"],
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/cluster_status_manager.py"
+            ], 
+            "patch_file": "5_0_5_status_reporter_race_rest-service_manager_rest_cluster_status_manager.py", 
+            "sha256sum": "23bf0ec6d5f3528adea7f09fc56af72905f81bfe19caf66be260b5c393dce409"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/cluster_status_manager.py": [
+            "f84dc377be365043bbb7d5b9ede68536c9db70ca801237542a488c9105d4b305"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/cluster_status_manager.py": [
+            "34d4ebfae04682f78e4ebae05d9489b97fe3d3b694a036eb88b8c55772dcf133"
+        ]
+    }
+}
