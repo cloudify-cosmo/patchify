@@ -1,3 +1,4 @@
+1.3.1 - Handle missing central registry.
 1.3.0 - Support nodes other than managers for 5.0.5.
 1.2.1 - Give helpful output if there's no cfy profile, and support CFY_WORKDIR envvar.
 1.2.0 - Support 5.0.5, correctly handle cfy status output when manager is not returning any service listings.

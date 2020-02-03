@@ -57,7 +57,7 @@ PATCH_VERSIONS = {
         },
     },
 }
-PATCHIFY_VERSION = (1, 3, 0)
+PATCHIFY_VERSION = (1, 3, 1)
 OPTIONAL_SERVICES = {
     'cloudify-handler-runner',
     'cloudify-check-runner',
@@ -2972,17 +2972,26 @@ def retrieve_central_patch_listing(registry_location, action,
             registry_location,
         ).read()
     except urllib2.HTTPError as err:
-        exit_with_sadness(
-            (
-                'Failed to retrieve central registry from: {location}\n'
-                'Failed with {code}: {reason}.'.format(
-                    location=registry_location,
-                    code=err.code,
-                    reason=err.reason,
-                )
-            ),
-            action,
-        )
+        if err.code == 404:
+            sadly_say('No patches found for this release.')
+            raw_listing = '{"patch_root_path": null, "patches": []}'
+        else:
+            exit_with_sadness(
+                (
+                    'Failed to retrieve central registry from: {location}\n'
+                    'Failed with {code}: {reason}.'.format(
+                        location=registry_location,
+                        code=err.code,
+                        reason=err.reason,
+                    )
+                ),
+                action,
+            )
+    except urllib2.URLError as err:
+        if isinstance(err.reason, OSError) and err.reason.errno == 2:
+            # File not found on file:// url
+            sadly_say('No patches found for this release.')
+            raw_listing = '{"patch_root_path": null, "patches": []}'
 
     try:
         central_listing = json.loads(raw_listing)
@@ -3241,7 +3250,8 @@ def list_central_manager_patches(central_repository_location,
     if skip_checking_manager:
         say('Not checking patches on manager.')
         leader = None
-    else:
+    elif central_listing.get('patches'):
+        # We'll check the nodes if there are any patches to check
         manager_patches, leader = set_recommended_patch_status(
             central_listing,
             action,
@@ -3251,6 +3261,9 @@ def list_central_manager_patches(central_repository_location,
     if json_output:
         output_json(central_listing)
     elif not verbose:
+        if not central_listing.get('patches'):
+            # No need to check
+            return
         display = []
 
         replica_count = len(manager_patches)
@@ -3314,6 +3327,9 @@ def list_central_manager_patches(central_repository_location,
                 version=manager_version,
             )
         )
+        if not central_listing.get('patches'):
+            say('No recommended updates found in central registry.')
+            return
         missing_patches = False
         for patch in central_listing['patches']:
             patch_message = '  '
