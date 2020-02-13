@@ -2,6 +2,7 @@
 """Tool for generating patchify patches based on git commits."""
 from __future__ import print_function
 import argparse
+from functools import total_ordering
 import hashlib
 import json
 import os
@@ -25,12 +26,49 @@ LOCATION_TO_SERVICE = {
     '/opt/manager/env/lib/python2.7/site-packages/amqp_postgres': (
         'cloudify-amqp-postgres'
     ),
+    '/opt/status-reporter': 'cloudify-status-reporter',
 }
+LOCATIONS_DB = [
+    '/opt/status-reporter',
+]
+LOCATIONS_BROKER = [
+    '/opt/status-reporter',
+]
 # Including commands that aren't generally part of core centos/ubuntu installs
 REQUIRED_COMMANDS = [
     'patch',
     'git',
 ]
+
+
+@total_ordering
+class Version(object):
+    def __init__(self, version_string, raw=None, edition=None):
+        version = version_string.split('.')
+        try:
+            self._version = tuple(int(part) for part in version)
+        except ValueError:
+            raise ValueError(
+                'Version string must contain only integer components. '
+                'Found: {version}'.format(version=version),
+            )
+        self.edition = edition
+        self.raw = raw
+
+    def __repr__(self):
+        return self._version
+
+    def __str__(self):
+        return '.'.join(str(part) for part in self._version)
+
+    def __eq__(self, other):
+        return self._version == other
+
+    def __lt__(self, other):
+        return self._version < other
+
+    def __getitem__(self, index):
+        return self._version[index]
 
 
 def check_required_commands():
@@ -400,9 +438,15 @@ def determine_affected_services(diff_files):
 def generate_patch(patch_name, patch_description, path_to_repo, commit,
                    location_mappings):
     """Generate the patch."""
-    patch_definition = {'patch_version': '2.0.0'}
-
     manager_version_details = get_manager_version()
+    if Version(manager_version_details['version']) >= (5, 0, 5):
+        patch_version = '2.1.0'
+        new_style_cluster = True
+    else:
+        patch_version = '2.0.0'
+        new_style_cluster = False
+
+    patch_definition = {'patch_version': patch_version}
     patch_definition['manager_versions'] = [manager_version_details['version']]
     patch_definition['community'] = manager_version_details['community']
     # Everything on a filesystem level should work with premium
@@ -430,6 +474,62 @@ def generate_patch(patch_name, patch_description, path_to_repo, commit,
             'destinations': details['destinations'],
         } for diff_file, details in diff_files.items()
     ]
+
+    if new_style_cluster:
+        node_types = ['manager']
+        db = False
+        broker = False
+        non_db = False
+        non_broker = False
+        for diff_file in diff_files.values():
+            for location in LOCATIONS_DB:
+                for dest in diff_file['destinations']:
+                    if dest.startswith(location):
+                        db = True
+                    else:
+                        non_db = True
+            for location in LOCATIONS_BROKER:
+                for dest in diff_file['destinations']:
+                    if dest.startswith(location):
+                        broker = True
+                    else:
+                        non_db = True
+
+        conflict = False
+        if db and non_db:
+            sys.stderr.write(
+                'DB and non-DB patches found. Please split commit into one '
+                'affecting the DB and one affecting non-DB nodes. '
+                'DB patches target {db_targets}, and this commit targets '
+                '{commit_targets}\n'.format(
+                    db_targets=','.join(LOCATIONS_DB),
+                    commit_targets=','.join(diff_files),
+                )
+            )
+            conflict = True
+        if broker and non_broker:
+            sys.stderr.write(
+                'Broker and non-broker patches found. Please split commit '
+                'into one affecting the broker and one affecting non-broker '
+                'nodes. broker patches target {db_targets}, and this commit '
+                'targets {commit_targets}\n'.format(
+                    db_targets=','.join(LOCATIONS_BROKER),
+                    commit_targets=','.join(diff_files),
+                )
+            )
+            conflict = True
+
+        if conflict:
+            raise ValueError(
+                'Patch targets node types that do not accept all changes '
+                'from patch.'
+            )
+
+        if db:
+            node_types.append('db')
+        if broker:
+            node_types.append('broker')
+        patch_definition['node_types'] = node_types
 
     patch_definition['sha256sums_before'] = {}
     before = patch_definition['sha256sums_before']
