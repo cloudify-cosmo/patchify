@@ -1,0 +1,47 @@
+{
+    "node_types": [
+        "manager"
+    ],
+    "affected_services": [
+        "cloudify-stage"
+    ], 
+    "community": false, 
+    "description": "Allow to migrate custom page and custom template properly.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/cloudify-stage/backend/migrations/20190401130022-5_0-MoveTemplatesResourcesToFiles.js"
+            ], 
+            "patch_file": "505_fixed_resources_table_migration_backend_migrations_20190401130022-5_0-MoveTemplatesResourcesToFiles.js", 
+            "sha256sum": "2e9cf24d5a0fe4fa95aeb6fcd5f35dcfd629d95dde7f6ae21d7810a99b0c6250"
+        }, 
+        {
+            "destinations": [
+                "/opt/cloudify-stage/backend/migrations/20190401111659-5_0-MovePageResourcesToFiles.js"
+            ], 
+            "patch_file": "505_fixed_resources_table_migration_backend_migrations_20190401111659-5_0-MovePageResourcesToFiles.js", 
+            "sha256sum": "ea74f20a9e268d484cb5c6e6bd5472368e0a6602961fcf4cea554e0979e2d807"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cloudify-stage/backend/migrations/20190401111659-5_0-MovePageResourcesToFiles.js": [
+            "0399f298033339936274eed88a6d85d77a133192eebb82eccac772d446db5def"
+        ], 
+        "/opt/cloudify-stage/backend/migrations/20190401130022-5_0-MoveTemplatesResourcesToFiles.js": [
+            "8d2da29a8042087d8c7b93736b404b1a7873cea34cb209c7c5fd5c524c9dcf13"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cloudify-stage/backend/migrations/20190401111659-5_0-MovePageResourcesToFiles.js": [
+            "87f29956121aaa90f563f5aa4ac632afe64dd72e6bd6d64cbd47444ce30982ce"
+        ], 
+        "/opt/cloudify-stage/backend/migrations/20190401130022-5_0-MoveTemplatesResourcesToFiles.js": [
+            "dd87ff8e0deb1297f10b7bd2660b3cb689568f85be0e2994925d89443c46eaa1"
+        ]
+    }
+}
