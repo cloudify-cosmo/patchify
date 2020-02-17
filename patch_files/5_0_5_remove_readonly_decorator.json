@@ -1,0 +1,92 @@
+{
+    "affected_services": [
+        "cloudify-restservice",
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "Remove the unnecessary SecuredResourceReadonlyMode decorator.", 
+    "manager_versions": [
+        "5.0.5"
+    ],
+    "node_types": ["manager"],
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/security/__init__.py"
+            ], 
+            "patch_file": "5_0_5_remove_readonly_decorator_rest-service_manager_rest_security___init__.py", 
+            "sha256sum": "d50f360755e5ea60caf5f7edca2effa340442574033c19a007fc3abf8683c47d"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/security/secured_resource.py"
+            ], 
+            "patch_file": "5_0_5_remove_readonly_decorator_rest-service_manager_rest_security_secured_resource.py", 
+            "sha256sum": "0eca2860fc7e71082afa0e9097bf85aa1cb592dfd30dffd7ec64c77856f3fb4b"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/security/authentication.py"
+            ], 
+            "patch_file": "5_0_5_remove_readonly_decorator_rest-service_manager_rest_security_authentication.py", 
+            "sha256sum": "d9fd610ae19ceb3ff10019717fbea3019f9251c5d280cbdc68c6f5c544b64985"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v3_1/status.py"
+            ], 
+            "patch_file": "5_0_5_remove_readonly_decorator_rest-service_manager_rest_rest_resources_v3_1_status.py", 
+            "sha256sum": "a6f6e00b04bf56e7000d68ca128e3f9756f359ed3f156374563174e5a79f0713"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/manager.py",
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_premium/manager.py"
+            ],
+            "patch_file": "5_0_5_remove_readonly_decorator_cloudify_premium_manager.py",
+            "sha256sum": "1c12fa3bea2b667b17399a76afc899466e9166eec96971cb4b022467d850072c"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v3_1/status.py": [
+            "fa3635b9640689fbc53e680c60edc038e1966490808c4263be30edcf1136ea8e"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/security/__init__.py": [
+            "026068dd9ac3a1af8876df1597f178b602b77b138327647accaaa31f1d4aeab4"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/security/authentication.py": [
+            "3926e6955255f3ae10bec684a5f69bcaa53902b8077c4d9b6a22de23a7e1d4a9"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/security/secured_resource.py": [
+            "82aa735716ebc2bc6b6a03e58d96a991b1c8981fffa7871cbd87954a1186fddd"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/manager.py": [
+            "87c715f447513c79382560aa6d872698f7677bf1c9ceffc258516cc080a9819f"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_premium/manager.py": [
+            "87c715f447513c79382560aa6d872698f7677bf1c9ceffc258516cc080a9819f"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v3_1/status.py": [
+            "0f79d65140f9b8e810dcdad649d112d3c8f0b6fcd6aa2627de5e4ef6a6165c9e"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/security/__init__.py": [
+            "a9b6f67b85735e0db6fa2fc0bd40e707d7fabb780c4a7196191df3d23f1c012c"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/security/authentication.py": [
+            "115f76489affb7581d160e45b148cdd751eb2b8d1ef71f001b53e4b4722d0723"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/security/secured_resource.py": [
+            "d356d6c4a365ba5b05effbc9f393505baf08bbec5d79addb7fcaa5594bda75f5"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/manager.py": [
+            "54138d001e758c4d5676ac43c558b23c5a2f5356e432dba85ccb0dbf537be56f"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_premium/manager.py": [
+            "54138d001e758c4d5676ac43c558b23c5a2f5356e432dba85ccb0dbf537be56f"
+        ]
+    }
+}
