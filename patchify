@@ -2992,6 +2992,17 @@ def retrieve_central_patch_listing(registry_location, action,
             # File not found on file:// url
             sadly_say('No patches found for this release.')
             raw_listing = '{"patch_root_path": null, "patches": []}'
+        else:
+            exit_with_sadness(
+                (
+                    'Failed to retrieve central registry from {location}\n'
+                    'Failed with URL error: {reason}'.format(
+                        location=registry_location,
+                        reason=err.reason,
+                    )
+                ),
+                action,
+            )
 
     try:
         central_listing = json.loads(raw_listing)
