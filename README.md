@@ -20,3 +20,7 @@ To apply an individual patch:
 2. If you point at another manager (or none), you should get helpful errors<br />
 `./patchify apply -p patch_files/test_patch_1.json --install-patch-command`
 3. Verify the patch applied successfully by SSHing into the manager and checking that /opt/cloudify/test_patch_1 exists.
+
+To use patches from a branch that is pushed to github:
+1. For listing the patches, `./patchify manager-updates list -c https://raw.githubusercontent.com/cloudify-cosmo/patchify/<BRANCH_NAME>/central_registry`
+2. For applying the patches, `./patchify manager-updates apply -c https://raw.githubusercontent.com/cloudify-cosmo/patchify/<BRANCH_NAME>/central_registry -r https://raw.githubusercontent.com/cloudify-cosmo/patchify/<BRANCH_NAME>/patch_files`
