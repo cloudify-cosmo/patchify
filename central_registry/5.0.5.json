@@ -38,6 +38,17 @@
       "patch_id": "5_0_5_remove_readonly_decorator-c1cf439edd20ff0f13e7bd697bc0df45be2a06b1cde4e3b0e05672a85f8cceb5", 
       "patch_name": "5_0_5_remove_readonly_decorator", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "5_0_5_Fixed_Openstreet_Maps_URL.json", 
+      "patch_description": "Fix Openstreet Maps URL.", 
+      "patch_files": [
+        "5_0_5_Fixed_Openstreet_Maps_URL_conf_userConfig.json"
+      ], 
+      "patch_hash": "9c2786615c5a7f8475be2e8c42b36f2e46ebcddf8dc073a7e3f7073e3f39976f", 
+      "patch_id": "5_0_5_Fixed_Openstreet_Maps_URL-9c2786615c5a7f8475be2e8c42b36f2e46ebcddf8dc073a7e3f7073e3f39976f", 
+      "patch_name": "5_0_5_Fixed_Openstreet_Maps_URL", 
+      "supports_community": false
     }
   ]
 }

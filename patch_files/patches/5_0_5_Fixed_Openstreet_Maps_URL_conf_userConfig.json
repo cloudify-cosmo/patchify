@@ -1,0 +1,12 @@
+diff --git a/conf/userConfig.json b/conf/userConfig.json
+index 374b185..511ca79 100644
+--- a/conf/userConfig.json
++++ b/conf/userConfig.json
+@@ -1,6 +1,6 @@
+ {
+   "maps": {
+-    "mapUrl": "https://maps.wikimedia.org",
++    "mapUrl": "https://maps.wikimedia.org/osm-intl/0/0/0.png",
+     "tilesUrlTemplate": "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png",
+     "attribution": "<a href='https://wikimediafoundation.org/wiki/Maps_Terms_of_Use'>Wikimedia</a>"
+   },

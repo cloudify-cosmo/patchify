@@ -1,0 +1,34 @@
+{
+    "affected_services": [
+        "cloudify-stage"
+    ], 
+    "community": false, 
+    "description": "Fix Openstreet Maps URL.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": [
+        "manager"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/cloudify-stage/conf/userConfig.json"
+            ], 
+            "patch_file": "5_0_5_Fixed_Openstreet_Maps_URL_conf_userConfig.json", 
+            "sha256sum": "3c22603da85f30267476a169d1b59039163bdde4fd569e9ba58168e7b8a482f2"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cloudify-stage/conf/userConfig.json": [
+            "0192fed61300d8f29dca5689d099b9788684d6c7decbc490fdbf46454d49f2fe"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cloudify-stage/conf/userConfig.json": [
+            "e52b0564c2fc663be790fdac3bc4a107e0de1d82aed2b7ee867e6fdac9099914"
+        ]
+    }
+}
