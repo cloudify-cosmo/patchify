@@ -181,6 +181,17 @@
       "patch_id": "45_agent_cluster_settings_path-d38e6a3892553bf17dafabf2b6969fcaee465e1ef8f1fe534393fd2ff7cfa0b4", 
       "patch_name": "45_agent_cluster_settings_path", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "45_agent_config_package_url.json", 
+      "patch_description": "Agent config: always regenerate package_url.", 
+      "patch_files": [
+        "45_agent_config_package_url_cloudify_agent_installer_config_agent_config.py"
+      ], 
+      "patch_hash": "7fef1c700ef72fa82d36fe8d631b541596f06a2e0b8f31299d6aa6e6015b1521", 
+      "patch_id": "45_agent_config_package_url-7fef1c700ef72fa82d36fe8d631b541596f06a2e0b8f31299d6aa6e6015b1521", 
+      "patch_name": "45_agent_config_package_url", 
+      "supports_community": false
     }
   ]
 }
