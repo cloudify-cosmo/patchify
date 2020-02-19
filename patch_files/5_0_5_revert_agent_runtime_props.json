@@ -1,0 +1,34 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "Don't update the agent runtime-props if agent upgrade fails.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": [
+        "manager"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py"
+            ], 
+            "patch_file": "5_0_5_revert_agent_runtime_props_cloudify_agent_operations.py", 
+            "sha256sum": "ddc828895c0a0eb12af7acb7467fa411a65cfd60f60586fa259c24688e100e43"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py": [
+            "2a9e4824500e147b3faf42942f6858100d25292b8dfff9217b2fae0976f0d57d"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/operations.py": [
+            "5e0cfcf4a3cce04eff62cb61c008c78ae20a0f317a1dcb3c80b4074f84aa7823"
+        ]
+    }
+}
