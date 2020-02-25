@@ -498,9 +498,9 @@ def generate_patch(patch_name, patch_description, path_to_repo, commit,
         conflict = False
         if db and non_db:
             sys.stderr.write(
-                'DB and non-DB patches found. Please split commit into one '
+                'DB and non-DB patches found. Please split patch into one '
                 'affecting the DB and one affecting non-DB nodes. '
-                'DB patches target {db_targets}, and this commit targets '
+                'DB patches target {db_targets}, and this patch targets '
                 '{commit_targets}\n'.format(
                     db_targets=','.join(LOCATIONS_DB),
                     commit_targets=','.join(diff_files),
@@ -509,9 +509,9 @@ def generate_patch(patch_name, patch_description, path_to_repo, commit,
             conflict = True
         if broker and non_broker:
             sys.stderr.write(
-                'Broker and non-broker patches found. Please split commit '
+                'Broker and non-broker patches found. Please split patch '
                 'into one affecting the broker and one affecting non-broker '
-                'nodes. broker patches target {db_targets}, and this commit '
+                'nodes. broker patches target {db_targets}, and this patch '
                 'targets {commit_targets}\n'.format(
                     db_targets=','.join(LOCATIONS_BROKER),
                     commit_targets=','.join(diff_files),
@@ -520,9 +520,10 @@ def generate_patch(patch_name, patch_description, path_to_repo, commit,
             conflict = True
 
         if conflict:
-            raise ValueError(
+            sys.stderr.write(
                 'Patch targets node types that do not accept all changes '
-                'from patch.'
+                'from patch.\n'
+                'You will need to split the patch up by hand. Sorry.\n'
             )
 
         if db:
