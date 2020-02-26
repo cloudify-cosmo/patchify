@@ -57,7 +57,7 @@ PATCH_VERSIONS = {
         },
     },
 }
-PATCHIFY_VERSION = (1, 3, 1)
+PATCHIFY_VERSION = (1, 3, 2)
 OPTIONAL_SERVICES = {
     'cloudify-handler-runner',
     'cloudify-check-runner',
@@ -3328,6 +3328,11 @@ def list_central_manager_patches(central_repository_location,
             else:
                 display_patch['installed'] = not missing_patches
                 fields = ['installed', 'patch_id']
+
+            if get_manager_version() >= Version('5.0.5'):
+                if 'applies_to' not in display_patch:
+                    # Don't cause error when displaying
+                    display_patch['applies_to'] = ['unknown- not applied']
 
             display.append(display_patch)
         output_table(display, fields)
