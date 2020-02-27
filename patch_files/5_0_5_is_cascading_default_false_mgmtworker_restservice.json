@@ -1,0 +1,89 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker",
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Change the is_cascading parameter default to false.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": [
+        "manager"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py"
+            ], 
+            "patch_file": "5_0_5_is_cascading_false_patch_rest-service_manager_rest_resource_manager.py", 
+            "sha256sum": "7c55a5850f35a61a81bf28c9934b12e6982b8bba20925146998e637b2791e04b"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/resources/cloudify/types/types.yaml", 
+                "/opt/manager/resources/spec/cloudify/5.0.5/types.yaml", 
+                "/opt/cfy/types/types.yaml"
+            ], 
+            "patch_file": "5_0_5_is_cascading_false_patch_resources_rest-service_cloudify_types_types.yaml", 
+            "sha256sum": "4d9667557343d7f25366c1c259a69845cd01024948ac2b010ab3fc71dd446783"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/elements/workflows.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/elements/workflows.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/elements/workflows.py"
+            ], 
+            "patch_file": "5_0_5_is_cascading_false_common_patch_dsl_parser_elements_workflows.py", 
+            "sha256sum": "8dfa0dd45b21e901e263671a1e55988b97543e5de2302cdc829d2334f79435a7"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/types/types.yaml": [
+            "a0f24add18bacfd0dcb488a1b332ad10a6c83cf1f3ab9cd1091c1c77cc47d6c5"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "2c61ab890b1f6dc8f50883bbca8d9e9a9ded7521a04f16123c7e45d44299e4fa"
+        ], 
+        "/opt/manager/resources/cloudify/types/types.yaml": [
+            "a0f24add18bacfd0dcb488a1b332ad10a6c83cf1f3ab9cd1091c1c77cc47d6c5"
+        ], 
+        "/opt/manager/resources/spec/cloudify/5.0.5/types.yaml": [
+            "a0f24add18bacfd0dcb488a1b332ad10a6c83cf1f3ab9cd1091c1c77cc47d6c5"
+        ],
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/elements/workflows.py": [
+            "b7a18dd04c4e9671030e1de715652617e8d80d932903a5250984dc1355b8fbec"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/elements/workflows.py": [
+            "b7a18dd04c4e9671030e1de715652617e8d80d932903a5250984dc1355b8fbec"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/elements/workflows.py": [
+            "b7a18dd04c4e9671030e1de715652617e8d80d932903a5250984dc1355b8fbec"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/types/types.yaml": [
+            "0e9ce997fa7650796bc34aa1ec6ba5e897ff385e6e991af2caec6b709ead7d21"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "4dc13f4258885e87b39ae43713166c4f9a5f5ec056d3bde9e54bd033d1ef9f59"
+        ], 
+        "/opt/manager/resources/cloudify/types/types.yaml": [
+            "0e9ce997fa7650796bc34aa1ec6ba5e897ff385e6e991af2caec6b709ead7d21"
+        ], 
+        "/opt/manager/resources/spec/cloudify/5.0.5/types.yaml": [
+            "0e9ce997fa7650796bc34aa1ec6ba5e897ff385e6e991af2caec6b709ead7d21"
+        ],
+                "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/elements/workflows.py": [
+            "91dbe0128783e7b4c275bc89953c0c804bb2b2aed6e26837d52a7bd801ecf4dd"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/elements/workflows.py": [
+            "91dbe0128783e7b4c275bc89953c0c804bb2b2aed6e26837d52a7bd801ecf4dd"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/elements/workflows.py": [
+            "91dbe0128783e7b4c275bc89953c0c804bb2b2aed6e26837d52a7bd801ecf4dd"
+        ]
+    }
+}

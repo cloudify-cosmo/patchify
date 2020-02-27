@@ -1,0 +1,36 @@
+{
+    "affected_services": [
+        "cloudify-status-reporter"
+    ], 
+    "community": false, 
+    "description": "Change is_cascading default to false.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": [
+        "manager", 
+        "db", 
+        "broker"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/status-reporter/env/lib/python2.7/site-packages/dsl_parser/elements/workflows.py"
+            ], 
+            "patch_file": "5_0_5_is_cascading_false_common_patch_dsl_parser_elements_workflows.py", 
+            "sha256sum": "8dfa0dd45b21e901e263671a1e55988b97543e5de2302cdc829d2334f79435a7"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/status-reporter/env/lib/python2.7/site-packages/dsl_parser/elements/workflows.py": [
+            "b7a18dd04c4e9671030e1de715652617e8d80d932903a5250984dc1355b8fbec"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/status-reporter/env/lib/python2.7/site-packages/dsl_parser/elements/workflows.py": [
+            "91dbe0128783e7b4c275bc89953c0c804bb2b2aed6e26837d52a7bd801ecf4dd"
+        ]
+    }
+}
