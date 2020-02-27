@@ -296,6 +296,21 @@
       "patch_id": "46_agent_env_unicode-c186b0d8ed3709b8aa3c05aa7ee5f0428084646fc8107a1c1c635c77f534eb9f", 
       "patch_name": "46_agent_env_unicode", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_general_refactors_to_namespacing_process.json", 
+      "patch_description": "Node templates relationships overloading support.", 
+      "patch_files": [
+        "4_6_general_refactors_to_namespacing_process_dsl_parser_utils.py", 
+        "4_6_general_refactors_to_namespacing_process_dsl_parser_framework_parser.py",
+        "4_6_general_refactors_to_namespacing_process_dsl_parser_tests_abstract_test_parser.py", 
+        "4_6_general_refactors_to_namespacing_process_dsl_parser_elements_imports.py", 
+        "4_6_general_refactors_to_namespacing_process_dsl_parser_holder.py"
+      ], 
+      "patch_hash": "da04d675c2ec4ceeef904067b6750541ba060289ae97beeb42d9316dd0e2d4a8", 
+      "patch_id": "4_6_general_refactors_to_namespacing_process-da04d675c2ec4ceeef904067b6750541ba060289ae97beeb42d9316dd0e2d4a8", 
+      "patch_name": "4_6_general_refactors_to_namespacing_process", 
+      "supports_community": false
     }
   ]
 }

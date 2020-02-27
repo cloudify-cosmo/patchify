@@ -1,0 +1,154 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Node templates relationships overloading support.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/utils.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/utils.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/utils.py"
+            ], 
+            "patch_file": "4_6_general_refactors_to_namespacing_process_dsl_parser_utils.py", 
+            "sha256sum": "ac815577ce1f47f18cbd060fc77aefbe45a7cb282cdfda9e703486b297cb7a21"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/framework/parser.py"
+            ], 
+            "patch_file": "4_6_general_refactors_to_namespacing_process_dsl_parser_framework_parser.py", 
+            "sha256sum": "7a04a3df7d3f6045abc89c4e40fb61eef6150404fd23a2c49205557213813a0b"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/tests/abstract_test_parser.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/tests/abstract_test_parser.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/tests/abstract_test_parser.py"
+            ], 
+            "patch_file": "4_6_general_refactors_to_namespacing_process_dsl_parser_tests_abstract_test_parser.py", 
+            "sha256sum": "10fc1bca629ba4f62eb03015acba03df5ae6deb03ce4af0df073b07af3a9a14c"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/elements/imports.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/elements/imports.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/elements/imports.py"
+            ], 
+            "patch_file": "4_6_general_refactors_to_namespacing_process_dsl_parser_elements_imports.py", 
+            "sha256sum": "89771f2545c9a25eb9b455ba6eab55e4d05258e7a17e090b06d1b8cc19b59afe"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/holder.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/holder.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/holder.py"
+            ], 
+            "patch_file": "4_6_general_refactors_to_namespacing_process_dsl_parser_holder.py", 
+            "sha256sum": "0431d9f9e4706c806680d669ef2830631d12c93f2a83716778ef7b8d417af299"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/elements/imports.py": [
+            "d030ff2ea0717b427874a9271350bf9d7b9c4f10445a8d03079f9e5b434f5b72"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "7b5d76699bf3edfeb650fd7d1e5acd64227af3826e3f09712bbf785305a19885"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/holder.py": [
+            "08c6518d840de1be9873591f79cd128a2d6bd8c49fe4b7073a188ce52051abee"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/tests/abstract_test_parser.py": [
+            "a8245484e1ce5dcb58cdcdb8f8d6131297065b5ca1e94786cd0f4f2ee93d075a"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/utils.py": [
+            "3e03fd523f749c733e4e02423fcf4997a461c22c6e81890d458d34b3942479af"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/elements/imports.py": [
+            "d030ff2ea0717b427874a9271350bf9d7b9c4f10445a8d03079f9e5b434f5b72"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "7b5d76699bf3edfeb650fd7d1e5acd64227af3826e3f09712bbf785305a19885"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/holder.py": [
+            "08c6518d840de1be9873591f79cd128a2d6bd8c49fe4b7073a188ce52051abee"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/tests/abstract_test_parser.py": [
+            "a8245484e1ce5dcb58cdcdb8f8d6131297065b5ca1e94786cd0f4f2ee93d075a"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/utils.py": [
+            "3e03fd523f749c733e4e02423fcf4997a461c22c6e81890d458d34b3942479af"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/elements/imports.py": [
+            "d030ff2ea0717b427874a9271350bf9d7b9c4f10445a8d03079f9e5b434f5b72"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "7b5d76699bf3edfeb650fd7d1e5acd64227af3826e3f09712bbf785305a19885"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/holder.py": [
+            "08c6518d840de1be9873591f79cd128a2d6bd8c49fe4b7073a188ce52051abee"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/tests/abstract_test_parser.py": [
+            "a8245484e1ce5dcb58cdcdb8f8d6131297065b5ca1e94786cd0f4f2ee93d075a"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/utils.py": [
+            "3e03fd523f749c733e4e02423fcf4997a461c22c6e81890d458d34b3942479af"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/elements/imports.py": [
+            "cc735c586c07e3db2d3de1460fa38e23be29ceb5ac8209270ab811afaca3e147"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "ea4dcb932a38d58b9f0f040373b82100b59c87289ce377f146ee4763b0081ef4"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/holder.py": [
+            "aefdf4a502221fb4af167b3fc5202faeebd3204405fa6083123f8a8c7716c88d"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/tests/abstract_test_parser.py": [
+            "6cb58790aa590431f00f5672c71a31ef3ccbbaeceff8cc2ce08dd12b98ac7f3c"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/utils.py": [
+            "94a6692a875010eba3aee6c399e8ca54d1b3527b8ef1f52420f633e8dcfc6d30"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/elements/imports.py": [
+            "cc735c586c07e3db2d3de1460fa38e23be29ceb5ac8209270ab811afaca3e147"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "ea4dcb932a38d58b9f0f040373b82100b59c87289ce377f146ee4763b0081ef4"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/holder.py": [
+            "aefdf4a502221fb4af167b3fc5202faeebd3204405fa6083123f8a8c7716c88d"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/tests/abstract_test_parser.py": [
+            "6cb58790aa590431f00f5672c71a31ef3ccbbaeceff8cc2ce08dd12b98ac7f3c"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/utils.py": [
+            "94a6692a875010eba3aee6c399e8ca54d1b3527b8ef1f52420f633e8dcfc6d30"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/elements/imports.py": [
+            "cc735c586c07e3db2d3de1460fa38e23be29ceb5ac8209270ab811afaca3e147"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "ea4dcb932a38d58b9f0f040373b82100b59c87289ce377f146ee4763b0081ef4"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/holder.py": [
+            "aefdf4a502221fb4af167b3fc5202faeebd3204405fa6083123f8a8c7716c88d"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/tests/abstract_test_parser.py": [
+            "6cb58790aa590431f00f5672c71a31ef3ccbbaeceff8cc2ce08dd12b98ac7f3c"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/utils.py": [
+            "94a6692a875010eba3aee6c399e8ca54d1b3527b8ef1f52420f633e8dcfc6d30"
+        ]
+    }
+}
