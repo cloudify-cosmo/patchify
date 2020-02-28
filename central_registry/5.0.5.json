@@ -56,8 +56,8 @@
       "patch_files": [
         "5_0_5_revert_agent_runtime_props_cloudify_agent_operations.py"
       ],
-      "patch_hash": "154dcdfc5ec7124c437c6ac550d7e4ea31501567b0b77fb0355fb5cd532b5ecf",
-      "patch_id": "5_0_5_revert_agent_runtime_props-154dcdfc5ec7124c437c6ac550d7e4ea31501567b0b77fb0355fb5cd532b5ecf",
+      "patch_hash": "76293f54c52e61b8ce341470c3b220d4c731435320fc36b8ab9074ada964a6cb",
+      "patch_id": "5_0_5_revert_agent_runtime_props-76293f54c52e61b8ce341470c3b220d4c731435320fc36b8ab9074ada964a6cb",
       "patch_name": "5_0_5_revert_agent_runtime_props",
       "supports_community": false
     },
