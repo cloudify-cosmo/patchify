@@ -321,13 +321,19 @@ def get_profile_ssh_details():
         sys.exit(1)
 
     ssh_user_pos = headers.index('ssh_user')
-    manager_ip_pos = headers.index('manager_ip')
     ssh_port_pos = headers.index('ssh_port')
     ssh_key_path_pos = headers.index('ssh_key_path')
     try:
+        manager_ip_pos = headers.index('manager_ip')
+    except ValueError:
+        manager_ip_pos = headers.index('Manager ip')
+    try:
         cluster_node_name_pos = headers.index('cluster node name')
     except ValueError:
-        cluster_node_name_pos = None
+        try:
+            cluster_node_name_pos = headers.index('Manager hostname')
+        except ValueError:
+            cluster_node_name_pos = None
 
     manager_connection_details = []
     for result in results:
