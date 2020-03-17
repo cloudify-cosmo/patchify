@@ -1,0 +1,34 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "When using the summary=true argument, the cluster-status REST call return code would signify the current cluster status.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": [
+        "manager"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v3_1/cluster_status.py"
+            ], 
+            "patch_file": "5_0_5_adding_return_code_to_cluster_status_rest-service_manager_rest_rest_resources_v3_1_cluster_status.py", 
+            "sha256sum": "02e044a517ee136ebb363b98cc5507ec5d9072da2ad8e3f097530f94e55f1b78"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v3_1/cluster_status.py": [
+            "cd334a03a68c29a1ccdc4f428cb2e71d2c1ab80db64f09fd8a64a6f64d5b17c0"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v3_1/cluster_status.py": [
+            "637935f4cf4f413937da9acacb7d2edc79152fe94600d7dc9f7a8571a4bceb65"
+        ]
+    }
+}

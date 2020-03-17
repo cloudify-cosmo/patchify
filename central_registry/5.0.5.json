@@ -49,40 +49,51 @@
       "patch_id": "5_0_5_Fixed_Openstreet_Maps_URL-9c2786615c5a7f8475be2e8c42b36f2e46ebcddf8dc073a7e3f7073e3f39976f", 
       "patch_name": "5_0_5_Fixed_Openstreet_Maps_URL", 
       "supports_community": false
-    },
+    }, 
     {
-      "patch_definition_path": "5_0_5_revert_agent_runtime_props.json",
-      "patch_description": "Don't update the agent runtime-props if agent upgrade fails.",
+      "patch_definition_path": "5_0_5_revert_agent_runtime_props.json", 
+      "patch_description": "Don't update the agent runtime-props if agent upgrade fails.", 
       "patch_files": [
         "5_0_5_revert_agent_runtime_props_cloudify_agent_operations.py"
-      ],
-      "patch_hash": "76293f54c52e61b8ce341470c3b220d4c731435320fc36b8ab9074ada964a6cb",
-      "patch_id": "5_0_5_revert_agent_runtime_props-76293f54c52e61b8ce341470c3b220d4c731435320fc36b8ab9074ada964a6cb",
-      "patch_name": "5_0_5_revert_agent_runtime_props",
+      ], 
+      "patch_hash": "76293f54c52e61b8ce341470c3b220d4c731435320fc36b8ab9074ada964a6cb", 
+      "patch_id": "5_0_5_revert_agent_runtime_props-76293f54c52e61b8ce341470c3b220d4c731435320fc36b8ab9074ada964a6cb", 
+      "patch_name": "5_0_5_revert_agent_runtime_props", 
       "supports_community": false
-    },
+    }, 
     {
-      "patch_definition_path": "5_0_5_is_cascading_default_false_mgmtworker_restservice.json",
-      "patch_description": "Change the is_cascading parameter default to false.",
+      "patch_definition_path": "5_0_5_is_cascading_default_false_mgmtworker_restservice.json", 
+      "patch_description": "Change the is_cascading parameter default to false.", 
       "patch_files": [
-        "5_0_5_is_cascading_false_patch_rest-service_manager_rest_resource_manager.py",
-        "5_0_5_is_cascading_false_patch_resources_rest-service_cloudify_types_types.yaml",
+        "5_0_5_is_cascading_false_patch_rest-service_manager_rest_resource_manager.py", 
+        "5_0_5_is_cascading_false_patch_resources_rest-service_cloudify_types_types.yaml", 
         "5_0_5_is_cascading_false_common_patch_dsl_parser_elements_workflows.py"
-      ],
-      "patch_hash": "e3b51ce53072608b5716461555745436633257690b8e1e3b91091c3c9cf18cea",
-      "patch_id": "5_0_5_is_cascading_default_false_mgmtworker_restservice-e3b51ce53072608b5716461555745436633257690b8e1e3b91091c3c9cf18cea",
-      "patch_name": "5_0_5_is_cascading_default_false_mgmtworker_restservice",
+      ], 
+      "patch_hash": "e3b51ce53072608b5716461555745436633257690b8e1e3b91091c3c9cf18cea", 
+      "patch_id": "5_0_5_is_cascading_default_false_mgmtworker_restservice-e3b51ce53072608b5716461555745436633257690b8e1e3b91091c3c9cf18cea", 
+      "patch_name": "5_0_5_is_cascading_default_false_mgmtworker_restservice", 
       "supports_community": false
-    },
+    }, 
     {
-      "patch_definition_path": "5_0_5_is_cascading_default_false_status_reporter.json",
-      "patch_description": "Change is_cascading default to false.",
+      "patch_definition_path": "5_0_5_is_cascading_default_false_status_reporter.json", 
+      "patch_description": "Change is_cascading default to false.", 
       "patch_files": [
         "5_0_5_is_cascading_false_common_patch_dsl_parser_elements_workflows.py"
-      ],
-      "patch_hash": "d0046b3e0470c2139789f6c73ad08b3585469d43cfe07161dd4f3a3a5a4fb648",
-      "patch_id": "5_0_5_is_cascading_default_false_status_reporter-d0046b3e0470c2139789f6c73ad08b3585469d43cfe07161dd4f3a3a5a4fb648",
-      "patch_name": "5_0_5_is_cascading_default_false_status_reporter",
+      ], 
+      "patch_hash": "d0046b3e0470c2139789f6c73ad08b3585469d43cfe07161dd4f3a3a5a4fb648", 
+      "patch_id": "5_0_5_is_cascading_default_false_status_reporter-d0046b3e0470c2139789f6c73ad08b3585469d43cfe07161dd4f3a3a5a4fb648", 
+      "patch_name": "5_0_5_is_cascading_default_false_status_reporter", 
+      "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "5_0_5_adding_return_code_to_cluster_status.json", 
+      "patch_description": "When using the summary=true argument, the cluster-status REST call return code would signify the current cluster status.", 
+      "patch_files": [
+        "5_0_5_adding_return_code_to_cluster_status_rest-service_manager_rest_rest_resources_v3_1_cluster_status.py"
+      ], 
+      "patch_hash": "ebe3bde445c1a9279e5a62e2008da10355a8c12a187a6c849abe03631f0316ea", 
+      "patch_id": "5_0_5_adding_return_code_to_cluster_status-ebe3bde445c1a9279e5a62e2008da10355a8c12a187a6c849abe03631f0316ea", 
+      "patch_name": "5_0_5_adding_return_code_to_cluster_status", 
       "supports_community": false
     }
   ]
