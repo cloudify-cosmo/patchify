@@ -1,3 +1,4 @@
+1.4.0 - Support deleting patches as part of a patch (by setting sha256sum_after to 'DOESNOTEXIST').
 1.3.2 - Don't crash checking for patches on 5.0.5 but not finding them.
 1.3.1 - Handle missing central registry.
 1.3.0 - Support nodes other than managers for 5.0.5.
