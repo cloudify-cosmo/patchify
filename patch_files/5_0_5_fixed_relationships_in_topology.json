@@ -1,0 +1,60 @@
+{
+    "affected_services": [
+        "cloudify-stage"
+    ], 
+    "community": false, 
+    "description": "Fixes relationships not displayed in the Topology view in some cases.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": [
+        "manager"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/topology/widget.js"
+            ],
+            "patch_file": "5_0_5_fixed_relationships_in_topology_dist_appData_widgets_topology_widget.js", 
+            "sha256sum": "a1bc5671582bbbbf16ef9a74d6b3a699553e837071734c82db7baf893123fe53"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/topology/widget.js.br"
+            ],
+            "patch_file": "5_0_5_fixed_relationships_in_topology_dist_appData_widgets_topology_widget.js.br", 
+            "sha256sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/topology/widget.js.gz"
+            ],
+            "patch_file": "5_0_5_fixed_relationships_in_topology_dist_appData_widgets_topology_widget.js.gz", 
+            "sha256sum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cloudify-stage/dist/appData/widgets/topology/widget.js": [
+            "372c90e0c2f8fb43d9c833a166ee3169fda1c2b069a67a9575b040b189226f6c"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/topology/widget.js.br": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/topology/widget.js.gz": [
+            "DOESNOTEXIST"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cloudify-stage/dist/appData/widgets/topology/widget.js": [
+            "4a4424713975b35a9ec6efbf13f4c672a104f38f35b6d327abcd62042f7ba173"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/topology/widget.js.br": [
+            "6303aefff674dc7b914b7cf6f75d318d3c941a8b5ae777e4748065d5f9691f28"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/topology/widget.js.gz": [
+            "fb5bbda3a808d1c34fda30adf110070044e2c187b4296e5ba542319f042be97b"
+        ]
+    }
+}

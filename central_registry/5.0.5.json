@@ -95,6 +95,19 @@
       "patch_id": "5_0_5_adding_return_code_to_cluster_status-ebe3bde445c1a9279e5a62e2008da10355a8c12a187a6c849abe03631f0316ea", 
       "patch_name": "5_0_5_adding_return_code_to_cluster_status", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "5_0_5_fixed_relationships_in_topology.json", 
+      "patch_description": "Fixes relationships not displayed in the Topology view in some cases.", 
+      "patch_files": [
+        "5_0_5_fixed_relationships_in_topology_dist_appData_widgets_topology_widget.js", 
+        "5_0_5_fixed_relationships_in_topology_dist_appData_widgets_topology_widget.js.br", 
+        "5_0_5_fixed_relationships_in_topology_dist_appData_widgets_topology_widget.js.gz"
+      ], 
+      "patch_hash": "6d1bef3e1b30917c1a0317ac67be46070b7264733ad43b8e516a81cf5984fa94", 
+      "patch_id": "5_0_5_fixed_relationships_in_topology-6d1bef3e1b30917c1a0317ac67be46070b7264733ad43b8e516a81cf5984fa94", 
+      "patch_name": "5_0_5_fixed_relationships_in_topology", 
+      "supports_community": false
     }
   ]
 }
