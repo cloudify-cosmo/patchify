@@ -91,8 +91,8 @@
       "patch_files": [
         "5_0_5_adding_return_code_to_cluster_status_rest-service_manager_rest_rest_resources_v3_1_cluster_status.py"
       ], 
-      "patch_hash": "ebe3bde445c1a9279e5a62e2008da10355a8c12a187a6c849abe03631f0316ea", 
-      "patch_id": "5_0_5_adding_return_code_to_cluster_status-ebe3bde445c1a9279e5a62e2008da10355a8c12a187a6c849abe03631f0316ea", 
+      "patch_hash": "e088136fa4f6ba09f979a2afa17f0000be850be5bf8a857b2222e54d00027cba", 
+      "patch_id": "5_0_5_adding_return_code_to_cluster_status-e088136fa4f6ba09f979a2afa17f0000be850be5bf8a857b2222e54d00027cba", 
       "patch_name": "5_0_5_adding_return_code_to_cluster_status", 
       "supports_community": false
     }, 
