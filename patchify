@@ -57,7 +57,7 @@ PATCH_VERSIONS = {
         },
     },
 }
-PATCHIFY_VERSION = (1, 4, 0)
+PATCHIFY_VERSION = (1, 4, 1)
 OPTIONAL_SERVICES = {
     'cloudify-handler-runner',
     'cloudify-check-runner',
@@ -1844,9 +1844,8 @@ def patch_applier(definition_file, skip_services, install_patch_command,
                     action,
                 )
         if apply_not_required == len(members):
-            exit_with_sadness(
+            say(
                 'Patch was already installed on all nodes in the cluster!',
-                action,
             )
         else:
             say("Patch applied to cluster.")
@@ -1889,7 +1888,10 @@ def patch_applier(definition_file, skip_services, install_patch_command,
             HashCheckFailure,
             RegistryGenerationFailure,
         ) as err:
-            exit_with_sadness(str(err), action)
+            if isinstance(err, PatchAlreadyApplied):
+                say("Patch did not need applying.")
+            else:
+                exit_with_sadness(str(err), action)
 
 
 def apply_patch(patch_definition, patch_name, definition_file, skip_services,
