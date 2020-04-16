@@ -122,6 +122,17 @@
       "patch_id": "4_5_5_hiding_postgres_credentials-2a15255faa8eaf361cc5dd81167e597826186a58d6db2d4cfe4d932f67fa6a51", 
       "patch_name": "4_5_5_hiding_postgres_credentials", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_5_5_fix_agent_install_after_failover.json", 
+      "patch_description": "Fix agent installation after manager failover.", 
+      "patch_files": [
+        "4_5_5_fix_agent_install_after_failover_cloudify_agent_installer_config_agent_config.py"
+      ], 
+      "patch_hash": "0f27abbe3090a6db6fb652391c8e8d3b9b2d5069c1d0cd6e030055bcfba6218b", 
+      "patch_id": "4_5_5_fix_agent_install_after_failover-0f27abbe3090a6db6fb652391c8e8d3b9b2d5069c1d0cd6e030055bcfba6218b", 
+      "patch_name": "4_5_5_fix_agent_install_after_failover", 
+      "supports_community": false
     }
   ]
 }

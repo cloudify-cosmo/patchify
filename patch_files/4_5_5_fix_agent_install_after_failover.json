@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "Fix agent installation after manager failover.", 
+    "manager_versions": [
+        "4.5.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py"
+            ], 
+            "patch_file": "4_5_5_fix_agent_install_after_failover_cloudify_agent_installer_config_agent_config.py", 
+            "sha256sum": "dc8ea88f2912739f2b5ad5a2ef5df013b64763db9f7af320d3e6036f9c2cf883"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py": [
+            "7cd2273ebaefb3dc2a7b6d3f01445061c53c28a18ee6787238f692ac02fd6d55"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py": [
+            "caea699b92aaa5682d45478ab72bdb07295caac87f1ffe6748a657958e9bf5a4"
+        ]
+    }
+}
