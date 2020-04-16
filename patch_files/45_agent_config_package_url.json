@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "Agent config: always regenerate package_url.", 
+    "manager_versions": [
+        "4.5"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py"
+            ], 
+            "patch_file": "45_agent_config_package_url_cloudify_agent_installer_config_agent_config.py", 
+            "sha256sum": "33888e5763afee65f9471d2a62c9e2ff7ce26c8b0e63e5b169cfd05ca4a49528"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py": [
+            "f0fa93a1ca73033058719d2c447449fb6538acf5620edac0278c492419be7447"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/installer/config/agent_config.py": [
+            "cad4c6a629e5bd6936d871e4ce97ffaed7f3eaa4efdf8adb7bc5423be1431e1c"
+        ]
+    }
+}
