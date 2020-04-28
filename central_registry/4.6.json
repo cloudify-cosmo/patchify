@@ -322,18 +322,29 @@
       "patch_id": "4_6_fix_agent_install_after_failover-570a476d2f02e41a11f4d915a583cb80bf4a8a2baa48d59e099b769d60de8383", 
       "patch_name": "4_6_fix_agent_install_after_failover", 
       "supports_community": false
-    }, 
+    },
     {
-      "patch_definition_path": "4_6_fix_integer_inputs_in_ui.json", 
-      "patch_description": "Fixes handling Integer inputs in deployment creation in UI.", 
+      "patch_definition_path": "4_6_fix_integer_inputs_in_ui.json",
+      "patch_description": "Fixes handling Integer inputs in deployment creation in UI.",
       "patch_files": [
-        "4_6_fix_integer_inputs_in_ui_dist_appData_widgets_common_common.js", 
-        "4_6_fix_integer_inputs_in_ui_dist_appData_widgets_common_common.js.br", 
+        "4_6_fix_integer_inputs_in_ui_dist_appData_widgets_common_common.js",
+        "4_6_fix_integer_inputs_in_ui_dist_appData_widgets_common_common.js.br",
         "4_6_fix_integer_inputs_in_ui_dist_appData_widgets_common_common.js.gz"
-      ], 
-      "patch_hash": "2baf782173a0938cc0f82ced1da5ccf6c13a6127cf492d223920ca8247ef9e47", 
-      "patch_id": "4_6_fix_integer_inputs_in_ui-2baf782173a0938cc0f82ced1da5ccf6c13a6127cf492d223920ca8247ef9e47", 
-      "patch_name": "4_6_fix_integer_inputs_in_ui", 
+      ],
+      "patch_hash": "2baf782173a0938cc0f82ced1da5ccf6c13a6127cf492d223920ca8247ef9e47",
+      "patch_id": "4_6_fix_integer_inputs_in_ui-2baf782173a0938cc0f82ced1da5ccf6c13a6127cf492d223920ca8247ef9e47",
+      "patch_name": "4_6_fix_integer_inputs_in_ui",
+      "supports_community": false
+    },
+    {
+      "patch_definition_path": "46_support_running_cloudify_proxy_client_on_py3.json",
+      "patch_description": "Support running cloudify proxy client on python3.",
+      "patch_files": [
+        "46_support_running_cloudify_proxy_client_on_py3_cloudify_proxy_client.py"
+      ],
+      "patch_hash": "6a65b63392ff703e39a0583d1b10cc01594f6faa9b49355bc74e770a731f5ca3",
+      "patch_id": "46_support_running_cloudify_proxy_client_on_py3-6a65b63392ff703e39a0583d1b10cc01594f6faa9b49355bc74e770a731f5ca3",
+      "patch_name": "46_support_running_cloudify_proxy_client_on_py3",
       "supports_community": false
     }
   ]
