@@ -1,0 +1,57 @@
+{
+    "affected_services": [
+        "cloudify-stage"
+    ], 
+    "community": false, 
+    "description": "Fixes handling Integer inputs in deployment creation in UI.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/common/common.js"
+            ], 
+            "patch_file": "4_6_fix_integer_inputs_in_ui_dist_appData_widgets_common_common.js", 
+            "sha256sum": "428221cd91b86986f7dfdb5ca1629fe444687320c4f50e2736f62d2700992299"
+        }, 
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/common/common.js.br"
+            ], 
+            "patch_file": "4_6_fix_integer_inputs_in_ui_dist_appData_widgets_common_common.js.br", 
+            "sha256sum": "1610479f3d52c9bb4f186e35268667a3ffd154b57f238b2f85a96356df186154"
+        }, 
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/common/common.js.gz"
+            ], 
+            "patch_file": "4_6_fix_integer_inputs_in_ui_dist_appData_widgets_common_common.js.gz", 
+            "sha256sum": "9cd34286b6eeb804448a4521f4b4ed507e2f4377b6ae987ce297073bf7949557"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cloudify-stage/dist/appData/widgets/common/common.js": [
+            "22733a2a8ab1e14d7c93a958927a000a6d15f88ebfe4ff6bd11baa46ca0c0024"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/common/common.js.br": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/common/common.js.gz": [
+            "DOESNOTEXIST"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cloudify-stage/dist/appData/widgets/common/common.js": [
+            "18202ee1aa07bf70d1357d0cc0bd2df7645c6d86e791567932981a940edf111d"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/common/common.js.br": [
+            "a39576017304e4c45bb5ff02579907db0fd7263e8916d314024188090d4b394d"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/common/common.js.gz": [
+            "99af0ce4d04e6c7fb66219022938b644054098b6d6c604dc6d92903331aa7cac"
+        ]
+    }
+}

@@ -322,6 +322,19 @@
       "patch_id": "4_6_fix_agent_install_after_failover-570a476d2f02e41a11f4d915a583cb80bf4a8a2baa48d59e099b769d60de8383", 
       "patch_name": "4_6_fix_agent_install_after_failover", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_fix_integer_inputs_in_ui.json", 
+      "patch_description": "Fixes handling Integer inputs in deployment creation in UI.", 
+      "patch_files": [
+        "4_6_fix_integer_inputs_in_ui_dist_appData_widgets_common_common.js", 
+        "4_6_fix_integer_inputs_in_ui_dist_appData_widgets_common_common.js.br", 
+        "4_6_fix_integer_inputs_in_ui_dist_appData_widgets_common_common.js.gz"
+      ], 
+      "patch_hash": "2baf782173a0938cc0f82ced1da5ccf6c13a6127cf492d223920ca8247ef9e47", 
+      "patch_id": "4_6_fix_integer_inputs_in_ui-2baf782173a0938cc0f82ced1da5ccf6c13a6127cf492d223920ca8247ef9e47", 
+      "patch_name": "4_6_fix_integer_inputs_in_ui", 
+      "supports_community": false
     }
   ]
 }
