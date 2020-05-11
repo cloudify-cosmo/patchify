@@ -1,0 +1,46 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Support running cloudify proxy client on python3.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/proxy/client.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/proxy/client.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/proxy/client.py"
+            ], 
+            "patch_file": "46_support_running_cloudify_proxy_client_on_py3_cloudify_proxy_client.py", 
+            "sha256sum": "112329046bc6b17484cd35abaffc7f76cdaba4db3a1ab4efbe2d89e2d6d9b981"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/proxy/client.py": [
+            "54c7ef93cd0ad4ee1c2c1a469191bef61c73fe0938cd20c5d0d6c6a5228df2ff"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/proxy/client.py": [
+            "54c7ef93cd0ad4ee1c2c1a469191bef61c73fe0938cd20c5d0d6c6a5228df2ff"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/proxy/client.py": [
+            "54c7ef93cd0ad4ee1c2c1a469191bef61c73fe0938cd20c5d0d6c6a5228df2ff"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/proxy/client.py": [
+            "8d7fce18b19f43cb6ee34007f86a7f36a647f1200c1424f6cad8230fb0257607"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/proxy/client.py": [
+            "8d7fce18b19f43cb6ee34007f86a7f36a647f1200c1424f6cad8230fb0257607"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/proxy/client.py": [
+            "8d7fce18b19f43cb6ee34007f86a7f36a647f1200c1424f6cad8230fb0257607"
+        ]
+    }
+}
