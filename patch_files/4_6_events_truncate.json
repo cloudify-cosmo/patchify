@@ -1,0 +1,83 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Added options to delete events/logs for given deployment and specified period of time safely (i.e. with logs being stored prior to deletion).", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+            {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v2/events.py"
+            ], 
+            "patch_file": "4_6_events_truncate_rest-service_manager_rest_rest_resources_v2_events.py", 
+            "sha256sum": "e68926034570f3879f454f0134c3c379a8f5b6f550348359d9268de9bfb04c3c"
+        },
+        {
+            "destinations": [
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/execution_events_fetcher.py"
+            ], 
+            "patch_file": "4_6_events_truncate_cloudify_cli_execution_events_fetcher.py", 
+            "sha256sum": "334e0a35f1722a75824270585a6c3c6c4e3cdf6aa8e0037330e339ee90618fdd"
+        }, 
+        {
+            "destinations": [
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/cli/helptexts.py"
+            ], 
+            "patch_file": "4_6_events_truncate_cloudify_cli_cli_helptexts.py", 
+            "sha256sum": "0659aa3f2268f80fef78a650e134246a3148a122c308c5011da023eceab17100"
+        }, 
+        {
+            "destinations": [
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/cli/cfy.py"
+            ], 
+            "patch_file": "4_6_events_truncate_cloudify_cli_cli_cfy.py", 
+            "sha256sum": "19633dd5ae3ec6059929a6872ac6a08d3f6275ece44b92937a6da8c8f336a3ec"
+        }, 
+        {
+            "destinations": [
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/commands/events.py"
+            ], 
+            "patch_file": "4_6_events_truncate_cloudify_cli_commands_events.py", 
+            "sha256sum": "eb9d40d1d84b080f9b10cc86d051adcd8c1deebd239e7be1fab6d2c3fd174a4b"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v2/events.py": [
+            "c60835e6baf74acea82c992d746016fd0530427504bcff810e2a377ae7cc3dc1"
+        ],
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/cli/cfy.py": [
+            "6512efaf463cca21690bc7268a6719c801c8ab3b15e1f6a3e6503c2927328bbb"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/cli/helptexts.py": [
+            "bd57fd240fa271a46a4937b33c9d6f602d0bb5ff7de1d31c5bf5fb503020d7a4"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/commands/events.py": [
+            "6c7fa71ff791c355fab104f47ec3b118a695838c3b8ebad2b18455c05ad8ae51"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/execution_events_fetcher.py": [
+            "3a69855480c538353281eefc719a3a5e9ad16430f92e013de7280b84eea40bf9"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v2/events.py": [
+            "cdec8e956fed039f6f928ebd48604746b0a6d21e0cc4b44f05df0d684821af99"
+        ],
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/cli/cfy.py": [
+            "d959ee4089e83e9b4aab9b96f42bd38f2c31c1152e7ef9ffefbff6c79ec6782e"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/cli/helptexts.py": [
+            "769db5dc0867255c8dd91e191ebb65b633bc45d63d9ce098a2cc330e05348d66"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/commands/events.py": [
+            "2cc3db566e324849ec7d97851c1d841c989472f10f4ea3664873c6c9e178ef70"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_cli/execution_events_fetcher.py": [
+            "abb493520c3659794b0b190b026ff0e4914d35c16628e019491f0d8316e17df7"
+        ]
+    }
+}
