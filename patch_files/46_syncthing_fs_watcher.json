@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Use FS watcher for syncthing.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/syncthing.py"
+            ], 
+            "patch_file": "46_syncthing_fs_watcher_cloudify_premium_ha_syncthing.py", 
+            "sha256sum": "dbf91506d5a76ca639d8ad21cf5ed39516f3872247646067c8c959295a8b705f"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/syncthing.py": [
+            "a5c1386cf4c94e761c3d1ba8d012f8affe1ece7bcb952af074db391b751c93f8"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/ha/syncthing.py": [
+            "efadd9e085cb19a68247be1a8b0bc11b2f6661a682201edda11b6a8fcc05394d"
+        ]
+    }
+}

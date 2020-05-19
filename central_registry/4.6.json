@@ -361,6 +361,17 @@
       "patch_id": "4_6_events_truncate-05606b66334862d9961edfef90d453053c2a28c307a45aa160ba4b2a17cb2f83", 
       "patch_name": "4_6_events_truncate", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_syncthing_fs_watcher.json", 
+      "patch_description": "Use FS watcher for syncthing.", 
+      "patch_files": [
+        "46_syncthing_fs_watcher_cloudify_premium_ha_syncthing.py"
+      ], 
+      "patch_hash": "87128def5371d388466a5d4e294a92ae1bc030b1308adfebaead9bca25cfb798", 
+      "patch_id": "46_syncthing_fs_watcher-87128def5371d388466a5d4e294a92ae1bc030b1308adfebaead9bca25cfb798", 
+      "patch_name": "46_syncthing_fs_watcher", 
+      "supports_community": false
     }
   ]
 }
