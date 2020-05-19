@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Correctly store pre-scale state for rollbacks.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py"
+            ], 
+            "patch_file": "4_6_store_pre_scale_state_rest-service_manager_rest_resource_manager.py", 
+            "sha256sum": "5b3c9f62eea0fda279aa2b7b82f611aaa4263bb989f37e647736a1d1b623981b"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "94e1dddabde18ce7d50146d1ce59eced7616c9b7e8a11050607b9e0b02ce94ca"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "bc1acd2a999a64f9b9aaa0e343886198fe618e1de0bc96c87b1aff92f7aa0eaf"
+        ]
+    }
+}
