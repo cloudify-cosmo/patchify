@@ -307,8 +307,8 @@
         "4_6_general_refactors_to_namespacing_process_dsl_parser_elements_imports.py", 
         "4_6_general_refactors_to_namespacing_process_dsl_parser_holder.py"
       ], 
-      "patch_hash": "da04d675c2ec4ceeef904067b6750541ba060289ae97beeb42d9316dd0e2d4a8", 
-      "patch_id": "4_6_general_refactors_to_namespacing_process-da04d675c2ec4ceeef904067b6750541ba060289ae97beeb42d9316dd0e2d4a8", 
+      "patch_hash": "9ca57174441fd089a6b2ef37800e103f5362a53e725e36ec668c3725a47b9a42",
+      "patch_id": "4_6_general_refactors_to_namespacing_process-9ca57174441fd089a6b2ef37800e103f5362a53e725e36ec668c3725a47b9a42", 
       "patch_name": "4_6_general_refactors_to_namespacing_process", 
       "supports_community": false
     }, 
