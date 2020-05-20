@@ -108,6 +108,17 @@
       "patch_id": "5_0_5_fixed_relationships_in_topology-6d1bef3e1b30917c1a0317ac67be46070b7264733ad43b8e516a81cf5984fa94", 
       "patch_name": "5_0_5_fixed_relationships_in_topology", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "505_syncthing_fs_watcher.json", 
+      "patch_description": "Use FS watcher for syncthing.", 
+      "patch_files": [
+        "505_syncthing_fs_watcher_cloudify_premium_syncthing_utils.py"
+      ], 
+      "patch_hash": "394d49bd4fdbf99cbdb81203d495124c81a1a9fe4091db92a9c7f97382cf4a71", 
+      "patch_id": "505_syncthing_fs_watcher-394d49bd4fdbf99cbdb81203d495124c81a1a9fe4091db92a9c7f97382cf4a71", 
+      "patch_name": "505_syncthing_fs_watcher", 
+      "supports_community": false
     }
   ]
 }

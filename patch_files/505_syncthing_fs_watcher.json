@@ -1,0 +1,42 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Use FS watcher for syncthing.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": [
+        "manager"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/syncthing_utils.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_premium/syncthing_utils.py"
+            ], 
+            "patch_file": "505_syncthing_fs_watcher_cloudify_premium_syncthing_utils.py", 
+            "sha256sum": "5e7c0fd8f87b4cec50094e80f107dc8b66b86fddbbb253fd63d39eaeb167d089"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/syncthing_utils.py": [
+            "925c2098f1b8970258bc79b957cb5869a7e305b12672a58d71a7799d3da951ab"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_premium/syncthing_utils.py": [
+            "925c2098f1b8970258bc79b957cb5869a7e305b12672a58d71a7799d3da951ab"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_premium/syncthing_utils.py": [
+            "33ad9fe2aa34c2799f2b05e85772ebb53fdfe59afc7929663c344d80918f650c"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_premium/syncthing_utils.py": [
+            "33ad9fe2aa34c2799f2b05e85772ebb53fdfe59afc7929663c344d80918f650c"
+        ]
+    }
+}
