@@ -119,6 +119,17 @@
       "patch_id": "505_syncthing_fs_watcher-394d49bd4fdbf99cbdb81203d495124c81a1a9fe4091db92a9c7f97382cf4a71", 
       "patch_name": "505_syncthing_fs_watcher", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "5_0_5_store_pre_scale_state.json", 
+      "patch_description": "Correctly store pre-scale state for rollbacks.", 
+      "patch_files": [
+        "5_0_5_store_pre_scale_state_rest-service_manager_rest_resource_manager.py"
+      ], 
+      "patch_hash": "30dc351858ef51bf9b9290e2f74fc374b85d2f645e880b067a7d49c4deea1c41", 
+      "patch_id": "5_0_5_store_pre_scale_state-30dc351858ef51bf9b9290e2f74fc374b85d2f645e880b067a7d49c4deea1c41", 
+      "patch_name": "5_0_5_store_pre_scale_state", 
+      "supports_community": false
     }
   ]
 }
