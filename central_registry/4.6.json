@@ -307,7 +307,7 @@
         "4_6_general_refactors_to_namespacing_process_dsl_parser_elements_imports.py", 
         "4_6_general_refactors_to_namespacing_process_dsl_parser_holder.py"
       ], 
-      "patch_hash": "9ca57174441fd089a6b2ef37800e103f5362a53e725e36ec668c3725a47b9a42",
+      "patch_hash": "9ca57174441fd089a6b2ef37800e103f5362a53e725e36ec668c3725a47b9a42", 
       "patch_id": "4_6_general_refactors_to_namespacing_process-9ca57174441fd089a6b2ef37800e103f5362a53e725e36ec668c3725a47b9a42", 
       "patch_name": "4_6_general_refactors_to_namespacing_process", 
       "supports_community": false
@@ -382,6 +382,19 @@
       "patch_hash": "0621c2d791beb8c8555cf46d05b44f910e51b18356116db34566892851929e55", 
       "patch_id": "4_6_store_pre_scale_state-0621c2d791beb8c8555cf46d05b44f910e51b18356116db34566892851929e55", 
       "patch_name": "4_6_store_pre_scale_state", 
+      "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_unicode_in_logs.json", 
+      "patch_description": "Allow Unicode in Cloudify logs.", 
+      "patch_files": [
+        "4_6_unicode_in_logs_cloudify_amqp_client.py", 
+        "4_6_unicode_in_logs_cloudify_logs.py", 
+        "4_6_unicode_in_logs_cloudify_event.py"
+      ], 
+      "patch_hash": "39623573db13df0ce0c42a4cf90f975e696d419a5dafafe52d958d711d0faf8f", 
+      "patch_id": "4_6_unicode_in_logs-39623573db13df0ce0c42a4cf90f975e696d419a5dafafe52d958d711d0faf8f", 
+      "patch_name": "4_6_unicode_in_logs", 
       "supports_community": false
     }
   ]
