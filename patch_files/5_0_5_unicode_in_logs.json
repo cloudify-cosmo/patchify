@@ -1,0 +1,159 @@
+{
+    "affected_services": [
+        "cloudify-status-reporter", 
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Allow Unicode in Cloudify logs.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": [
+        "manager"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/amqp_client.py", 
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/amqp_client.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/amqp_client.py"
+            ], 
+            "patch_file": "5_0_5_unicode_in_logs_cloudify_amqp_client.py", 
+            "sha256sum": "25713d6b713fe3968610d356786813396e6b00b4abc3903693ed68b52b083f57"
+        }, 
+        {
+            "destinations": [
+                "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/logs.py", 
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/logs.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/logs.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/logs.py"
+            ], 
+            "patch_file": "5_0_5_unicode_in_logs_cloudify_logs.py", 
+            "sha256sum": "83ed9d91bfaff1ac592576ce2a9b6894e48551e9cbae38d4ea6654d88ecca822"
+        }, 
+        {
+            "destinations": [
+                "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/_compat.py", 
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/_compat.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/_compat.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/_compat.py"
+            ], 
+            "patch_file": "5_0_5_unicode_in_logs_cloudify__compat.py", 
+            "sha256sum": "789002a794947fa654a36b9be40a72d8370504f7f6b7ad916acb0faa33e4290c"
+        }, 
+        {
+            "destinations": [
+                "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/event.py", 
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/event.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/event.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/event.py"
+            ], 
+            "patch_file": "5_0_5_unicode_in_logs_cloudify_event.py", 
+            "sha256sum": "f682c2ef3e7eb75cd87b5971883e8d8c1a959061e2080846afd7185d3c5e1e14"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/_compat.py": [
+            "482ad5cd482865d3caa76413ba9002d9348130ad4fc85ce0fb9791d871ef6859"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "64a56fb3ac20a86f81a6a8b58f0e572fafc05aade75ca972817f55b33efa2f7c"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/event.py": [
+            "3dd67b47f79f5f5c7a873dd3d1c87cc9da9463bb980cd22fb47b23f323b8be5b"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/logs.py": [
+            "1f2f577d24c0ad8c85936dbdc42ffcc0de46912f8afa68af83837526bf473b5d"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/_compat.py": [
+            "482ad5cd482865d3caa76413ba9002d9348130ad4fc85ce0fb9791d871ef6859"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "64a56fb3ac20a86f81a6a8b58f0e572fafc05aade75ca972817f55b33efa2f7c"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "3dd67b47f79f5f5c7a873dd3d1c87cc9da9463bb980cd22fb47b23f323b8be5b"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "1f2f577d24c0ad8c85936dbdc42ffcc0de46912f8afa68af83837526bf473b5d"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/_compat.py": [
+            "482ad5cd482865d3caa76413ba9002d9348130ad4fc85ce0fb9791d871ef6859"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "64a56fb3ac20a86f81a6a8b58f0e572fafc05aade75ca972817f55b33efa2f7c"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "3dd67b47f79f5f5c7a873dd3d1c87cc9da9463bb980cd22fb47b23f323b8be5b"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "1f2f577d24c0ad8c85936dbdc42ffcc0de46912f8afa68af83837526bf473b5d"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/_compat.py": [
+            "482ad5cd482865d3caa76413ba9002d9348130ad4fc85ce0fb9791d871ef6859"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "64a56fb3ac20a86f81a6a8b58f0e572fafc05aade75ca972817f55b33efa2f7c"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "3dd67b47f79f5f5c7a873dd3d1c87cc9da9463bb980cd22fb47b23f323b8be5b"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "1f2f577d24c0ad8c85936dbdc42ffcc0de46912f8afa68af83837526bf473b5d"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/_compat.py": [
+            "44b9f15e84f624f9a0ba2cea99fb17eca48b922b80c5e2e0cb94d3179f1eb989"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "941981be46a5c6d1307d747f8e354b5d02b25e43e0a79d3e216c9c5b09b7ae9b"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/event.py": [
+            "87b00c1263a09bde2f8be531da19c0cd7f9b7d9f88e309496509fcdc264b0e05"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/logs.py": [
+            "1f7442a3481b671abb59dff7ad44f5abd5e1d647ad4ef4792f3730e8e9798cd9"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/_compat.py": [
+            "44b9f15e84f624f9a0ba2cea99fb17eca48b922b80c5e2e0cb94d3179f1eb989"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "941981be46a5c6d1307d747f8e354b5d02b25e43e0a79d3e216c9c5b09b7ae9b"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "87b00c1263a09bde2f8be531da19c0cd7f9b7d9f88e309496509fcdc264b0e05"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "1f7442a3481b671abb59dff7ad44f5abd5e1d647ad4ef4792f3730e8e9798cd9"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/_compat.py": [
+            "44b9f15e84f624f9a0ba2cea99fb17eca48b922b80c5e2e0cb94d3179f1eb989"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "941981be46a5c6d1307d747f8e354b5d02b25e43e0a79d3e216c9c5b09b7ae9b"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "87b00c1263a09bde2f8be531da19c0cd7f9b7d9f88e309496509fcdc264b0e05"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "1f7442a3481b671abb59dff7ad44f5abd5e1d647ad4ef4792f3730e8e9798cd9"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/_compat.py": [
+            "44b9f15e84f624f9a0ba2cea99fb17eca48b922b80c5e2e0cb94d3179f1eb989"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "941981be46a5c6d1307d747f8e354b5d02b25e43e0a79d3e216c9c5b09b7ae9b"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "87b00c1263a09bde2f8be531da19c0cd7f9b7d9f88e309496509fcdc264b0e05"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "1f7442a3481b671abb59dff7ad44f5abd5e1d647ad4ef4792f3730e8e9798cd9"
+        ]
+    }
+}

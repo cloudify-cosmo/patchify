@@ -130,6 +130,20 @@
       "patch_id": "5_0_5_store_pre_scale_state-30dc351858ef51bf9b9290e2f74fc374b85d2f645e880b067a7d49c4deea1c41", 
       "patch_name": "5_0_5_store_pre_scale_state", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "5_0_5_unicode_in_logs.json", 
+      "patch_description": "Allow Unicode in Cloudify logs.", 
+      "patch_files": [
+        "5_0_5_unicode_in_logs_cloudify_amqp_client.py", 
+        "5_0_5_unicode_in_logs_cloudify_logs.py", 
+        "5_0_5_unicode_in_logs_cloudify__compat.py", 
+        "5_0_5_unicode_in_logs_cloudify_event.py"
+      ], 
+      "patch_hash": "d82fdfbd39cb31a9ae0632179bace9e2385d30b94be6ed17ae1497a108c243ce", 
+      "patch_id": "5_0_5_unicode_in_logs-d82fdfbd39cb31a9ae0632179bace9e2385d30b94be6ed17ae1497a108c243ce", 
+      "patch_name": "5_0_5_unicode_in_logs", 
+      "supports_community": false
     }
   ]
 }
