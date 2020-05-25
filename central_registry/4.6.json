@@ -396,6 +396,18 @@
       "patch_id": "4_6_unicode_in_logs-39623573db13df0ce0c42a4cf90f975e696d419a5dafafe52d958d711d0faf8f", 
       "patch_name": "4_6_unicode_in_logs", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_rollback_started_depmods.json", 
+      "patch_description": "Rollback started dep-mods on scale_entity workflow.", 
+      "patch_files": [
+        "4_6_rollback_started_depmods_cloudify_workflows_workflow_context.py", 
+        "4_6_rollback_started_depmods_cloudify_plugins_workflows.py"
+      ], 
+      "patch_hash": "07ac8a3f50f6dab45687c66ff5076f841ffd35125c168ad34dba2f603a40d42b", 
+      "patch_id": "4_6_rollback_started_depmods-07ac8a3f50f6dab45687c66ff5076f841ffd35125c168ad34dba2f603a40d42b", 
+      "patch_name": "4_6_rollback_started_depmods", 
+      "supports_community": false
     }
   ]
 }

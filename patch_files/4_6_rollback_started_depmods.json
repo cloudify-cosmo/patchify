@@ -1,0 +1,59 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Rollback started dep-mods on scale_entity workflow.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py"
+            ], 
+            "patch_file": "4_6_rollback_started_depmods_cloudify_workflows_workflow_context.py", 
+            "sha256sum": "f77cddfd4d596c16c451aa9d83ad2c3345d3712999502aabb0781127285a3d4b"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/plugins/workflows.py"
+            ], 
+            "patch_file": "4_6_rollback_started_depmods_cloudify_plugins_workflows.py", 
+            "sha256sum": "6d628b15417d48a48aebc9f6f2f0f5443da61dd6fc8ac9727a43aff8f6bde3dc"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "ecaf786d2c9e88a92e2473b22e2071a147938cdf6d86a122a5f51f1455b431ce"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "ecaf786d2c9e88a92e2473b22e2071a147938cdf6d86a122a5f51f1455b431ce"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "ecaf786d2c9e88a92e2473b22e2071a147938cdf6d86a122a5f51f1455b431ce"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "a34b3436035cdacc276d9802d7f8a25d3b2febef2204eb5bbcd9328ef918bcc9"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "15f340f94f0644ee8f50a7b1e30b125323efef70a38130fb4cd7086e6f7d473c"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "15f340f94f0644ee8f50a7b1e30b125323efef70a38130fb4cd7086e6f7d473c"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "15f340f94f0644ee8f50a7b1e30b125323efef70a38130fb4cd7086e6f7d473c"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "3a01d18d0342ba5a99c14d50d6fa67473922b111602035f30466ae57495387d6"
+        ]
+    }
+}
