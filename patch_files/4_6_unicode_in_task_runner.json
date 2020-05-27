@@ -1,0 +1,59 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Allow Unicode in task runner.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/script_runner/tasks.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/script_runner/tasks.py"
+            ], 
+            "patch_file": "4_6_unicode_in_task_runner_script_runner_tasks.py", 
+            "sha256sum": "944f3b0fd60fac2211e548a1c3c637ff3783be05eb4829e0279f3a3a9e9f83c0"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/event.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/event.py"
+            ], 
+            "patch_file": "4_6_unicode_in_task_runner_cloudify_event.py", 
+            "sha256sum": "eebd87cabb055f2a73058446faf86db2d78819de4ce266adf1bb26ae6a39a758"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/script_runner/tasks.py": [
+            "c380f63b5415905472bd67d380aa1b8e8b7f2dfba4ada942d351b8b1ef7a942e"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "e24dc5ad9140cf50debfa12318fda61f9cd51050b3556c75ae98127d506b71f4"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/script_runner/tasks.py": [
+            "c380f63b5415905472bd67d380aa1b8e8b7f2dfba4ada942d351b8b1ef7a942e"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "e24dc5ad9140cf50debfa12318fda61f9cd51050b3556c75ae98127d506b71f4"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/script_runner/tasks.py": [
+            "41ef46e8e211f38c2ae9c5d7e1cd20b501e04887bc25c842f8c146bc5ae97adc"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "5ce33c12da6e5111f60eb73f20550c86fb7589f98e53e5d5ddb3a4c44ee5caf9"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/script_runner/tasks.py": [
+            "41ef46e8e211f38c2ae9c5d7e1cd20b501e04887bc25c842f8c146bc5ae97adc"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "5ce33c12da6e5111f60eb73f20550c86fb7589f98e53e5d5ddb3a4c44ee5caf9"
+        ]
+    }
+}
