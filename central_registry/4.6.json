@@ -408,6 +408,18 @@
       "patch_id": "4_6_rollback_started_depmods-07ac8a3f50f6dab45687c66ff5076f841ffd35125c168ad34dba2f603a40d42b", 
       "patch_name": "4_6_rollback_started_depmods", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_unicode_in_task_runner.json", 
+      "patch_description": "Allow Unicode in task runner.", 
+      "patch_files": [
+        "4_6_unicode_in_task_runner_script_runner_tasks.py", 
+        "4_6_unicode_in_task_runner_cloudify_event.py"
+      ], 
+      "patch_hash": "b401cd356dc54f3081adbe8ab56a7016b0c2466e9ec9042263f888fd5c0bc1d0", 
+      "patch_id": "4_6_unicode_in_task_runner-b401cd356dc54f3081adbe8ab56a7016b0c2466e9ec9042263f888fd5c0bc1d0", 
+      "patch_name": "4_6_unicode_in_task_runner", 
+      "supports_community": false
     }
   ]
 }
