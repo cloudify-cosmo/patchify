@@ -420,6 +420,19 @@
       "patch_id": "4_6_unicode_in_task_runner-b401cd356dc54f3081adbe8ab56a7016b0c2466e9ec9042263f888fd5c0bc1d0", 
       "patch_name": "4_6_unicode_in_task_runner", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_unicode_in_mgmtworker.json", 
+      "patch_description": "Allow Unicode in management worker.", 
+      "patch_files": [
+        "4_6_unicode_in_mgmtworker_cloudify_event.py", 
+        "4_6_unicode_in_mgmtworker_script_runner_tasks.py", 
+        "4_6_unicode_in_mgmtworker_cloudify_proxy_server.py"
+      ], 
+      "patch_hash": "4d49a4bdbc97d246993bbab8ff78beace7d5ffa1ce0a6543f9cb593fe9d33d04", 
+      "patch_id": "4_6_unicode_in_mgmtworker-4d49a4bdbc97d246993bbab8ff78beace7d5ffa1ce0a6543f9cb593fe9d33d04", 
+      "patch_name": "4_6_unicode_in_mgmtworker", 
+      "supports_community": false
     }
   ]
 }
