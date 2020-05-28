@@ -1,0 +1,125 @@
+{
+    "affected_services": [
+        "cloudify-status-reporter", 
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Allow Unicode in task runner.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": [
+        "manager"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/utils.py", 
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/utils.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/utils.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/utils.py"
+            ], 
+            "patch_file": "5_0_5_unicode_in_task_runner_cloudify_utils.py", 
+            "sha256sum": "eaf978878aa477aa147d1014949681fa9ec988c7b2f2a1c2ebd01c150cfd141d"
+        }, 
+        {
+            "destinations": [
+                "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/proxy/server.py", 
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/proxy/server.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/proxy/server.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/proxy/server.py"
+            ], 
+            "patch_file": "5_0_5_unicode_in_task_runner_cloudify_proxy_server.py", 
+            "sha256sum": "22b571444d71f254f4c86595155f600aa0c84edd8fa3e1f43287eef47a358e29"
+        }, 
+        {
+            "destinations": [
+                "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/event.py", 
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/event.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/event.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/event.py"
+            ], 
+            "patch_file": "5_0_5_unicode_in_task_runner_cloudify_event.py", 
+            "sha256sum": "41f8fa2e2c1076c001ab4582f59234950f9741ce997e73f27d7fc6e29b95d2fe"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/event.py": [
+            "a0341b60cd155f69ad6522c0f395ec74f3496312461fdf0a085ac682e2c2cb52"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "94756f653f15358e3b82b692d76d6aad8447d6a714accd12f9140a077e1018e5"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/utils.py": [
+            "e1b5f37714806b8a61c48530157b5074b15d05bb8ce10e5f05493544304e983e"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "a0341b60cd155f69ad6522c0f395ec74f3496312461fdf0a085ac682e2c2cb52"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "94756f653f15358e3b82b692d76d6aad8447d6a714accd12f9140a077e1018e5"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "e1b5f37714806b8a61c48530157b5074b15d05bb8ce10e5f05493544304e983e"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "a0341b60cd155f69ad6522c0f395ec74f3496312461fdf0a085ac682e2c2cb52"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "94756f653f15358e3b82b692d76d6aad8447d6a714accd12f9140a077e1018e5"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "e1b5f37714806b8a61c48530157b5074b15d05bb8ce10e5f05493544304e983e"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "a0341b60cd155f69ad6522c0f395ec74f3496312461fdf0a085ac682e2c2cb52"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "94756f653f15358e3b82b692d76d6aad8447d6a714accd12f9140a077e1018e5"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "e1b5f37714806b8a61c48530157b5074b15d05bb8ce10e5f05493544304e983e"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/event.py": [
+            "3dd67b47f79f5f5c7a873dd3d1c87cc9da9463bb980cd22fb47b23f323b8be5b"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "a8c9065c929c33e1c3e03e87a1e47f510dea1e7c40977f090041acef0ec183e5"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/utils.py": [
+            "eff79a3ff357a3a0514e4fd2995d486f5a02ef30edff8ce945f93899c1742257"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "3dd67b47f79f5f5c7a873dd3d1c87cc9da9463bb980cd22fb47b23f323b8be5b"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "a8c9065c929c33e1c3e03e87a1e47f510dea1e7c40977f090041acef0ec183e5"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "eff79a3ff357a3a0514e4fd2995d486f5a02ef30edff8ce945f93899c1742257"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "3dd67b47f79f5f5c7a873dd3d1c87cc9da9463bb980cd22fb47b23f323b8be5b"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "a8c9065c929c33e1c3e03e87a1e47f510dea1e7c40977f090041acef0ec183e5"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "eff79a3ff357a3a0514e4fd2995d486f5a02ef30edff8ce945f93899c1742257"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/event.py": [
+            "3dd67b47f79f5f5c7a873dd3d1c87cc9da9463bb980cd22fb47b23f323b8be5b"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "a8c9065c929c33e1c3e03e87a1e47f510dea1e7c40977f090041acef0ec183e5"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "eff79a3ff357a3a0514e4fd2995d486f5a02ef30edff8ce945f93899c1742257"
+        ]
+    }
+}

@@ -144,6 +144,19 @@
       "patch_id": "5_0_5_unicode_in_logs-d82fdfbd39cb31a9ae0632179bace9e2385d30b94be6ed17ae1497a108c243ce", 
       "patch_name": "5_0_5_unicode_in_logs", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "5_0_5_unicode_in_task_runner.json", 
+      "patch_description": "Allow Unicode in task runner.", 
+      "patch_files": [
+        "5_0_5_unicode_in_task_runner_cloudify_utils.py", 
+        "5_0_5_unicode_in_task_runner_cloudify_proxy_server.py", 
+        "5_0_5_unicode_in_task_runner_cloudify_event.py"
+      ], 
+      "patch_hash": "d0fed1ed42ce6226403a5eb9e4737dd4ccefffb8f67ebdd75f3388aafe4fd193", 
+      "patch_id": "5_0_5_unicode_in_task_runner-d0fed1ed42ce6226403a5eb9e4737dd4ccefffb8f67ebdd75f3388aafe4fd193", 
+      "patch_name": "5_0_5_unicode_in_task_runner", 
+      "supports_community": false
     }
   ]
 }
