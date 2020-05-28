@@ -1,0 +1,73 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Allow Unicode in mgmtworker.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/script_runner/tasks.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/script_runner/tasks.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/script_runner/tasks.py"
+            ], 
+            "patch_file": "4_6_unicode_in_mgmtworker_script_runner_tasks.py", 
+            "sha256sum": "335ee7acb9b33d48b0f334cbad40f5ba742727dab647537ab8851fbee17f1812"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/proxy/server.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/proxy/server.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/proxy/server.py"
+            ], 
+            "patch_file": "4_6_unicode_in_mgmtworker_cloudify_proxy_server.py", 
+            "sha256sum": "b71afc2a2d8d56309b9bd92937d4005d54c7ef5953faec1b1c28419e61c4a738"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "8af3950efd291c32b9b385bf267e6e3a795475f408c207fd26062c723ea13977"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/script_runner/tasks.py": [
+            "5df0906ff2317be82ea466f24b47cb9c9fd8a6f99edeec81adaf610238f72841"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "8af3950efd291c32b9b385bf267e6e3a795475f408c207fd26062c723ea13977"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/script_runner/tasks.py": [
+            "5df0906ff2317be82ea466f24b47cb9c9fd8a6f99edeec81adaf610238f72841"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "8af3950efd291c32b9b385bf267e6e3a795475f408c207fd26062c723ea13977"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/script_runner/tasks.py": [
+            "5df0906ff2317be82ea466f24b47cb9c9fd8a6f99edeec81adaf610238f72841"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "15e94fd62d86978250eaf14a4b70f905647798ac4e12362151911fdfeba5128a"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/script_runner/tasks.py": [
+            "c380f63b5415905472bd67d380aa1b8e8b7f2dfba4ada942d351b8b1ef7a942e"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "15e94fd62d86978250eaf14a4b70f905647798ac4e12362151911fdfeba5128a"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/script_runner/tasks.py": [
+            "c380f63b5415905472bd67d380aa1b8e8b7f2dfba4ada942d351b8b1ef7a942e"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/proxy/server.py": [
+            "15e94fd62d86978250eaf14a4b70f905647798ac4e12362151911fdfeba5128a"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/script_runner/tasks.py": [
+            "c380f63b5415905472bd67d380aa1b8e8b7f2dfba4ada942d351b8b1ef7a942e"
+        ]
+    }
+}
