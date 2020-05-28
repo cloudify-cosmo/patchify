@@ -420,6 +420,30 @@
       "patch_id": "4_6_unicode_in_task_runner-b401cd356dc54f3081adbe8ab56a7016b0c2466e9ec9042263f888fd5c0bc1d0", 
       "patch_name": "4_6_unicode_in_task_runner", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_unicode_consistency.json", 
+      "patch_description": "Make Cloudify envs consistent (Unicode-wise).", 
+      "patch_files": [
+        "4_6_unicode_consistency_script_runner_tasks.py", 
+        "4_6_unicode_consistency_cloudify_event.py"
+      ], 
+      "patch_hash": "b3a46da1373c50702d3cc053d371f6eebd72e39732e6aba2789d66bb057b4b6f", 
+      "patch_id": "4_6_unicode_consistency-b3a46da1373c50702d3cc053d371f6eebd72e39732e6aba2789d66bb057b4b6f", 
+      "patch_name": "4_6_unicode_consistency", 
+      "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_unicode_in_mgmtworker.json", 
+      "patch_description": "Allow Unicode in mgmtworker.", 
+      "patch_files": [
+        "4_6_unicode_in_mgmtworker_script_runner_tasks.py", 
+        "4_6_unicode_in_mgmtworker_cloudify_proxy_server.py"
+      ], 
+      "patch_hash": "010dd78817a5db6078a33a60145457056b0cff69fdd893b00719a2158a50367c", 
+      "patch_id": "4_6_unicode_in_mgmtworker-010dd78817a5db6078a33a60145457056b0cff69fdd893b00719a2158a50367c", 
+      "patch_name": "4_6_unicode_in_mgmtworker", 
+      "supports_community": false
     }
   ]
 }
