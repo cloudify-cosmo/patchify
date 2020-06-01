@@ -157,6 +157,18 @@
       "patch_id": "5_0_5_unicode_in_task_runner-d0fed1ed42ce6226403a5eb9e4737dd4ccefffb8f67ebdd75f3388aafe4fd193", 
       "patch_name": "5_0_5_unicode_in_task_runner", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "505_refresh_node_instances.json", 
+      "patch_description": "Automatically refresh node instances when scaling.", 
+      "patch_files": [
+        "505_refresh_node_instances_cloudify_workflows_workflow_context.py", 
+        "505_refresh_node_instances_cloudify_plugins_workflows.py"
+      ], 
+      "patch_hash": "471a907f36d0c6bc223dd7b0a2ce31cdd524c6213f71c4ae6a7e8a069e37a2b2", 
+      "patch_id": "505_refresh_node_instances-471a907f36d0c6bc223dd7b0a2ce31cdd524c6213f71c4ae6a7e8a069e37a2b2", 
+      "patch_name": "505_refresh_node_instances", 
+      "supports_community": false
     }
   ]
 }
