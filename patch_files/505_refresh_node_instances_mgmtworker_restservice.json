@@ -1,7 +1,6 @@
 {
     "affected_services": [
-        "cloudify-status-reporter", 
-        "cloudify-mgmtworker", 
+        "cloudify-mgmtworker",
         "cloudify-restservice"
     ], 
     "community": false, 
@@ -10,16 +9,13 @@
         "5.0.5"
     ], 
     "node_types": [
-        "manager", 
-        "db", 
-        "broker"
-    ], 
+        "manager"
+    ],
     "patch_version": "2.1.0", 
     "patches": [
         {
             "destinations": [
-                "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py", 
-                "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py", 
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py",
                 "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py", 
                 "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py"
             ], 
@@ -28,8 +24,7 @@
         }, 
         {
             "destinations": [
-                "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py", 
-                "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py", 
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py",
                 "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py", 
                 "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/plugins/workflows.py"
             ], 
@@ -56,12 +51,6 @@
         ], 
         "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
             "03f1d47238a4b848b295e75edb3254949a00da1de3194613bcc6f0983c3b9119"
-        ], 
-        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
-            "bbf1d0ef2f212563edd9c89ce5caa4d3eb7b3d2639b1ae8bce0469d33f482472"
-        ], 
-        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
-            "03f1d47238a4b848b295e75edb3254949a00da1de3194613bcc6f0983c3b9119"
         ]
     }, 
     "sha256sums_before": {
@@ -81,12 +70,6 @@
             "ee5e32a7ba1de479f05cfbf1e0b45ed454081a0d2a28e3f6a151e08268aed9be"
         ], 
         "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
-            "6ec4f5f22defe1a149d8c2af507fca63782d262619eea7b53674600058a0bb92"
-        ], 
-        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
-            "ee5e32a7ba1de479f05cfbf1e0b45ed454081a0d2a28e3f6a151e08268aed9be"
-        ], 
-        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
             "6ec4f5f22defe1a149d8c2af507fca63782d262619eea7b53674600058a0bb92"
         ]
     }

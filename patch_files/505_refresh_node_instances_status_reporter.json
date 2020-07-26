@@ -1,0 +1,49 @@
+{
+    "affected_services": [
+      "cloudify-status-reporter"
+    ],
+    "community": false,
+    "description": "Automatically refresh node instances when scaling.",
+    "manager_versions": [
+        "5.0.5"
+    ],
+    "node_types": [
+      "manager",
+      "db",
+      "broker"
+    ],
+    "patch_version": "2.1.0",
+    "patches": [
+        {
+            "destinations": [
+                "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py"
+            ],
+            "patch_file": "505_refresh_node_instances_cloudify_workflows_workflow_context.py",
+            "sha256sum": "47d1baac4cca651e53ca2f64dfc0f138e5d7715d688740dfec902b3b2871ceb3"
+        },
+        {
+            "destinations": [
+                "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py"
+            ],
+            "patch_file": "505_refresh_node_instances_cloudify_plugins_workflows.py",
+            "sha256sum": "ad8d8a3d4b4b1a5fedcbe065f543bd66167ae4af8ccc383719c6b927b53052c8"
+        }
+    ],
+    "premium": true,
+    "sha256sums_after": {
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "bbf1d0ef2f212563edd9c89ce5caa4d3eb7b3d2639b1ae8bce0469d33f482472"
+        ],
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "03f1d47238a4b848b295e75edb3254949a00da1de3194613bcc6f0983c3b9119"
+        ]
+    },
+    "sha256sums_before": {
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/plugins/workflows.py": [
+            "ee5e32a7ba1de479f05cfbf1e0b45ed454081a0d2a28e3f6a151e08268aed9be"
+        ],
+        "/opt/status-reporter/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "6ec4f5f22defe1a149d8c2af507fca63782d262619eea7b53674600058a0bb92"
+        ]
+    }
+}

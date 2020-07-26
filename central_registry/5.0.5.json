@@ -159,15 +159,27 @@
       "supports_community": false
     }, 
     {
-      "patch_definition_path": "505_refresh_node_instances.json", 
+      "patch_definition_path": "505_refresh_node_instances_status_reporter.json",
       "patch_description": "Automatically refresh node instances when scaling.", 
       "patch_files": [
         "505_refresh_node_instances_cloudify_workflows_workflow_context.py", 
         "505_refresh_node_instances_cloudify_plugins_workflows.py"
       ], 
-      "patch_hash": "471a907f36d0c6bc223dd7b0a2ce31cdd524c6213f71c4ae6a7e8a069e37a2b2", 
-      "patch_id": "505_refresh_node_instances-471a907f36d0c6bc223dd7b0a2ce31cdd524c6213f71c4ae6a7e8a069e37a2b2", 
-      "patch_name": "505_refresh_node_instances", 
+      "patch_hash": "fa75424c7a67430cdf946abd99bade1ff1c39c4075777989538cfed94261d386",
+      "patch_id": "505_refresh_node_instances_status_reporter-fa75424c7a67430cdf946abd99bade1ff1c39c4075777989538cfed94261d386",
+      "patch_name": "505_refresh_node_instances_status_reporter",
+      "supports_community": false
+    },
+    {
+      "patch_definition_path": "505_refresh_node_instances_mgmtworker_restservice.json",
+      "patch_description": "Automatically refresh node instances when scaling.",
+      "patch_files": [
+        "505_refresh_node_instances_cloudify_workflows_workflow_context.py",
+        "505_refresh_node_instances_cloudify_plugins_workflows.py"
+      ],
+      "patch_hash": "62a3adbaa21d8735f246bea807e18cc55491a262012df3b581029f34bd3fa44a",
+      "patch_id": "505_refresh_node_instances_mgmtworker_restservice-62a3adbaa21d8735f246bea807e18cc55491a262012df3b581029f34bd3fa44a",
+      "patch_name": "505_refresh_node_instances_mgmtworker_restservice",
       "supports_community": false
     }
   ]
