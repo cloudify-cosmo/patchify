@@ -1,0 +1,418 @@
+{
+    "affected_services": [
+        "cloudify-stage"
+    ],
+    "community": false,
+    "description": "Change map tiles provider, add Deploy & Install option, add Change Password option.",
+    "manager_versions": [
+        "5.0.5"
+    ],
+    "node_types": [
+        "manager"
+    ],
+    "patch_version": "2.1.0",
+    "patches": [
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/blueprintActionButtons/widget.js"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_blueprintActionButtons_widget.js",
+            "sha256sum": "ee5e39d7ec4c10fe3aa953558ee2e4b66aadb077f457818e1d3600fd265030a0"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/sitesMap/widget.js"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_sitesMap_widget.js",
+            "sha256sum": "5918a05260c0a252aa310b6106d1b4c8d5cb6b12d3fb1ed44ff29e8532d95288"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/deploymentWizardButtons/widget.js.br"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_deploymentWizardButtons_widget.js.br",
+            "sha256sum": "fd9a8fcc393b7f165f5a981a762980b6e02bbec8223ac8db4841f6f1039d25c5"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/static/js/main.bundle.js"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_static_js_main.bundle.js",
+            "sha256sum": "dfd65c7a8419de9f0541542c78615163814b5698c300e111279cb5ff40392a20"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/deploymentButton/widget.js.br"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_deploymentButton_widget.js.br",
+            "sha256sum": "2a42aa6128ed587dfc7676d6ad8bc9e3d6e241839f9fdc61d6aeb1aa5929a862"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/static/js/main.bundle.js.br"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_static_js_main.bundle.js.br",
+            "sha256sum": "fec9b9d50ce9e4388a882213a66519debb4e44d171d81d7e801c744f234e17b6"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/deploymentButton/widget.js"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_deploymentButton_widget.js",
+            "sha256sum": "e698654d7190ee81efe8f152422780a1581c5136530b2e2118a8a23a14acea3f"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/userManagement/widget.js"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_userManagement_widget.js",
+            "sha256sum": "00f9882eabe99c60729c3194d80d7423c5a6cbcedf3c92bfda9f0447d4757313"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/sitesMap/widget.js.br"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_sitesMap_widget.js.br",
+            "sha256sum": "7857580c71b55564d9a3181eaea854271100b482f9f896b92aa7773f9af37ad9"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/blueprints/widget.js.br"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_blueprints_widget.js.br",
+            "sha256sum": "c995f633869785ae7d77d50f5610ad3ebdb571330b69ca481fc8a38a352e1073"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/deploymentWizardButtons/widget.js.gz"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_deploymentWizardButtons_widget.js.gz",
+            "sha256sum": "bb827ae6e286712b79950587e87545dd58fad994c91bbf3520a6cc5b41b47b95"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/sites/widget.js"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_sites_widget.js",
+            "sha256sum": "a668c2476ac9b62f26e2537e63c8940b9b66b28b718d2b4c8d07a97d5f14510e"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/userManagement/widget.js.gz"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_userManagement_widget.js.gz",
+            "sha256sum": "f6f60839370ddf2896ef63bd5a55b31a1b41bd70da899afc623f3a2acff1aff4"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/static/js/vendor.bundle.js.br"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_static_js_vendor.bundle.js.br",
+            "sha256sum": "7a1a86ca8e3e23943efd782e96e387522914461517d3930b47abfbe1965bb6b4"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/common/common.js"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_common_common.js",
+            "sha256sum": "e5c9f45b62de3780195c83f093da0fafa551c330cbe45f2ab8756c8ed7fca0fa"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/common/common.js.br"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_common_common.js.br",
+            "sha256sum": "ca7f044b6ef44577c1767f2b69dbb1a6b0f4e63445005d790bdb4178bf74b8e4"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/common/common.js.gz"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_common_common.js.gz",
+            "sha256sum": "0ce2a974c3f2673415651b8aabd463a56b742ce6b307d6464698939ff662b0ea"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/backend/server.js"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_backend_server.js",
+            "sha256sum": "e509999a6c5f020268c4d9a7e0d0d058602d1b680d869b3f15e885cfba0fcc4d"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/sites/widget.js.br"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_sites_widget.js.br",
+            "sha256sum": "274c04ef03b19daab0313e993a717fdfcf885e235f91a169e824ea469a001324"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/deploymentWizardButtons/widget.js"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_deploymentWizardButtons_widget.js",
+            "sha256sum": "dd015f8d800e96085861c5d08a7b6d385c2a7352e222592390bb3f0bd33f8cc9"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/deploymentButton/widget.js.gz"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_deploymentButton_widget.js.gz",
+            "sha256sum": "c6bad37f4357470115620e6ab725c66fb6f297fcbd286588db1b2e5106e30e31"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/blueprints/widget.js"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_blueprints_widget.js",
+            "sha256sum": "7c439f23c2f3011ecc3d1a62c7d75db1ba8005af4d3bc4a1570ed38d3109f31f"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/static/js/main.bundle.js.gz"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_static_js_main.bundle.js.gz",
+            "sha256sum": "e7873cf926118e7ff43a6515fbf780166bafd2f397ee4c955f8367b7c53d5da4"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/sitesMap/widget.js.gz"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_sitesMap_widget.js.gz",
+            "sha256sum": "77efca486d88ece0143cfab0b3931b53ed5639350f20ce448adc784c6aab72c9"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/conf/userConfig.json"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_conf_userConfig.json",
+            "sha256sum": "cc04902d7346e244dbd36290c3c2a523c16787e4416bc91f504a80b59a3f9a9d"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/static/js/vendor.bundle.js.gz"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_static_js_vendor.bundle.js.gz",
+            "sha256sum": "fd3a089a05b72f3daeec805868e1405f381c60bee56bfa5cb6b6960049a2f1d9"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/userManagement/widget.js.br"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_userManagement_widget.js.br",
+            "sha256sum": "3ea4b0758c713165c9ac36a9fb489a4a6f78fa94df87090d39ad9d56cb8071ef"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/blueprints/widget.js.gz"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_blueprints_widget.js.gz",
+            "sha256sum": "aeb93d0d69672037965ba434bf68c055dd3fd7478e079826601c37be8121d8c6"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/backend/routes/Maps.js"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_backend_routes_Maps.js",
+            "sha256sum": "d749e9f5701913f102ce36ade640bfea534c4bd1e34a2a96b7a60a47df38a5dc"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/sites/widget.js.gz"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_sites_widget.js.gz",
+            "sha256sum": "52129aab690644990fb9d0677f79c61e5d09905a2ea8ccc7b1c63625b13f7fa4"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/static/js/vendor.bundle.js"
+            ],
+            "patch_file": "5_0_5_maps_provider_change_for_ui_and_new_features_dist_static_js_vendor.bundle.js",
+            "sha256sum": "d3c0d2dd44636302c2b6a54fff4c6f976343a4bf2461b9e868fbecdbd6fe4a07"
+        }
+    ],
+    "premium": true,
+    "sha256sums_after": {
+        "/opt/cloudify-stage/backend/server.js": [
+            "bb6a2a3e51aa3aac789bf5923cb430878526d89a15c8d38c0f6c8c5797708cce"
+        ],
+        "/opt/cloudify-stage/conf/userConfig.json": [
+            "c8f1d3b20012bb2ad132f03a3f5f03d1d42c67a7889d453156f8b4c42e3948ff"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprintActionButtons/widget.js": [
+            "5cba59feb17987c282b24badacd58f930147f984ca1560b76c9bb5e9651e28ef"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprints/widget.js": [
+            "46793054a4277eb66d75fe82ac325165c7560056eb3a0bcf50814973244d88b8"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprints/widget.js.br": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprints/widget.js.gz": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/common/common.js": [
+            "9870c16c57f90c6c7dd6c8324d69bb224cd11209d0fc97717bf330b5cdad2eff"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/common/common.js.br": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/common/common.js.gz": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/deploymentButton/widget.js": [
+            "cb92b5eead36246912d1b31b7e4875539b565762f7663a083c8486cd17711777"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/deploymentButton/widget.js.br": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/deploymentButton/widget.js.gz": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/deploymentWizardButtons/widget.js": [
+            "f1a1a01d75be4be707236c798324d7bc804d0db33070910c5c5ed9b4e59add73"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/deploymentWizardButtons/widget.js.br": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/deploymentWizardButtons/widget.js.gz": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/sites/widget.js": [
+            "b3f846bb788e4d4dd31ede2c9ce77e40373d03c0b11e98cb1936f0a570c5fb84"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/sites/widget.js.br": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/sites/widget.js.gz": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/sitesMap/widget.js": [
+            "7c4b07fd7edd2a8bef6c563f35366f0521e8631715f173c8f67a3f2e171d648a"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/sitesMap/widget.js.br": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/sitesMap/widget.js.gz": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/userManagement/widget.js": [
+            "93815971570620b633b38ca4c484829dab91a72533fc077cb485631b4686424b"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/userManagement/widget.js.br": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/userManagement/widget.js.gz": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/static/js/main.bundle.js": [
+            "02c5b348aad4d253cc1b4eeb9a98db4717cec8ef1a1c2dd31a1b611438dc0679"
+        ],
+        "/opt/cloudify-stage/dist/static/js/main.bundle.js.br": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/static/js/main.bundle.js.gz": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/static/js/vendor.bundle.js": [
+            "a4cd00f761115051df46fed241bfecd76b783b1697010271833c3899fdc02c06"
+        ],
+        "/opt/cloudify-stage/dist/static/js/vendor.bundle.js.br": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/static/js/vendor.bundle.js.gz": [
+            "DOESNOTEXIST"
+        ]
+    },
+    "sha256sums_before": {
+        "/opt/cloudify-stage/backend/server.js": [
+            "baaad936c241201d41c44457b3199912cf2380bcd8433ce8d273fc5f1da30bb5"
+        ],
+        "/opt/cloudify-stage/conf/userConfig.json": [
+            "0192fed61300d8f29dca5689d099b9788684d6c7decbc490fdbf46454d49f2fe"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprintActionButtons/widget.js": [
+            "1a69ecea1f4ecbafcfb73c4137b1b25f3c0748b3f64a0df260478f69233eef0a"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprints/widget.js": [
+            "8eef0425218b029fdd53c741102f39199189638923005df7f9127a79959f8a39"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprints/widget.js.br": [
+            "c5c6ae6a5c0e6941c7ae8be64c48e63c985198a48410edfcdebb305ff49fdc86"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprints/widget.js.gz": [
+            "acda4bf1c9b0434b6fff6e4c739a6f8a8fb8f4a231df799ee8c1fed9a32b0d1f"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/common/common.js": [
+            "61d65903ea0e4d590af9c8ca4a996ec9b3668f6d68cdde3e965d88b72ad1e556"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/common/common.js.br": [
+            "62e6786a2446dc97d67a8e3d14b9bd6f890ac881858d5b8fc436b70b0e562b0e"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/common/common.js.gz": [
+            "4967ec320688af6cf73f3fde5d5e60570958c77a23b8a726968b06c6cb0dfc07"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/deploymentButton/widget.js": [
+            "5bcdf62a8e1daab4282c0e4dbe25be95d566d2e0f82a36b6ea41ee6cffee940f"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/deploymentButton/widget.js.br": [
+            "77e8572601c8073ce7c2f27b70dafd601e86e5dc40e2d4efc3fec275738ed8c1"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/deploymentButton/widget.js.gz": [
+            "3804fbcf22fed9a198fd3a6f5bcb4dce0727c59d6d3c2f9d20a67b384de3cfff"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/deploymentWizardButtons/widget.js": [
+            "85e211f748b13e46fbff726249e54c8e748453e7736d8888fb1bd2b84b9af83c"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/deploymentWizardButtons/widget.js.br": [
+            "18a0cc79bd15ae1ba09492784724347d99d1c8126a72fc27abccd5a649a2159c"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/deploymentWizardButtons/widget.js.gz": [
+            "3b584613a324af82c8597543ab6ec465345a83b8dd0a437e2df5cd8a984ce1a7"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/sites/widget.js": [
+            "a48dd2961709a155536b35003b6d74b4e86dc67819875ec7233302adfe18938e"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/sites/widget.js.br": [
+            "2a2cbc9eddea37d16a4050f9753da2e0bbcd3e01a533f4a6038fd737d33363fe"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/sites/widget.js.gz": [
+            "6e8cbe598182fbcf9056bf0b105555a58d61dea4ac08d156e41242a05402ec47"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/sitesMap/widget.js": [
+            "66639dfac19f1f6406230dae57e885c50e301d13ecd702e1f582d4eab0756ad1"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/sitesMap/widget.js.br": [
+            "e3d98d5643afd12b6795f220749a1d7de6e6daea5c9894998910a1ad6b808ee9"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/sitesMap/widget.js.gz": [
+            "ce9b50b893cc26d8187abf543638e5fe79cd9cb58cc0579b595eda1f151a5793"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/userManagement/widget.js": [
+            "334a07ccc54aef98d56ac7ed0a2ee2fc4398761aec90155cc73001152edc442c"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/userManagement/widget.js.br": [
+            "1f777c894c9922536fc07afc5cf8b80dd6b869e2af9f7af76c1167a15db3160a"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/userManagement/widget.js.gz": [
+            "982be6c0d95cdaf50a634f2459dbd59fd6900da933431b16f1e485986fc95b8c"
+        ],
+        "/opt/cloudify-stage/dist/static/js/main.bundle.js": [
+            "64e733b8b9da71e2728ca5fa62e3cdcb10fdd34f372d7c6f5d5ef76717212c6d"
+        ],
+        "/opt/cloudify-stage/dist/static/js/main.bundle.js.br": [
+            "394bbf6cde0ec5cf1cca86c76a97150c4ce72ece41c3af1632c5f448491391d8"
+        ],
+        "/opt/cloudify-stage/dist/static/js/main.bundle.js.gz": [
+            "d3157809507e0f89a4ebf4338b228ee720f17c9917b1d2a7d56762a17c8a41fa"
+        ],
+        "/opt/cloudify-stage/dist/static/js/vendor.bundle.js": [
+            "985febdc994845900c4c9d062ecca8d9acaa278e34a76961f73e3073a0ba0d77"
+        ],
+        "/opt/cloudify-stage/dist/static/js/vendor.bundle.js.br": [
+            "5a774233c330141468850b08c889c68da5d08a9884153e0cce86561c8bc04eeb"
+        ],
+        "/opt/cloudify-stage/dist/static/js/vendor.bundle.js.gz": [
+            "17658082c381e3ba05e5840bd31284bc73379b953dd948fdf3f6f6ce2a9519c0"
+        ]
+    }
+}

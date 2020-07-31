@@ -181,6 +181,47 @@
       "patch_id": "505_refresh_node_instances_mgmtworker_restservice-62a3adbaa21d8735f246bea807e18cc55491a262012df3b581029f34bd3fa44a",
       "patch_name": "505_refresh_node_instances_mgmtworker_restservice",
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "5_0_5_maps_provider_change_for_ui_and_new_features.json", 
+      "patch_description": "Change map tiles provider, add Deploy & Install option, add Change Password option.", 
+      "patch_files": [
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_blueprintActionButtons_widget.js", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_sitesMap_widget.js", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_deploymentWizardButtons_widget.js.br", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_static_js_main.bundle.js", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_deploymentButton_widget.js.br", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_static_js_main.bundle.js.br", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_deploymentButton_widget.js", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_userManagement_widget.js", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_sitesMap_widget.js.br", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_blueprints_widget.js.br", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_deploymentWizardButtons_widget.js.gz", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_sites_widget.js", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_userManagement_widget.js.gz", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_static_js_vendor.bundle.js.br", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_common_common.js", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_common_common.js.br", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_common_common.js.gz", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_backend_server.js", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_sites_widget.js.br", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_deploymentWizardButtons_widget.js", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_deploymentButton_widget.js.gz", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_blueprints_widget.js", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_static_js_main.bundle.js.gz", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_sitesMap_widget.js.gz", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_conf_userConfig.json", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_static_js_vendor.bundle.js.gz", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_userManagement_widget.js.br", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_blueprints_widget.js.gz", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_backend_routes_Maps.js", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_appData_widgets_sites_widget.js.gz", 
+        "5_0_5_maps_provider_change_for_ui_and_new_features_dist_static_js_vendor.bundle.js"
+      ], 
+      "patch_hash": "c66f9531487752e3d94df9802bc47af2be3e147193516427edd885aa56c287b2", 
+      "patch_id": "5_0_5_maps_provider_change_for_ui_and_new_features-c66f9531487752e3d94df9802bc47af2be3e147193516427edd885aa56c287b2", 
+      "patch_name": "5_0_5_maps_provider_change_for_ui_and_new_features", 
+      "supports_community": false
     }
   ]
 }
