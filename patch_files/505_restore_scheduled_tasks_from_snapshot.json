@@ -1,0 +1,84 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Properly restore scheduled executions from snapshots.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": [
+        "manager"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [], 
+            "patch_file": "505_restore_scheduled_tasks_from_snapshot_workflows_setup.py", 
+            "sha256sum": "76ae75dc85009b5da8321a4dd6309028a541799d26ea6c214b50c44fed1d75d0"
+        }, 
+        {
+            "destinations": [], 
+            "patch_file": "505_restore_scheduled_tasks_from_snapshot_tests_README.md", 
+            "sha256sum": "63778ff4b80e60cfb19bc9ae6aee0a63c23bd5ce61ca68d3c0af7a82d8fee327"
+        }, 
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/utils.py"
+            ], 
+            "patch_file": "505_restore_scheduled_tasks_from_snapshot_workflows_cloudify_system_workflows_snapshots_utils.py", 
+            "sha256sum": "cc21b576d5a91812c98ee7273d0b58a124ea51a94d5046d61e83e8a88ff59ec4"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py"
+            ], 
+            "patch_file": "505_restore_scheduled_tasks_from_snapshot_rest-service_manager_rest_resource_manager.py", 
+            "sha256sum": "7dc33b20ddc83ca53f78730d4dc26cf4c795dc67a23f19671cb1638030718f5b"
+        }, 
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py"
+            ], 
+            "patch_file": "505_restore_scheduled_tasks_from_snapshot_workflows_cloudify_system_workflows_snapshots_snapshot_restore.py", 
+            "sha256sum": "a26c011a606ff91c2a0c97db66da2e79c05c5865672f5d2ed715e51771a6745a"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v1/executions.py"
+            ], 
+            "patch_file": "505_restore_scheduled_tasks_from_snapshot_rest-service_manager_rest_rest_resources_v1_executions.py", 
+            "sha256sum": "8f9f6f39a4c47a9bcd524da3add9bba67a9798e7275a76eccf6a10d716633c3c"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "4100b704981abccd88f2d9b44ff8584ec0985c89aa9b6c8b7a8fdab704a38382"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v1/executions.py": [
+            "8ee22d0e92bdc2b3f454b706ea3c6aedca96a84cc5f8365d2be36ce4a1afcab4"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
+            "99f85b3b8b9ffda3d1c6be1507e397eb63c5d5657a68c3597328de6dd288c48b"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/utils.py": [
+            "bcb0d72ae43d2103563d575d7463565960436372d27396838a449aa5c1a0a6f5"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "de0ea5f7a8d97f0da5af4d2727183dad46273d473b7bdc055da0e426146179e9"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v1/executions.py": [
+            "085e22095a924d8600167e06411a8ebe0c4a0736e6b793a248b6b5c8be831ad8"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
+            "32bf28697a9ed5e3bf3170a4d3070bc7ea651f683b203c8fc40c8d2b586ff828"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/utils.py": [
+            "f44c31aa8d09e5b5aa8b8a204479267f7a2a75bf49b5d48d69f3cab6ddd8ba29"
+        ]
+    }
+}
