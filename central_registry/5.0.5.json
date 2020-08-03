@@ -238,6 +238,22 @@
       "patch_id": "5_0_5_blueprints_catalog_improvements-d483842539d5d3ca4e66ec4d50e1aa84949f4c850be44afa18d1db672d203a45", 
       "patch_name": "5_0_5_blueprints_catalog_improvements", 
       "supports_community": false
+    },
+    {
+      "patch_definition_path": "505_restore_scheduled_tasks_from_snapshot.json", 
+      "patch_description": "Properly restore scheduled executions from snapshots.", 
+      "patch_files": [
+        "505_restore_scheduled_tasks_from_snapshot_workflows_setup.py", 
+        "505_restore_scheduled_tasks_from_snapshot_tests_README.md", 
+        "505_restore_scheduled_tasks_from_snapshot_workflows_cloudify_system_workflows_snapshots_utils.py", 
+        "505_restore_scheduled_tasks_from_snapshot_rest-service_manager_rest_resource_manager.py", 
+        "505_restore_scheduled_tasks_from_snapshot_workflows_cloudify_system_workflows_snapshots_snapshot_restore.py", 
+        "505_restore_scheduled_tasks_from_snapshot_rest-service_manager_rest_rest_resources_v1_executions.py"
+      ], 
+      "patch_hash": "7db598533c61c6036f30ecba20bd02b090388f748d7ed7c54bb5980821629ef5", 
+      "patch_id": "505_restore_scheduled_tasks_from_snapshot-7db598533c61c6036f30ecba20bd02b090388f748d7ed7c54bb5980821629ef5", 
+      "patch_name": "505_restore_scheduled_tasks_from_snapshot", 
+      "supports_community": false
     }
   ]
 }
