@@ -177,8 +177,8 @@
         "505_refresh_node_instances_cloudify_workflows_workflow_context.py",
         "505_refresh_node_instances_cloudify_plugins_workflows.py"
       ],
-      "patch_hash": "62a3adbaa21d8735f246bea807e18cc55491a262012df3b581029f34bd3fa44a",
-      "patch_id": "505_refresh_node_instances_mgmtworker_restservice-62a3adbaa21d8735f246bea807e18cc55491a262012df3b581029f34bd3fa44a",
+      "patch_hash": "6ce363f58772a841c0169caec7cce08bc5fe52328f43578407713fa925c239e7", 
+      "patch_id": "505_refresh_node_instances_mgmtworker_restservice-6ce363f58772a841c0169caec7cce08bc5fe52328f43578407713fa925c239e7", 
       "patch_name": "505_refresh_node_instances_mgmtworker_restservice",
       "supports_community": false
     }, 
@@ -221,6 +221,22 @@
       "patch_hash": "c66f9531487752e3d94df9802bc47af2be3e147193516427edd885aa56c287b2", 
       "patch_id": "5_0_5_maps_provider_change_for_ui_and_new_features-c66f9531487752e3d94df9802bc47af2be3e147193516427edd885aa56c287b2", 
       "patch_name": "5_0_5_maps_provider_change_for_ui_and_new_features", 
+      "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "5_0_5_blueprints_catalog_improvements.json", 
+      "patch_description": "Adds support for default blueprint and changes default view in Blueprints Catalog widget.", 
+      "patch_files": [
+        "5_0_5_blueprints_catalog_improvements_dist_appData_widgets_blueprintCatalog_widget.js", 
+        "5_0_5_blueprints_catalog_improvements_dist_appData_widgets_blueprintCatalog_widget.js.br", 
+        "5_0_5_blueprints_catalog_improvements_dist_appData_widgets_blueprintCatalog_widget.js.gz", 
+        "5_0_5_blueprints_catalog_improvements_dist_appData_tours_main-sys_admin.json", 
+        "5_0_5_blueprints_catalog_improvements_dist_appData_templates_pages_catalog.json", 
+        "5_0_5_blueprints_catalog_improvements_dist_appData_templates_pages_catalog-community.json"
+      ], 
+      "patch_hash": "d483842539d5d3ca4e66ec4d50e1aa84949f4c850be44afa18d1db672d203a45", 
+      "patch_id": "5_0_5_blueprints_catalog_improvements-d483842539d5d3ca4e66ec4d50e1aa84949f4c850be44afa18d1db672d203a45", 
+      "patch_name": "5_0_5_blueprints_catalog_improvements", 
       "supports_community": false
     }
   ]

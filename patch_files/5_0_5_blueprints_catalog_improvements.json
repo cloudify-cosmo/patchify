@@ -1,0 +1,99 @@
+{
+    "affected_services": [
+        "cloudify-stage"
+    ],
+    "community": false,
+    "description": "Adds support for default blueprint and changes default view in Blueprints Catalog widget.",
+    "manager_versions": [
+        "5.0.5"
+    ],
+    "node_types": [
+        "manager"
+    ],
+    "patch_version": "2.1.0",
+    "patches": [
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/blueprintCatalog/widget.js"
+            ],
+            "patch_file": "5_0_5_blueprints_catalog_improvements_dist_appData_widgets_blueprintCatalog_widget.js",
+            "sha256sum": "27b80c5ad7674d4062c97ebbbd595ca12e5685e31137de390a7cd7c1d966c4ba"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/blueprintCatalog/widget.js.br"
+            ],
+            "patch_file": "5_0_5_blueprints_catalog_improvements_dist_appData_widgets_blueprintCatalog_widget.js.br",
+            "sha256sum": "b40b414721ad2a145629f61587032edb4e59caeb9e341477e57d0a017837416f"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/widgets/blueprintCatalog/widget.js.gz"
+            ],
+            "patch_file": "5_0_5_blueprints_catalog_improvements_dist_appData_widgets_blueprintCatalog_widget.js.gz",
+            "sha256sum": "acc47cca36f6699eaa04070c967a47752460f592d49c3eb6130a9e34a3d0471c"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/tours/main-sys_admin.json"
+            ],
+            "patch_file": "5_0_5_blueprints_catalog_improvements_dist_appData_tours_main-sys_admin.json",
+            "sha256sum": "6f45d0d9823b96e5888356ced46f4ab1957a0683c1c56dc899e65d1bce616fff"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/templates/pages/catalog.json"
+            ],
+            "patch_file": "5_0_5_blueprints_catalog_improvements_dist_appData_templates_pages_catalog.json",
+            "sha256sum": "a3111e8c601369d01c7afedaf076930f93a5136ac753687b1a79f37fa8b1fa9a"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/dist/appData/templates/pages/catalog-community.json"
+            ],
+            "patch_file": "5_0_5_blueprints_catalog_improvements_dist_appData_templates_pages_catalog-community.json",
+            "sha256sum": "f6a3e32d142756690c72c2bb00ffdf3fb41c8bb8c4f83a81478e0db557c0182d"
+        }
+    ],
+    "premium": true,
+    "sha256sums_after": {
+        "/opt/cloudify-stage/dist/appData/templates/pages/catalog-community.json": [
+            "af0b5743a55908212e7dd00be9a72af39ab324050bd357ab1be9e3c1eb2a57bb"
+        ],
+        "/opt/cloudify-stage/dist/appData/templates/pages/catalog.json": [
+            "b846e4a5252939474df60518308a954eeccd43237bd44b76caf4adb6ed31bfeb"
+        ],
+        "/opt/cloudify-stage/dist/appData/tours/main-sys_admin.json": [
+            "3843a502fa2aefadd5343fbb02e397331ee2c028f887e4cbdf6b9628251e74b4"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprintCatalog/widget.js": [
+            "630de2a3aeaa89d65dc8dd74625dbed865a5deb57acfb5a4f8653a56e396e505"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprintCatalog/widget.js.br": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprintCatalog/widget.js.gz": [
+            "DOESNOTEXIST"
+        ]
+    },
+    "sha256sums_before": {
+        "/opt/cloudify-stage/dist/appData/templates/pages/catalog-community.json": [
+            "16c977f6a439794f9638054882c3fd56adb70dcff8543393f05fbc3477da1dd2"
+        ],
+        "/opt/cloudify-stage/dist/appData/templates/pages/catalog.json": [
+            "22e7e5876e80b8487372eefe4c611cb1654c253e240ac5796e17a975d22abfb5"
+        ],
+        "/opt/cloudify-stage/dist/appData/tours/main-sys_admin.json": [
+            "f54e23f23eb49947c9da292b6fc69cdbe6fec85954a76882f9c6bcad43e1b336"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprintCatalog/widget.js": [
+            "ee3c05ecf4e2ad96effcb4fc16252a21a6f01d4e8488ddbe429df9698b8b1843"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprintCatalog/widget.js.br": [
+            "79c340cc5f74cdb295f96f45bb806cb07009e3fc4ceaecfcf52c437bf7bd48f1"
+        ],
+        "/opt/cloudify-stage/dist/appData/widgets/blueprintCatalog/widget.js.gz": [
+            "428111ae7787dfb98934c0b73022f7bb4ef226e4042c45973017642d88b274c7"
+        ]
+    }
+}
