@@ -254,6 +254,17 @@
       "patch_id": "505_restore_scheduled_tasks_from_snapshot-7db598533c61c6036f30ecba20bd02b090388f748d7ed7c54bb5980821629ef5", 
       "patch_name": "505_restore_scheduled_tasks_from_snapshot", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "505_fix_agent_plugin_installer.json", 
+      "patch_description": "CY 3147 Fix agent plugin installer.", 
+      "patch_files": [
+        "505_fix_agent_plugin_installer_rest-service_manager_rest_resource_manager.py"
+      ], 
+      "patch_hash": "9e34db5ddc8ff0566863db6f850e6b4342b288bf8ccb3de06fb4c62dd846ed44", 
+      "patch_id": "505_fix_agent_plugin_installer-9e34db5ddc8ff0566863db6f850e6b4342b288bf8ccb3de06fb4c62dd846ed44", 
+      "patch_name": "505_fix_agent_plugin_installer", 
+      "supports_community": false
     }
   ]
 }

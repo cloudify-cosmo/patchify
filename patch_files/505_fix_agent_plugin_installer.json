@@ -1,0 +1,34 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "CY 3147 Fix agent plugin installer.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": [
+        "manager"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py"
+            ], 
+            "patch_file": "505_fix_agent_plugin_installer_rest-service_manager_rest_resource_manager.py", 
+            "sha256sum": "1e72f4ff0ad137575197a0b28c0fac1c3dec50a823dd1a5c8fd6ade4bfcfeb84"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "572a9e8fb78dba921e23f019940f90ae64efb72d4a87cfed3c417a405b09572b"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "4100b704981abccd88f2d9b44ff8584ec0985c89aa9b6c8b7a8fdab704a38382"
+        ]
+    }
+}
