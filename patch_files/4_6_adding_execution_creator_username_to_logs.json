@@ -1,0 +1,138 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Adding execution creator username to logs.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py"
+            ], 
+            "patch_file": "4_6_adding_execution_creator_username_to_logs_cloudify_workflows_workflow_context.py", 
+            "sha256sum": "469324c11ac1ffb472d4c01e5e88891bdf5317e66e4051c60e3ef2cf57a9c21a"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/utils.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/utils.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/utils.py"
+            ], 
+            "patch_file": "4_6_adding_execution_creator_username_to_logs_cloudify_utils.py", 
+            "sha256sum": "a331acdae3b06f791e8162d7b65fc33b1039e2d41e5a4e1c70ded9f82071c659"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/logs.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/logs.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/logs.py"
+            ], 
+            "patch_file": "4_6_adding_execution_creator_username_to_logs_cloudify_logs.py", 
+            "sha256sum": "a0ac5fc2dc85323f9a2b0545c22a46811cc6a144fb36c2f2137840f1c0483b27"
+        }, 
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/context.py"
+            ], 
+            "patch_file": "4_6_adding_execution_creator_username_to_logs_cloudify_context.py", 
+            "sha256sum": "d6e3e40061933da5812e481892347dad1ba5ecb232cb03bd43d9b43d535aca5f"
+        }, 
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py"
+            ], 
+            "patch_file": "4_6_adding_execution_creator_username_to_logs_cloudify_amqp_client.py", 
+            "sha256sum": "76c4352c43febce9d163aeeb41d8a689e0c84e45f17c4ec2302198002c1e97fe"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/workflow_executor.py"
+            ],
+            "patch_file": "4_6_adding_execution_creator_username_to_logs_manager_rest-service_manager_rest_workflow_executor.py",
+            "sha256sum": "a0f6aea1d5d6db83ddc9ef9d382b67650894d51508c9778e3c01fe4b13e4f16f"
+        },
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/worker.py"
+            ],
+            "patch_file": "4_6_adding_execution_creator_username_to_logs_agent_cloudify_agent_worker.py",
+            "sha256sum": "5a8ea74df379a24561bf7b07eb5242a632bd571ece583cc460d535ede7bfc71f"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/logs.py": [
+            "71f96899e052e73f6850501df4ed66e8ac0feb0e5b3315c63c4e3b6435673889"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/utils.py": [
+            "8d3f50e7875f676b52b9542c7440c022851fda0cd31f93dc6e3f0207b90d2002"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "71f96899e052e73f6850501df4ed66e8ac0feb0e5b3315c63c4e3b6435673889"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "8d3f50e7875f676b52b9542c7440c022851fda0cd31f93dc6e3f0207b90d2002"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "97361a7576894f10728f51ad93ab3c1fc8597d86622b90703f55feaeacafc1ed"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/context.py": [
+            "a4dfdb2bee6cbd5c8c17b2647c6d9804b7fdffcd9e9cf3eac58d5b0b1df08577"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "71f96899e052e73f6850501df4ed66e8ac0feb0e5b3315c63c4e3b6435673889"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "8d3f50e7875f676b52b9542c7440c022851fda0cd31f93dc6e3f0207b90d2002"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "01949990a87ad26b03c58b745422efd4aaf86a801ef50cdd6933e4749387be67"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/workflow_executor.py": [
+            "361339f94b3072b60155c5c9c368d876c8d242c76d8a98bed796395279035cfe"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/worker.py": [
+            "e95333f2e19ce87343702e55e69c0ab6ece439ba9e549166f4ed214ecc56ebb7"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/logs.py": [
+            "0661ba1930b1baf5538223920e517bcf283a3617933d79c5a3f55648a33c3406"
+        ], 
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/utils.py": [
+            "0d13c6e11fe17904bd7c0e857026301a33db3f1701ff7938385dee33579153ee"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "0661ba1930b1baf5538223920e517bcf283a3617933d79c5a3f55648a33c3406"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "0d13c6e11fe17904bd7c0e857026301a33db3f1701ff7938385dee33579153ee"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/amqp_client.py": [
+            "46ea50102fdb4137f5d92a5448ca8fa5457b24563c7d18d369a407c64a273c7b"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/context.py": [
+            "446848bf78da0eccc431a7922d0b0ffe79f518f0e5b5f79547f85d1ac8868473"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/logs.py": [
+            "0661ba1930b1baf5538223920e517bcf283a3617933d79c5a3f55648a33c3406"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/utils.py": [
+            "0d13c6e11fe17904bd7c0e857026301a33db3f1701ff7938385dee33579153ee"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "a34b3436035cdacc276d9802d7f8a25d3b2febef2204eb5bbcd9328ef918bcc9"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/workflow_executor.py": [
+            "25dd9ff19e9e822a93cde53730dee541bad4ceea6ea33aaecbdc577818bdc79c"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_agent/worker.py": [
+            "5230cf4687519a47684bc3536e76966b2c7ae46421ed1c8c4e4b35e40ff3b191"
+        ]
+    }
+}

@@ -444,6 +444,23 @@
       "patch_id": "4_6_unicode_in_mgmtworker-010dd78817a5db6078a33a60145457056b0cff69fdd893b00719a2158a50367c", 
       "patch_name": "4_6_unicode_in_mgmtworker", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_adding_execution_creator_username_to_logs.json", 
+      "patch_description": "Adding execution creator username to logs.", 
+      "patch_files": [
+        "4_6_adding_execution_creator_username_to_logs_cloudify_workflows_workflow_context.py", 
+        "4_6_adding_execution_creator_username_to_logs_cloudify_utils.py", 
+        "4_6_adding_execution_creator_username_to_logs_cloudify_logs.py", 
+        "4_6_adding_execution_creator_username_to_logs_cloudify_context.py", 
+        "4_6_adding_execution_creator_username_to_logs_cloudify_amqp_client.py", 
+        "4_6_adding_execution_creator_username_to_logs_manager_rest-service_manager_rest_workflow_executor.py", 
+        "4_6_adding_execution_creator_username_to_logs_agent_cloudify_agent_worker.py"
+      ], 
+      "patch_hash": "df62f894e7dd1403aeb63df8b382f1743d3e4e1b4d589ad118d6958a0055736d", 
+      "patch_id": "4_6_adding_execution_creator_username_to_logs-df62f894e7dd1403aeb63df8b382f1743d3e4e1b4d589ad118d6958a0055736d", 
+      "patch_name": "4_6_adding_execution_creator_username_to_logs", 
+      "supports_community": false
     }
   ]
 }
