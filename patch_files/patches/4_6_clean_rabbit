@@ -1,0 +1,155 @@
+--- a/clean_rabbit
++++ b/clean_rabbit
+@@ -0,0 +1,152 @@
++#! /opt/manager/env/bin/python
++import os
++import re
++import sys
++import subprocess
++from urllib import quote
++
++import requests
++
++from cloudify.rabbitmq_client import RabbitMQClient
++from manager_rest.config import instance
++from manager_rest.flask_utils import setup_flask_app
++from manager_rest.storage import get_storage_manager, models
++
++os.environ["MANAGER_REST_CONFIG_PATH"] = "/opt/manager/cloudify-rest.conf"
++os.environ["MANAGER_REST_SECURITY_CONFIG_PATH"] = \
++    "/opt/manager/rest-security.conf"
++os.environ["MANAGER_REST_AUTHORIZATION_CONFIG_PATH"] = \
++    "/opt/manager/authorization.conf"
++
++IGNORED_EXCHANGES = [
++    '',
++    'amq.direct',
++    'amq.fanout',
++    'amq.headers',
++    'amq.match',
++    'amq.rabbitmq.trace',
++    'amq.topic',
++    'cloudify-events-topic',
++    'cloudify-logs',
++]
++
++
++def abort_if_not_leader():
++    try:
++        subprocess.check_output(
++            ['/usr/bin/systemctl', 'status', 'cloudify-restservice'])
++    except subprocess.CalledProcessError:
++        print('cloudify-restservice does not appear to be running.')
++        print('This is not the current cluster leader, not cleaning rabbit.')
++        sys.exit(0)
++
++
++def get_interfaces():
++    with setup_flask_app().app_context():
++        sm = get_storage_manager()
++        rmq_client = RabbitMQClient(
++            host=instance.amqp_management_host,
++            username=instance.amqp_username,
++            password=instance.amqp_password,
++            verify=instance.amqp_ca_path,
++        )
++    return sm, rmq_client
++
++
++def get_tenants(storage_manager):
++    return [
++        tenant.name for tenant in storage_manager.list(models.Tenant)
++    ]
++
++
++def get_vhost(tenant):
++    return quote('rabbitmq_vhost_{}'.format(tenant))
++
++
++def list_rabbit_entities(rmq_client, tenant, entity):
++    return rmq_client._do_request(
++        requests.get,
++        '{entity}/{vhost}'.format(
++            entity=entity,
++            vhost=get_vhost(tenant),
++        )
++    )
++
++
++def get_instances_for_tenant(storage_manager, tenant):
++    return {
++        i[0] for i in storage_manager.list(
++            models.NodeInstance,
++            include=['id'],
++            filters={'tenant_name': tenant},
++            get_all_results=True,
++        )
++    }
++
++
++def delete_if_exists(rmq_client, entity_type, tenant, name):
++    print('Deleting {entity} {name} for tenant {tenant}'.format(
++        entity=entity_type,
++        name=name,
++        tenant=tenant,
++    ))
++    try:
++        rmq_client._do_request(
++            requests.delete,
++            '{entity}s/{vhost}/{name}'.format(
++                entity=entity_type,
++                vhost=get_vhost(tenant),
++                name=name,
++            )
++        )
++    except requests.exceptions.HTTPError as err:
++        if err.response.status_code == 404:
++            # It doesn't exist, excellent.
++            return
++        sys.stderr.write(
++            'Failed to delete {entity} {name}: {err}\n'.format(
++                entity=entity_type,
++                name=name,
++                err=err,
++            )
++        )
++
++
++def clean_rabbit():
++    print('Starting rabbit cleaning.')
++    storage_manager, rmq_client = get_interfaces()
++
++    # This regex will find the name of instances with queues-
++    # The instance is anything followed by _service, _workflow, or_operation;
++    # followed by an end-of-line. The ?: makes us not capture the trailing
++    # part of the queue, instead only capturing the instance name.
++    queue_mangler = re.compile('(.*)_(?:service|workflow|operation)$')
++
++    for tenant in get_tenants(storage_manager):
++        queues = list_rabbit_entities(rmq_client, tenant, 'queues')
++        queue_instances = {queue_mangler.findall(queue['name'])[0]
++                           for queue in queues.json()
++                           if queue_mangler.match(queue['name'])}
++
++        exchanges = list_rabbit_entities(rmq_client, tenant, 'exchanges')
++        exchange_instances = {exchange['name']
++                              for exchange in exchanges.json()
++                              if exchange['name'] not in IGNORED_EXCHANGES}
++
++        instances = queue_instances | exchange_instances
++
++        expected_instances = get_instances_for_tenant(storage_manager, tenant)
++
++        to_delete = instances - expected_instances
++
++        for instance_id in to_delete:
++            for qt in ['service', 'workflow', 'operation']:
++                queue_name = '{}_{}'.format(instance_id, qt)
++                delete_if_exists(rmq_client, 'queue', tenant, queue_name)
++            delete_if_exists(rmq_client, 'exchange', tenant, instance_id)
++    print('Rabbit cleaning complete.')
++
++
++if __name__ == '__main__':
++    abort_if_not_leader()
++    clean_rabbit()

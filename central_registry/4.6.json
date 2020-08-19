@@ -461,6 +461,18 @@
       "patch_id": "4_6_adding_execution_creator_username_to_logs-df62f894e7dd1403aeb63df8b382f1743d3e4e1b4d589ad118d6958a0055736d", 
       "patch_name": "4_6_adding_execution_creator_username_to_logs", 
       "supports_community": false
+    },
+    {
+      "patch_definition_path": "4_6_clean_rabbit.json", 
+      "patch_description": "Routinely remove old queues and exchanges from rabbit.", 
+      "patch_files": [
+        "4_6_clean_rabbit", 
+        "4_6_clean_rabbit_cron"
+      ], 
+      "patch_hash": "a78a8968e6ca656d5833373cdcbb75f70a4cfa722434e32c445a0f32a1193eec", 
+      "patch_id": "4_6_clean_rabbit-a78a8968e6ca656d5833373cdcbb75f70a4cfa722434e32c445a0f32a1193eec", 
+      "patch_name": "4_6_clean_rabbit", 
+      "supports_community": false
     }
   ]
 }

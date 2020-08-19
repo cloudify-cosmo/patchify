@@ -1,0 +1,28 @@
+{
+  "patch_version": "2.0.0",
+  "description": "Routinely remove old queues and exchanges from rabbit..",
+  "manager_versions": ["4.6"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "4_6_clean_rabbit",
+      "sha256sum": "3723bba7671b43fe32e45af696ea07d0db655db19d32297434644a6be2afcd0b",
+      "destinations": ["/opt/cloudify/clean-rabbit"]
+    },
+    {
+      "patch_file": "4_6_clean_rabbit_cron",
+      "sha256sum": "587cf32ee4f3483218e7e7e4040f9a7cfdc7ac60f1aebf8832932564b9d51e8d",
+      "destinations": ["/etc/cron.d/cloudify-clean-rabbit"]
+    }
+  ],
+  "affected_services": [],
+  "sha256sums_before": {
+    "/opt/cloudify/clean-rabbit": ["DOESNOTEXIST"],
+    "/etc/cron.d/cloudify-clean-rabbit": ["DOESNOTEXIST"]
+  },
+  "sha256sums_after": {
+    "/opt/cloudify/clean-rabbit": ["52da06d95e686ee4a3f4ff0cfec5dfc509a1e32e49cfe598658f753750783670"],
+    "/etc/cron.d/cloudify-clean-rabbit": ["7f679a3134ab91951e9903e67b7dcf03dc61269aa1a6ddeeaf299506f211a2ef"]
+  }
+}
