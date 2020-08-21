@@ -1,0 +1,39 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "Don't try to use datetime to parse time strings in snapshot restore.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": [
+        "manager"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [], 
+            "patch_file": "5_0_5_no_dateutil_in_snapshot_restore_workflows_setup.py", 
+            "sha256sum": "9ec983365eb004c566fdfce47f1d490e8e51da8b68f16a2697115aebcb446894"
+        }, 
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/utils.py"
+            ], 
+            "patch_file": "5_0_5_no_dateutil_in_snapshot_restore_workflows_cloudify_system_workflows_snapshots_utils.py", 
+            "sha256sum": "8f657eb69e567764d48ecf2dbd4e318d7fd30cbf9d08972de7df8a471a40a9d1"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/utils.py": [
+            "ce7e719fbddd62bc1679fc33bba43101df3339254d4a2169298a4e1797bd2308"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/utils.py": [
+            "bcb0d72ae43d2103563d575d7463565960436372d27396838a449aa5c1a0a6f5"
+        ]
+    }
+}

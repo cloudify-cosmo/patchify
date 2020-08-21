@@ -265,6 +265,18 @@
       "patch_id": "505_fix_agent_plugin_installer-9e34db5ddc8ff0566863db6f850e6b4342b288bf8ccb3de06fb4c62dd846ed44", 
       "patch_name": "505_fix_agent_plugin_installer", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "5_0_5_no_dateutil_in_snapshot_restore.json", 
+      "patch_description": "Don't try to use datetime to parse time strings in snapshot restore.", 
+      "patch_files": [
+        "5_0_5_no_dateutil_in_snapshot_restore_workflows_setup.py", 
+        "5_0_5_no_dateutil_in_snapshot_restore_workflows_cloudify_system_workflows_snapshots_utils.py"
+      ], 
+      "patch_hash": "65de554d116c7279b3ffb9340c61e44dedc3a0dfed18822101a44df42a3e70f0", 
+      "patch_id": "5_0_5_no_dateutil_in_snapshot_restore-65de554d116c7279b3ffb9340c61e44dedc3a0dfed18822101a44df42a3e70f0", 
+      "patch_name": "5_0_5_no_dateutil_in_snapshot_restore", 
+      "supports_community": false
     }
   ]
 }
