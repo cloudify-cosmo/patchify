@@ -159,27 +159,27 @@
       "supports_community": false
     }, 
     {
-      "patch_definition_path": "505_refresh_node_instances_status_reporter.json",
+      "patch_definition_path": "505_refresh_node_instances_status_reporter.json", 
       "patch_description": "Automatically refresh node instances when scaling.", 
       "patch_files": [
         "505_refresh_node_instances_cloudify_workflows_workflow_context.py", 
         "505_refresh_node_instances_cloudify_plugins_workflows.py"
       ], 
-      "patch_hash": "fa75424c7a67430cdf946abd99bade1ff1c39c4075777989538cfed94261d386",
-      "patch_id": "505_refresh_node_instances_status_reporter-fa75424c7a67430cdf946abd99bade1ff1c39c4075777989538cfed94261d386",
-      "patch_name": "505_refresh_node_instances_status_reporter",
+      "patch_hash": "fa75424c7a67430cdf946abd99bade1ff1c39c4075777989538cfed94261d386", 
+      "patch_id": "505_refresh_node_instances_status_reporter-fa75424c7a67430cdf946abd99bade1ff1c39c4075777989538cfed94261d386", 
+      "patch_name": "505_refresh_node_instances_status_reporter", 
       "supports_community": false
-    },
+    }, 
     {
-      "patch_definition_path": "505_refresh_node_instances_mgmtworker_restservice.json",
-      "patch_description": "Automatically refresh node instances when scaling.",
+      "patch_definition_path": "505_refresh_node_instances_mgmtworker_restservice.json", 
+      "patch_description": "Automatically refresh node instances when scaling.", 
       "patch_files": [
-        "505_refresh_node_instances_cloudify_workflows_workflow_context.py",
+        "505_refresh_node_instances_cloudify_workflows_workflow_context.py", 
         "505_refresh_node_instances_cloudify_plugins_workflows.py"
-      ],
+      ], 
       "patch_hash": "6ce363f58772a841c0169caec7cce08bc5fe52328f43578407713fa925c239e7", 
       "patch_id": "505_refresh_node_instances_mgmtworker_restservice-6ce363f58772a841c0169caec7cce08bc5fe52328f43578407713fa925c239e7", 
-      "patch_name": "505_refresh_node_instances_mgmtworker_restservice",
+      "patch_name": "505_refresh_node_instances_mgmtworker_restservice", 
       "supports_community": false
     }, 
     {
@@ -238,7 +238,7 @@
       "patch_id": "5_0_5_blueprints_catalog_improvements-d483842539d5d3ca4e66ec4d50e1aa84949f4c850be44afa18d1db672d203a45", 
       "patch_name": "5_0_5_blueprints_catalog_improvements", 
       "supports_community": false
-    },
+    }, 
     {
       "patch_definition_path": "505_restore_scheduled_tasks_from_snapshot.json", 
       "patch_description": "Properly restore scheduled executions from snapshots.", 
@@ -276,6 +276,17 @@
       "patch_hash": "65de554d116c7279b3ffb9340c61e44dedc3a0dfed18822101a44df42a3e70f0", 
       "patch_id": "5_0_5_no_dateutil_in_snapshot_restore-65de554d116c7279b3ffb9340c61e44dedc3a0dfed18822101a44df42a3e70f0", 
       "patch_name": "5_0_5_no_dateutil_in_snapshot_restore", 
+      "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "5_0_5_Fix_namespaced_input_list_parsing.json", 
+      "patch_description": "Fix namespaced input list parsing.", 
+      "patch_files": [
+        "5_0_5_Fix_namespaced_input_list_parsing_dsl_parser_framework_parser.py"
+      ], 
+      "patch_hash": "036f0c97c320913a2c44c039aee992c6b39135a8aeee593b3cdaa7824b2d3405", 
+      "patch_id": "5_0_5_Fix_namespaced_input_list_parsing-036f0c97c320913a2c44c039aee992c6b39135a8aeee593b3cdaa7824b2d3405", 
+      "patch_name": "5_0_5_Fix_namespaced_input_list_parsing", 
       "supports_community": false
     }
   ]

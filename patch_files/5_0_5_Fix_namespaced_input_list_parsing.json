@@ -1,0 +1,59 @@
+{
+    "affected_services": [
+        "cloudify-status-reporter", 
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Fix namespaced input list parsing.", 
+    "manager_versions": [
+        "5.0.5"
+    ], 
+    "node_types": [
+        "manager", 
+        "db", 
+        "broker"
+    ], 
+    "patch_version": "2.1.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/status-reporter/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py", 
+                "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/framework/parser.py"
+            ], 
+            "patch_file": "5_0_5_Fix_namespaced_input_list_parsing_dsl_parser_framework_parser.py", 
+            "sha256sum": "20d8ada1996537d726e83b1fd1903b0f233fb9afed4d6f275220aafa3e1a626e"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "a06ce5d0b6de305d3d82190a684ad41705f93368e5484143646997a4e65a689e"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "a06ce5d0b6de305d3d82190a684ad41705f93368e5484143646997a4e65a689e"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "a06ce5d0b6de305d3d82190a684ad41705f93368e5484143646997a4e65a689e"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "a06ce5d0b6de305d3d82190a684ad41705f93368e5484143646997a4e65a689e"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "7b5d76699bf3edfeb650fd7d1e5acd64227af3826e3f09712bbf785305a19885"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "7b5d76699bf3edfeb650fd7d1e5acd64227af3826e3f09712bbf785305a19885"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "7b5d76699bf3edfeb650fd7d1e5acd64227af3826e3f09712bbf785305a19885"
+        ], 
+        "/opt/status-reporter/env/lib/python2.7/site-packages/dsl_parser/framework/parser.py": [
+            "7b5d76699bf3edfeb650fd7d1e5acd64227af3826e3f09712bbf785305a19885"
+        ]
+    }
+}
