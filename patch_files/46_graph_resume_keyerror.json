@@ -1,0 +1,126 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker",
+        "cloudify-restservice"
+    ],
+    "community": false,
+    "description": "Restore all operations when resuming graphs.",
+    "manager_versions": [
+        "4.6"
+    ],
+    "patch_version": "2.0.0",
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify_rest_client/operations.py",
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_rest_client/operations.py",
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_rest_client/operations.py"
+            ],
+            "patch_file": "46_graph_resume_keyerror_1_cloudify_rest_client_operations.py",
+            "sha256sum": "501ccb021e7f3f2a912c67e1bc403be195103f38a738f79b4d4875d1f4e1176c"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/tests/test_tasks_graph.py",
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/tests/test_tasks_graph.py",
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/tests/test_tasks_graph.py"
+            ],
+            "patch_file": "46_graph_resume_keyerror_1_cloudify_tests_test_tasks_graph.py",
+            "sha256sum": "8644b2ca1dcf63e5874ea7354d8b02862d257f09f46e2c17f132cbda422b62ae"
+        },
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py"
+            ],
+            "patch_file": "46_graph_resume_keyerror_1_cloudify_workflows_workflow_context.py",
+            "sha256sum": "4b4a4d3465279ae26ac9ee142b292608e6ae8b5446ccf9c35b4d788f0f63f4cb"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/tasks_graph.py",
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks_graph.py",
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/tasks_graph.py"
+            ],
+            "patch_file": "46_graph_resume_keyerror_1_cloudify_workflows_tasks_graph.py",
+            "sha256sum": "a0be4b6bdc09c55cc15f68988f5e777efc93742c47bbb8b6bde25cb6fbb27e8c"
+        },
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/storage_manager.py"
+            ],
+            "patch_file": "46_graph_resume_keyerror_2_rest-service_manager_rest_storage_storage_manager.py",
+            "sha256sum": "fe5f99aac9cb23a5a1bf1e2ec902a01100dd7f17a5a5988ce6bfc2026c465676"
+        }
+    ],
+    "premium": true,
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/tests/test_tasks_graph.py": [
+            "3b24232562ad59e26e0270afed14f62be1a5c56cb09fc82547b059c96b9d9cf8"
+        ],
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/tasks_graph.py": [
+            "9c79f7a9c01f6cfae865492d3ca7885857551cc5b0381b81b3f70350d1234e09"
+        ],
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_rest_client/operations.py": [
+            "9a4b059fa509e344d7c6567dcf0f301495cff3357b3d926a2d21778a2902a456"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/tests/test_tasks_graph.py": [
+            "3b24232562ad59e26e0270afed14f62be1a5c56cb09fc82547b059c96b9d9cf8"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/tasks_graph.py": [
+            "9c79f7a9c01f6cfae865492d3ca7885857551cc5b0381b81b3f70350d1234e09"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_rest_client/operations.py": [
+            "9a4b059fa509e344d7c6567dcf0f301495cff3357b3d926a2d21778a2902a456"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/tests/test_tasks_graph.py": [
+            "3b24232562ad59e26e0270afed14f62be1a5c56cb09fc82547b059c96b9d9cf8"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks_graph.py": [
+            "9c79f7a9c01f6cfae865492d3ca7885857551cc5b0381b81b3f70350d1234e09"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "5530aefc0a7e3ffd72978e48ff4998a691b6fbf31e7f0b7b6792affc96ebfd14"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_rest_client/operations.py": [
+            "9a4b059fa509e344d7c6567dcf0f301495cff3357b3d926a2d21778a2902a456"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/storage_manager.py": [
+            "a396b51628ccb58cf6f876e5b14a72186fa80fbe262dfd777f1035fe39c04358"
+        ]
+    },
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/tests/test_tasks_graph.py": [
+            "e67e1bbdc4b0bd2b4476e2c05a203b6bd8bebc9d6d08d3749c2df7d32b4ec89b"
+        ],
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/workflows/tasks_graph.py": [
+            "d1eac3e138a7e2fe10c8b31da5ed6cf013d31d9903b2abb40d53385e55d7137f"
+        ],
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify_rest_client/operations.py": [
+            "28f0e3e14b1b5b10b17f1d7316c4746ca95dade1379d536bcb741d155ada9e59"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/tests/test_tasks_graph.py": [
+            "e67e1bbdc4b0bd2b4476e2c05a203b6bd8bebc9d6d08d3749c2df7d32b4ec89b"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/workflows/tasks_graph.py": [
+            "d1eac3e138a7e2fe10c8b31da5ed6cf013d31d9903b2abb40d53385e55d7137f"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify_rest_client/operations.py": [
+            "28f0e3e14b1b5b10b17f1d7316c4746ca95dade1379d536bcb741d155ada9e59"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/tests/test_tasks_graph.py": [
+            "e67e1bbdc4b0bd2b4476e2c05a203b6bd8bebc9d6d08d3749c2df7d32b4ec89b"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks_graph.py": [
+            "d1eac3e138a7e2fe10c8b31da5ed6cf013d31d9903b2abb40d53385e55d7137f"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/workflow_context.py": [
+            "01949990a87ad26b03c58b745422efd4aaf86a801ef50cdd6933e4749387be67"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_rest_client/operations.py": [
+            "28f0e3e14b1b5b10b17f1d7316c4746ca95dade1379d536bcb741d155ada9e59"
+        ],
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/storage_manager.py": [
+            "1c8a431ce7e3394ab59f320c89ad39297cc4201399e43f0e6b90c38a23051efc"
+        ]
+    }
+}

@@ -461,7 +461,7 @@
       "patch_id": "4_6_adding_execution_creator_username_to_logs-df62f894e7dd1403aeb63df8b382f1743d3e4e1b4d589ad118d6958a0055736d", 
       "patch_name": "4_6_adding_execution_creator_username_to_logs", 
       "supports_community": false
-    },
+    }, 
     {
       "patch_definition_path": "4_6_clean_rabbit.json", 
       "patch_description": "Routinely remove old queues and exchanges from rabbit.", 
@@ -472,6 +472,21 @@
       "patch_hash": "a78a8968e6ca656d5833373cdcbb75f70a4cfa722434e32c445a0f32a1193eec", 
       "patch_id": "4_6_clean_rabbit-a78a8968e6ca656d5833373cdcbb75f70a4cfa722434e32c445a0f32a1193eec", 
       "patch_name": "4_6_clean_rabbit", 
+      "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_graph_resume_keyerror.json", 
+      "patch_description": "Restore all operations when resuming graphs.", 
+      "patch_files": [
+        "46_graph_resume_keyerror_1_cloudify_rest_client_operations.py", 
+        "46_graph_resume_keyerror_1_cloudify_tests_test_tasks_graph.py", 
+        "46_graph_resume_keyerror_1_cloudify_workflows_workflow_context.py", 
+        "46_graph_resume_keyerror_1_cloudify_workflows_tasks_graph.py", 
+        "46_graph_resume_keyerror_2_rest-service_manager_rest_storage_storage_manager.py"
+      ], 
+      "patch_hash": "a538a94c860499e0c52e9ad2a21da00d8672e2f82f7c72ab1e9f8d99ee56dce6", 
+      "patch_id": "46_graph_resume_keyerror-a538a94c860499e0c52e9ad2a21da00d8672e2f82f7c72ab1e9f8d99ee56dce6", 
+      "patch_name": "46_graph_resume_keyerror", 
       "supports_community": false
     }
   ]
