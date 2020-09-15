@@ -1,0 +1,83 @@
+{
+    "affected_services": [
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Lightweight deployment delete.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/storage_manager.py"
+            ], 
+            "patch_file": "46_delete_deployment_rest-service_manager_rest_storage_storage_manager.py", 
+            "sha256sum": "16202037067d31e913d64dda6a2053a5a2cbc3ca333be0e1b86f5e3862048b7d"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v1/deployments.py"
+            ], 
+            "patch_file": "46_delete_deployment_rest-service_manager_rest_rest_resources_v1_deployments.py", 
+            "sha256sum": "7cb1f9b1454739ddd02a9cc55621bb1808c1c07771935276e843c1abe432e72a"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/relationships.py"
+            ], 
+            "patch_file": "46_delete_deployment_rest-service_manager_rest_storage_relationships.py", 
+            "sha256sum": "2d7b779216048a98a6b654886e1d9bddb9c332c4d2ae42135a6a5e275a9cd6e0"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/resource_models.py"
+            ], 
+            "patch_file": "46_delete_deployment_rest-service_manager_rest_storage_resource_models.py", 
+            "sha256sum": "7543026c1478e017caa72e549cee1f2250490b7001c29792a971b9f25843f887"
+        }, 
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py"
+            ], 
+            "patch_file": "46_delete_deployment_rest-service_manager_rest_resource_manager.py", 
+            "sha256sum": "2b171cfacb8a24c49b3e0fc2f296ef0f43d16e5a2ff8318974b16c76891e83fb"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "00812402af5278595c997bcf5125bc5e7b0e8e13b3d0513661d2d95f3d63fce7"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v1/deployments.py": [
+            "d7f966748ff943eaf376c8b4c637d467800402a48c5965703fcf365b96370821"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/relationships.py": [
+            "07f0451cf56bfff765f7a47f1af6215795d0f8694b86870d0d3d09604d186a73"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/resource_models.py": [
+            "44484acdfd97bb0f738bea8546123a3513ff78768f67775c99c88d69caedb629"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/storage_manager.py": [
+            "156e48bfae1b1c3b7c7a1e4dafef043f188c6c0337cc624c43e494f99a744b78"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/resource_manager.py": [
+            "94e1dddabde18ce7d50146d1ce59eced7616c9b7e8a11050607b9e0b02ce94ca"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/rest/resources_v1/deployments.py": [
+            "5dcbd6fd82779206b7de99c3ffffbbc412f2d3bef105fba5014883577b996bca"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/relationships.py": [
+            "e3a0b8ae7047725eea09880c5219aad0e47cff8bb37c6cccce6a4311cc032869"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/resource_models.py": [
+            "3ef7344e6a0f0afb17b9d43bc47011d5f49219817e36bfec453fefb618249a80"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/manager_rest/storage/storage_manager.py": [
+            "a396b51628ccb58cf6f876e5b14a72186fa80fbe262dfd777f1035fe39c04358"
+        ]
+    }
+}

@@ -488,6 +488,21 @@
       "patch_id": "46_graph_resume_keyerror-a538a94c860499e0c52e9ad2a21da00d8672e2f82f7c72ab1e9f8d99ee56dce6", 
       "patch_name": "46_graph_resume_keyerror", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_delete_deployment.json", 
+      "patch_description": "Lightweight deployment delete.", 
+      "patch_files": [
+        "46_delete_deployment_rest-service_manager_rest_storage_storage_manager.py", 
+        "46_delete_deployment_rest-service_manager_rest_rest_resources_v1_deployments.py", 
+        "46_delete_deployment_rest-service_manager_rest_storage_relationships.py", 
+        "46_delete_deployment_rest-service_manager_rest_storage_resource_models.py", 
+        "46_delete_deployment_rest-service_manager_rest_resource_manager.py"
+      ], 
+      "patch_hash": "157a39aa065912c23a19ae159259d5bf30b5bc5d7d481c05d88f12095d188352", 
+      "patch_id": "46_delete_deployment-157a39aa065912c23a19ae159259d5bf30b5bc5d7d481c05d88f12095d188352", 
+      "patch_name": "46_delete_deployment", 
+      "supports_community": false
     }
   ]
 }
