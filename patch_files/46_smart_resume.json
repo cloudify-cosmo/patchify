@@ -1,0 +1,59 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker", 
+        "cloudify-restservice"
+    ], 
+    "community": false, 
+    "description": "Smart resume of the install workflow.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/lifecycle.py", 
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/lifecycle.py", 
+                "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/plugins/lifecycle.py"
+            ], 
+            "patch_file": "46_smart_resume_cloudify_plugins_lifecycle.py", 
+            "sha256sum": "ac616b6c30a428b28d257169def6871d48610af18f0da1b82908e0890b47baab"
+        },
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py"
+            ], 
+            "patch_file": "46_smart_resume_cloudify_workflows_tasks.py", 
+            "sha256sum": "25f39491572d320c6193c89f5a7b6849943b259ab57e14895a12c580162ab63c"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/plugins/lifecycle.py": [
+            "b6f9ecc2da80b9663b36fa318b9040f319f755b5ae4e77d1352da5388f3dac6a"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/lifecycle.py": [
+            "b6f9ecc2da80b9663b36fa318b9040f319f755b5ae4e77d1352da5388f3dac6a"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/lifecycle.py": [
+            "b6f9ecc2da80b9663b36fa318b9040f319f755b5ae4e77d1352da5388f3dac6a"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "79c5c5634eecad095e5a66070247539cd187f1b8bb44900d9bf1c832752ef9f6"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/cfy/embedded/lib/python2.7/site-packages/cloudify/plugins/lifecycle.py": [
+            "a586b2957666eb438c0808c136443722218dff18c6c2f0a792345f7c21157a41"
+        ], 
+        "/opt/manager/env/lib/python2.7/site-packages/cloudify/plugins/lifecycle.py": [
+            "a586b2957666eb438c0808c136443722218dff18c6c2f0a792345f7c21157a41"
+        ], 
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/plugins/lifecycle.py": [
+            "a586b2957666eb438c0808c136443722218dff18c6c2f0a792345f7c21157a41"
+        ],
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "c00bbd6b24594f3b8cba12af704564bd3fc6986489f64e6b58f845a51a8be759"
+        ]
+    }
+}

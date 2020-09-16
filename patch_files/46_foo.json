@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ], 
+    "community": false, 
+    "description": "Foo.", 
+    "manager_versions": [
+        "4.6"
+    ], 
+    "patch_version": "2.0.0", 
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py"
+            ], 
+            "patch_file": "46_foo_cloudify_workflows_tasks.py", 
+            "sha256sum": "25f39491572d320c6193c89f5a7b6849943b259ab57e14895a12c580162ab63c"
+        }
+    ], 
+    "premium": true, 
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "79c5c5634eecad095e5a66070247539cd187f1b8bb44900d9bf1c832752ef9f6"
+        ]
+    }, 
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify/workflows/tasks.py": [
+            "c00bbd6b24594f3b8cba12af704564bd3fc6986489f64e6b58f845a51a8be759"
+        ]
+    }
+}

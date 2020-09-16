@@ -503,6 +503,18 @@
       "patch_id": "46_delete_deployment-157a39aa065912c23a19ae159259d5bf30b5bc5d7d481c05d88f12095d188352", 
       "patch_name": "46_delete_deployment", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "46_smart_resume.json", 
+      "patch_description": "Smart resume of the install workflow.", 
+      "patch_files": [
+        "46_smart_resume_cloudify_plugins_lifecycle.py", 
+        "46_smart_resume_cloudify_workflows_tasks.py"
+      ], 
+      "patch_hash": "05fffd2cfaf058b9f513ba6ead0b2e4e0461838355134ccb5bbcfa72374b73c8", 
+      "patch_id": "46_smart_resume-05fffd2cfaf058b9f513ba6ead0b2e4e0461838355134ccb5bbcfa72374b73c8", 
+      "patch_name": "46_smart_resume", 
+      "supports_community": false
     }
   ]
 }
