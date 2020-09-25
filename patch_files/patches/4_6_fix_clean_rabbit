@@ -1,0 +1,26 @@
+--- clean-rabbit    2020-09-24 11:59:06.759732263 +0000
++++ clean-rabbit.new    2020-09-24 11:57:38.807732263 +0000
+@@ -122,7 +122,12 @@
+     # part of the queue, instead only capturing the instance name.
+     queue_mangler = re.compile('(.*)_(?:service|workflow|operation)$')
+
+-    for tenant in get_tenants(storage_manager):
++    tenants = get_tenants(storage_manager)
++    expected_instances = set()
++    for tenant in tenants:
++        expected_instances.update(get_instances_for_tenant(storage_manager, tenant))
++
++    for tenant in tenants:
+         queues = list_rabbit_entities(rmq_client, tenant, 'queues')
+         queue_instances = {queue_mangler.findall(queue['name'])[0]
+                            for queue in queues.json()
+@@ -135,8 +140,6 @@
+
+         instances = queue_instances | exchange_instances
+
+-        expected_instances = get_instances_for_tenant(storage_manager, tenant)
+-
+         to_delete = instances - expected_instances
+
+         for instance_id in to_delete:
+

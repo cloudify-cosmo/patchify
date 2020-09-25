@@ -1,0 +1,28 @@
+{
+  "patch_version": "2.0.0",
+  "description": "Don't remove queues that are shared between tenants.",
+  "manager_versions": ["4.6"],
+  "community": true,
+  "premium": true,
+  "patches": [
+    {
+      "patch_file": "4_6_fix_clean_rabbit",
+      "sha256sum": "021b2aef85e724583d0fbd3ff98abba7bbcc2ac949467e43916dd5e6d89e208e",
+      "destinations": ["/opt/cloudify/clean-rabbit"]
+    },
+    {
+      "patch_file": "4_6_fix_clean_rabbit_cron",
+      "sha256sum": "b03d49bf21c6b93c4bd981908f684c08d52b5cf9afb98ed47e8fe28c64bc6e2e",
+      "destinations": ["/etc/cron.d/cloudify-clean-rabbit"]
+    }
+  ],
+  "affected_services": [],
+  "sha256sums_before": {
+    "/opt/cloudify/clean-rabbit": ["52da06d95e686ee4a3f4ff0cfec5dfc509a1e32e49cfe598658f753750783670"],
+    "/etc/cron.d/cloudify-clean-rabbit": ["7f679a3134ab91951e9903e67b7dcf03dc61269aa1a6ddeeaf299506f211a2ef"]
+  },
+  "sha256sums_after": {
+    "/opt/cloudify/clean-rabbit": ["3884f879fa9dbc68877b8e2af310244d1fd73f46d93d767b7355fc8db8937010"],
+    "/etc/cron.d/cloudify-clean-rabbit": ["8baebec11800002dbc92523c7489aead788d39d48285aa304ffa48423d3d044e"]
+  }
+}

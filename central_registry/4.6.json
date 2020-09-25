@@ -515,6 +515,18 @@
       "patch_id": "46_smart_resume-05fffd2cfaf058b9f513ba6ead0b2e4e0461838355134ccb5bbcfa72374b73c8", 
       "patch_name": "46_smart_resume", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "4_6_fix_clean_rabbit.json", 
+      "patch_description": "Don't remove queues that are shared between tenants.", 
+      "patch_files": [
+        "4_6_fix_clean_rabbit", 
+        "4_6_fix_clean_rabbit_cron"
+      ], 
+      "patch_hash": "54752181e5f1ac886f82ee0f48c21ea5986e76a83b767a3a0392c98b2a227835", 
+      "patch_id": "4_6_fix_clean_rabbit-54752181e5f1ac886f82ee0f48c21ea5986e76a83b767a3a0392c98b2a227835", 
+      "patch_name": "4_6_fix_clean_rabbit", 
+      "supports_community": true
     }
   ]
 }

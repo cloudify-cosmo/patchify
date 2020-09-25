@@ -1,0 +1,5 @@
+--- cloudify-clean-rabbit.orig  2020-09-24 11:53:23.421742559 +0000
++++ cloudify-clean-rabbit   2020-09-24 11:54:30.386734576 +0000
+@@ -1 +1 @@
+-* */4 * * * root /opt/manager/env/bin/python /opt/cloudify/clean-rabbit
++0 */4 * * * root /opt/manager/env/bin/python /opt/cloudify/clean-rabbit
