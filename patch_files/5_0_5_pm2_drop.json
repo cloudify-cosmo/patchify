@@ -1,0 +1,152 @@
+{
+    "affected_services": [
+        "cloudify-stage"
+    ],
+    "community": false,
+    "description": "Remove PM2 from Stage backend.",
+    "manager_versions": [
+        "5.0.5"
+    ],
+    "node_types": [
+        "manager"
+    ],
+    "patch_version": "2.1.0",
+    "patches": [
+        {
+            "destinations": [
+
+                "/opt/cloudify-stage/backend/ecosystem.config.js"
+            ],
+            "patch_file": "5_0_5_pm2_drop_backend_ecosystem.config.js",
+            "sha256sum": "41239c53c6e8a6c3accb6244ed1f99e79f32f1eb0498017ad3366ae224938d5e"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/conf/app.json"
+            ],
+            "patch_file": "5_0_5_pm2_drop_conf_app.json",
+            "sha256sum": "3b2fdf271bf6e51cb5358bfbd47640663f0e0abc506f7b8880a882487de83ea1"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/backend/server.js"
+            ],
+            "patch_file": "5_0_5_pm2_drop_backend_server.js",
+            "sha256sum": "6b8f881d2d4f608a0547f532446c130634e7c428310f6c8d2ecf6dea18288388"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/backend/package.json"
+            ],
+            "patch_file": "5_0_5_pm2_drop_backend_package.json",
+            "sha256sum": "c05487349ed734e5863cc22a82bd805dc51151620389ba1bcf1518ec30ed03a2"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/backend/handler/LoggerHandler.js"
+            ],
+            "patch_file": "5_0_5_pm2_drop_backend_handler_LoggerHandler.js",
+            "sha256sum": "0bd17ba6a97e5f0a9ce80aacf353f7216fa3834e20c855a99d1ed8e4c53e26ca"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/backend/package-lock.json"
+            ],
+            "patch_file": "5_0_5_pm2_drop_backend_package-lock.json",
+            "sha256sum": "c00c6b74557b9f5e9acde4efb0cac180e69028c750e5a5cf9fc8d94ead4192ee"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/conf/README.md"
+            ],
+            "patch_file": "5_0_5_pm2_drop_conf_README.md",
+            "sha256sum": "d6ee4184e88280facd0a0b4af75436747475cb75b037ea8f41fef728ffc09fea"
+        },
+        {
+            "destinations": [
+                "/opt/cloudify-stage/backend/README.md"
+            ],
+            "patch_file": "5_0_5_pm2_drop_backend_README.md",
+            "sha256sum": "d101370a205ef37a5e10ee708af324775e12fe0d807f4177e02537ed2367864b"
+        },
+        {
+            "destinations": [
+                "/usr/lib/systemd/system/cloudify-stage.service"
+            ],
+            "patch_file": "5_0_5_pm2_drop_system_cloudify-stage.service",
+            "sha256sum": "c6b31083d7032ed7160a99fe3523adec8d657593798240a56f141d656b2c3349"
+        },
+        {
+            "destinations": [
+                "/etc/sysconfig/cloudify-stage"
+            ],
+            "patch_file": "5_0_5_pm2_drop_system_cloudify-stage",
+            "sha256sum": "2d1bfbb8d575ebb03acd179327f3c8da8577271f33747f1766e625a4e9880602"
+        }
+    ],
+    "premium": true,
+    "sha256sums_after": {
+        "/opt/cloudify-stage/backend/ecosystem.config.js": [
+            "DOESNOTEXIST"
+        ],
+        "/opt/cloudify-stage/backend/README.md": [
+            "11774bdaf170dda22271f3cd416112b622ebc360b5479169d03dc5d2761b1c47"
+        ],
+        "/opt/cloudify-stage/backend/handler/LoggerHandler.js": [
+            "bb64e21551799a44321f8540681ffa819cbce3bdb8d01789de36c8dc748715bc"
+        ],
+        "/opt/cloudify-stage/backend/package-lock.json": [
+            "d23d8fb36617e9e5287be8ed2df4160a197b87eb99fe1d085c10b590eacfec8a"
+        ],
+        "/opt/cloudify-stage/backend/package.json": [
+            "5413f72612241a029ea0ec67d7525c3fbfb0a40fe81ca975724c9dd741e09bc5"
+        ],
+        "/opt/cloudify-stage/backend/server.js": [
+            "a3afd7612f5627f4d2b9c76f2c53b95f79222c6826bbd91e70b243aa399ee0bd"
+        ],
+        "/opt/cloudify-stage/conf/app.json": [
+            "25571a8ed3c03595d3b32bc0f03961d07738fba58b71522f4d6cbca5f4ba3034"
+        ],
+        "/opt/cloudify-stage/conf/README.md": [
+            "35618c949800b77d86c7d87a067676408525c305a45e42efa3077f5e1a0d37c6"
+        ],
+        "/usr/lib/systemd/system/cloudify-stage.service": [
+            "b881600a5158c4b7318d64ad80a8d38a68673de16a1e56c6b4abf5895357b709"
+        ],
+        "/etc/sysconfig/cloudify-stage": [
+            "d7546b84d0bad9d371243c16b79b6d2d819d602b776973911aff7f4ad75c8b61"
+        ]
+    },
+    "sha256sums_before": {
+        "/opt/cloudify-stage/backend/ecosystem.config.js": [
+            "c71f16765e8472e3daaa0a3f585a2697547fce4ea79e71bd24614418d8df9508"
+        ],
+        "/opt/cloudify-stage/backend/README.md": [
+            "dff00b39598803376f8dd0e4128417b09a6bdfc250b30c2a9cd5312283f9a25a"
+        ],
+        "/opt/cloudify-stage/backend/handler/LoggerHandler.js": [
+            "e043e111051927484d00c27935f3ab1df1ed700f4d67c8a2bc1021969ba1b429"
+        ],
+        "/opt/cloudify-stage/backend/package-lock.json": [
+            "38ab0d2e18112f1b96e292c923edeb3273d490421a992545ff6998dc590a2a52"
+        ],
+        "/opt/cloudify-stage/backend/package.json": [
+            "dd0f09e40118c5055103e344297956ce15e126d54759e7357b07c5487020611e"
+        ],
+        "/opt/cloudify-stage/backend/server.js": [
+            "bb6a2a3e51aa3aac789bf5923cb430878526d89a15c8d38c0f6c8c5797708cce"
+        ],
+        "/opt/cloudify-stage/conf/app.json": [
+            "b145b4fcf93bc0d34c0e92de8d463ad4dccee7e70f9cb70ee28faa6f5606024a"
+        ],
+        "/opt/cloudify-stage/conf/README.md": [
+            "d86c9f585a55b1b2c528917a23607024226ac8efd9efd1b82a45f8d4b572969b"
+        ],
+        "/usr/lib/systemd/system/cloudify-stage.service": [
+            "7b0535c8453c60decc5f4a70efb524b3a3a103a1f447293eba933d0e1ccd70a8"
+        ],
+        "/etc/sysconfig/cloudify-stage": [
+            "69b57085337cd767991664a856297a9692c6cb0bb2587488e834d55b5271a215"
+        ]
+    }
+}

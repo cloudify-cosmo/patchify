@@ -1,0 +1,11 @@
+diff --git a/etc/sysconfig/cloudify-stage b/../cloudify-manager-install/cfy_manager/components/stage/config/cloudify-stage
+index 2fc20c0..d6849c6 100644
+--- a/etc/sysconfig/cloudify-stage
++++ b/../cloudify-manager-install/cfy_manager/components/stage/config/cloudify-stage
+@@ -1,5 +1,3 @@
+ NODEJS_HOME=/opt/nodejs
+ STAGE_HOME=/opt/cloudify-stage
+ STAGE_BACKEND_ARGS=
+-STAGE_BACKEND_INSTANCES=0
+-PM2_HOME=/opt/cloudify-stage/.pm2
+\ No newline at end of file

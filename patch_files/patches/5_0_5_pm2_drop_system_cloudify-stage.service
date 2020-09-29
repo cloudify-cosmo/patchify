@@ -1,0 +1,29 @@
+diff --git a/usr/lib/systemd/system/cloudify-stage.service b/../cloudify-manager-install/cfy_manager/components/stage/config/cloudify-stage.service
+index c850f56..591bf4a 100644
+--- a/usr/lib/systemd/system/cloudify-stage.service
++++ b/../cloudify-manager-install/cfy_manager/components/stage/config/cloudify-stage.service
+@@ -4,21 +4,14 @@ Wants=network-online.target
+ After=network-online.target
+ 
+ [Service]
+-Type=forking
+-LimitNOFILE=infinity
+-LimitNPROC=infinity
+-LimitCORE=infinity
+-Restart=on-failure
++Restart=always
+ RestartSec=10
+-PIDFile=/opt/cloudify-stage/.pm2/pm2.pid
+ EnvironmentFile=/etc/sysconfig/cloudify-stage
+ User=stage_user
+ Group=stage_group
+ WorkingDirectory=/opt/cloudify-stage/backend
+ ExecStart=/opt/nodejs/bin/npm run start
+-ExecStop=/opt/nodejs/bin/npm run stop
+-ExecReload=/opt/nodejs/bin/npm run restart
+ UMask=0002
+ 
+ [Install]
+-WantedBy=multi-user.target
+\ No newline at end of file
++WantedBy=multi-user.target

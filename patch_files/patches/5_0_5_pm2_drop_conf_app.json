@@ -1,0 +1,14 @@
+diff --git a/opt/cloudify-stage/conf/app.json b/opt/cloudify-stage/conf/app.json
+index f7cb2d8..0aaed6e 100644
+--- a/opt/cloudify-stage/conf/app.json
++++ b/opt/cloudify-stage/conf/app.json
+@@ -50,5 +50,7 @@
+             "widget.png"
+         ],
+         "tempDir": "cloudifyWidgets"
+-    }
++    },
++    "logsFile": "/var/log/cloudify/stage/server-output.log",
++    "errorsFile": "/var/log/cloudify/stage/server-error.log"
+ }
+\ No newline at end of file

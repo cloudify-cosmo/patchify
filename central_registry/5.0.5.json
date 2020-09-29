@@ -288,6 +288,26 @@
       "patch_id": "5_0_5_Fix_namespaced_input_list_parsing-036f0c97c320913a2c44c039aee992c6b39135a8aeee593b3cdaa7824b2d3405", 
       "patch_name": "5_0_5_Fix_namespaced_input_list_parsing", 
       "supports_community": false
+    }, 
+    {
+      "patch_definition_path": "5_0_5_pm2_drop.json", 
+      "patch_description": "Remove PM2 from Stage backend.", 
+      "patch_files": [
+        "5_0_5_pm2_drop_backend_ecosystem.config.js", 
+        "5_0_5_pm2_drop_conf_app.json", 
+        "5_0_5_pm2_drop_backend_server.js", 
+        "5_0_5_pm2_drop_backend_package.json", 
+        "5_0_5_pm2_drop_backend_handler_LoggerHandler.js", 
+        "5_0_5_pm2_drop_backend_package-lock.json", 
+        "5_0_5_pm2_drop_conf_README.md", 
+        "5_0_5_pm2_drop_backend_README.md", 
+        "5_0_5_pm2_drop_system_cloudify-stage.service", 
+        "5_0_5_pm2_drop_system_cloudify-stage"
+      ], 
+      "patch_hash": "ebf79d6ece3db76368e26397547c57300361ba60e857f2537de448ee2e465785", 
+      "patch_id": "5_0_5_pm2_drop-ebf79d6ece3db76368e26397547c57300361ba60e857f2537de448ee2e465785", 
+      "patch_name": "5_0_5_pm2_drop", 
+      "supports_community": false
     }
   ]
 }
