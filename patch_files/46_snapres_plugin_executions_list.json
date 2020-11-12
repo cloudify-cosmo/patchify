@@ -1,0 +1,31 @@
+{
+    "affected_services": [
+        "cloudify-mgmtworker"
+    ],
+    "community": false,
+    "description": "Optimize plugin execution polling in snapshot-restore.",
+    "manager_versions": [
+        "4.6"
+    ],
+    "patch_version": "2.0.0",
+    "patches": [
+        {
+            "destinations": [
+                "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py"
+            ],
+            "patch_file": "46_snapres_plugin_executions_list_workflows_cloudify_system_workflows_snapshots_snapshot_restore.py",
+            "sha256sum": "4aa53131f4e3b566cabf4eed9784e178d9be645daeff166757536b0d16d1c496"
+        }
+    ],
+    "premium": true,
+    "sha256sums_after": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
+            "e62ae3e8f3ea03f8917ba924886058b1f35467f69c5bd82173b3261d67cf3dd5"
+        ]
+    },
+    "sha256sums_before": {
+        "/opt/mgmtworker/env/lib/python2.7/site-packages/cloudify_system_workflows/snapshots/snapshot_restore.py": [
+            "8dfa9b6b63c29dc884aae5429adae36cda75d6a9485a4717254cfac6e4fdbc33"
+        ]
+    }
+}
